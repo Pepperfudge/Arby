@@ -5,6 +5,7 @@ public class UCI {
 	static Game currGame = new Game();
 	public static void main(String[] args) {
 		Scanner input = new Scanner(System.in);
+		System.out.println("Whitey has arrived");
 		
 		while (true)
 	        {
