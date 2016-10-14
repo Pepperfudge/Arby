@@ -77,6 +77,15 @@ public class Game{
 			for (int j = 0; j < 8; j++){
 				if (board[i][j] == 'p'){
 					moves.addAll(generatePawnMoves(i, j));
+				}	
+				if (board[i][j] == 'k'){ 	
+					moves.addAll(generateKingMoves(i, j));
+				}
+				if (board[i][j] == 'r'){ 	
+					moves.addAll(generateRookMoves(i, j));
+				}
+				if (board[i][j] == 'b'){ 	
+					moves.addAll(generateBishopMoves(i, j));
 				}
 			}
 		}
@@ -100,6 +109,133 @@ public class Game{
 				moves.add(new Move(row, col, row+1,col+1));
 			} 
 		}		
+		return moves;
+	}
+	
+	private ArrayList<Move> generateKingMoves(int row, int col){
+		System.out.println("generateKingMoves");
+		ArrayList<Move> moves = new ArrayList<Move>();
+		
+		if (col +1 <=7) {
+			if (board[row][col +1] == 'x' || contains(whitePieces,board[row][col +1])) {
+			moves.add(new Move(row,col,row,col +1));
+			}
+		}	
+		if (col -1 >=0) {
+			if (board[row][col -1] == 'x' || contains(whitePieces,board[row][col -1]) ){
+			moves.add(new Move(row,col,row,col -1));
+			}
+		}	
+		if (row+1<=7){
+			if (board[row +1][col] == 'x' || contains(whitePieces,board[row+1][col] )){
+			moves.add(new Move(row, col, row +1,col));
+			}
+		}
+		if	(row-1>=0) {
+			if (board[row -1][col] == 'x' || contains(whitePieces,board[row-1][col] )){
+			moves.add(new Move(row,col,row -1,col));
+			}
+		}
+		if  (row +1 <= 7 && col+1 <=7) {
+			if (board[row +1][col +1] == 'x' || contains(whitePieces,board[row+1][col +1] )) {
+			moves.add(new Move(row,col,row +1,col +1));
+			}
+		}	
+		if  (row +1 <= 7 && col-1 >=0) {
+			if (board[row +1][ col -1] == 'x' || contains(whitePieces,board[row+1][col -1] )) {
+			moves.add(new Move(row,col,row +1, col -1));
+			}
+		}
+		if  (row -1 >= 0 && col+1 <=7) {
+			if (board[row -1][ col +1] == 'x' || contains(whitePieces,board[row-1][col +1] )) {
+			moves.add(new Move(row,col,row -1, col +1));
+			}
+		}
+		if  (row -1 >=0 && col+1 <=7) {
+			if (board[row -1][ col -1] == 'x' || contains(whitePieces,board[row-1][col -1] )) {
+			moves.add(new Move(row,col,row -1, col -1));
+			}
+		}		
+		return moves;
+	}
+	
+	private ArrayList<Move> generateRookMoves(int row, int col){
+		System.out.println("generateRookMoves");
+		ArrayList<Move> moves = new ArrayList<Move>();
+		
+		for (int i = row +1; i<=7; i++) {
+		    if (board[i][col] == 'x' || contains(whitePieces,board[i][col]) ) {
+			moves.add(new Move(row,col,i, col));
+			} 
+			if (board[i][col] != 'x' ) {
+			break;
+			}
+		}
+		for (int i = row -1; i>=0; i--) {
+		    if (board[i][col] == 'x' || contains(whitePieces,board[i][col] )) {
+			moves.add(new Move(row,col,i, col));
+			} 
+			if (board[i][col] != 'x')  {
+			break;
+			} 
+		} 		
+		for (int i = col +1; i<=7; i++) {
+			if (board[row][i] == 'x' || contains(whitePieces,board[row][i] )) {
+			moves.add(new Move(row,col,row, i));
+			} 
+			if (board[row][i] != 'x' ) {
+			break;
+			}
+		}
+		for (int i = col -1; i>=0; i--) {
+		    if (board[row][i] == 'x' || contains(whitePieces,board[row][i] )) {
+			moves.add(new Move(row,col,row, i));
+			} 
+			if (board[row][i] != 'x' ) {
+			break;
+			}  
+		} 
+		
+		return moves;
+	}
+	
+	private ArrayList<Move> generateBishopMoves(int row, int col){
+		System.out.println("generateBishopMoves");
+		ArrayList<Move> moves = new ArrayList<Move>();
+		
+		for (int i = row +1, j = col + 1; i<=7 && j <=7; i++, j++) {
+			if (board[i][j] == 'x' || contains(whitePieces,board[i][j] )) {
+			moves.add(new Move(row,col,i, j));
+			} 
+			if (board[i][j] != 'x' ) {
+			break;
+			}
+		}
+		for (int i = row +1, j = col -1; i<=7 && j >=0; i++, j--) {
+			if (board[i][j] == 'x' || contains(whitePieces,board[i][j] )) {
+			moves.add(new Move(row,col,i, j));
+			} 
+			if (board[i][j] != 'x' ) {
+			break;
+			}
+		}
+		for (int i = row -1, j = col +1; i>=0 && j <=7; i--, j++) {
+			if (board[i][j] == 'x' || contains(whitePieces,board[i][j] )) {
+			moves.add(new Move(row,col,i, j));
+			} 
+			if (board[i][j] != 'x')  {
+			break;
+			}
+		}
+		for (int i = row -1, j = col -1; i>=0 && j>=0; i--, j--) {
+			if (board[i][j] == 'x' || contains(whitePieces,board[i][j] )) {
+			moves.add(new Move(row,col,i, j));
+			} 
+			if (board[i][j] != 'x' ) {
+			break;
+			}
+		}
+				
 		return moves;
 	}
 	
