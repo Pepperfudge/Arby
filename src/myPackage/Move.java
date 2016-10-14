@@ -10,9 +10,9 @@ public class Move {
 	
 	public Move(String UCIFormat){
 		currColumn = letterToCol.get(UCIFormat.charAt(0));
-		currRow = 8 - Character.getNumericValue(UCIFormat.charAt(1));
+		currRow = Character.getNumericValue(UCIFormat.charAt(1)) - 1;
 		newColumn = letterToCol.get(UCIFormat.charAt(2));
-		newRow = 8 - Character.getNumericValue(UCIFormat.charAt(3));
+		newRow = Character.getNumericValue(UCIFormat.charAt(3)) - 1;
 	}
 	
 	public Move(int currRow, int currColumn, int newRow, int newColumn){
@@ -23,33 +23,33 @@ public class Move {
 	}
 	
 	public String convertToUCIFormat(){
-		return colToLetter.get(currColumn) + Integer.toString(8 - currRow) 
-			   + colToLetter.get(newColumn) + Integer.toString(8-newRow); 
+		return colToLetter.get(currColumn) + Integer.toString(currRow + 1) 
+			   + colToLetter.get(newColumn) + Integer.toString( newRow + 1); 
 	}
 	
 	private static HashMap<Character, Integer> createLettertoColumnMap(){
 		HashMap<Character, Integer> hash = new HashMap<Character, Integer> ();
-		hash.put('a', 0);
-		hash.put('b', 1);
-		hash.put('c', 2);
-		hash.put('d', 3);
-		hash.put('e', 4);
-		hash.put('f', 5);
-		hash.put('g', 6);
-		hash.put('h', 7);
+		hash.put('a', 7);
+		hash.put('b', 6);
+		hash.put('c', 5);
+		hash.put('d', 4);
+		hash.put('e', 3);
+		hash.put('f', 2);
+		hash.put('g', 1);
+		hash.put('h', 0);
 		return hash;
 	}
 	
 	private static HashMap<Integer, Character> createColumntoLetterMap(){
 		HashMap<Integer, Character> hash = new HashMap<Integer, Character> ();
-		hash.put(0,'a');
-		hash.put(1,'b');
-		hash.put(2,'c');
-		hash.put(3,'d');
-		hash.put(4,'e');
-		hash.put(5,'f');
-		hash.put(6,'g');
-		hash.put(7,'h');
+		hash.put(7,'a');
+		hash.put(6,'b');
+		hash.put(5,'c');
+		hash.put(4,'d');
+		hash.put(3,'e');
+		hash.put(2,'f');
+		hash.put(1,'g');
+		hash.put(0,'h');
 		return hash;
 	}
 }

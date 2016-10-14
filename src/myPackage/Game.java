@@ -3,14 +3,16 @@ package myPackage;
 import java.util.ArrayList;
 
 public class Game{
-	private char[][] board = {{'r','h','b','q','k','b','h','r'},
-							 {'p','p','p','p','p','p','p','p'},
-							 {'x','x','x','x','x','x','x','x'},
-							 {'x','x','x','x','x','x','x','x'},
-							 {'x','x','x','x','x','x','x','x'},
-							 {'x','x','x','x','x','x','x','x'},
+	private char[][] board = {{'R','N','B','K','Q','B','N','R'},
 							 {'P','P','P','P','P','P','P','P'},
-							 {'R','H','B','Q','K','B','H','R'}};
+							 {'x','x','x','x','x','x','x','x'},
+							 {'x','x','x','x','x','x','x','x'},
+							 {'x','x','x','x','x','x','x','x'},
+							 {'x','x','x','x','x','x','x','x'},
+							 {'p','p','p','p','p','p','p','p'},
+							 {'r','n','b','k','q','b','n','r'}};
+	
+	private char sideToMove;
 	
 	private static char[] whitePieces = {'R','H','B','Q','K','P'};
 	
@@ -18,6 +20,50 @@ public class Game{
 		board = copyBoard(prevPosition.board);
 		board[move.newRow][move.newColumn] = board[move.currRow][move.currColumn];
 		board[move.currRow][move.currColumn] = 'x';
+		if (prevPosition.sideToMove == 'w'){
+			this.sideToMove = 'b';
+		} else{
+			this.sideToMove = 'w';
+		}
+	}
+	/* Constructor to create game out of standard position format
+	   rnbqkbnr/pppppp1p/8/6p1/4P3/8/PPPP1PPP/RNBQKBNR w KQkq g6
+	   <Piece Placement>
+       ' ' <Side to move>
+       ' ' <Castling ability>
+       ' ' <En passant target square>
+	 */
+	public Game(String epdFormat){
+		String[] fields = epdFormat.split(" ");
+		
+		sideToMove = fields[1].charAt(0);
+		String[] piecePlacement = fields[0].split("/");
+		
+		
+		//iterate through every rank of the board
+		for(int i = 0; i < 8; i++){
+			String rank = piecePlacement[i];
+			int rowIndex = 7 - i;
+			int colIndex = 7;
+			//iterate through every piece of the rank
+			for (int j = 0; j < rank.length(); j++){
+				char piece = rank.charAt(j);
+				int emptySquares = Character.getNumericValue(piece);
+				//if piece is a number, fill empty squares with x's
+				if (Character.isDigit(piece)){
+					for (int k = 0; k < emptySquares; k++){
+						board[rowIndex][colIndex] = 'x';
+						colIndex--;
+					}
+				}else {
+					//otherwise add the piece to the matrix
+					board[rowIndex][colIndex] = piece;
+					colIndex--;
+				}
+			}
+		}
+		
+				
 	}
 	
 	public Game() {
@@ -37,7 +83,7 @@ public class Game{
 		return moves;
 	}
 	
-	private ArrayList<Move> generatePawnMoves(int row, int col){
+	public ArrayList<Move> generatePawnMoves(int row, int col){
 		System.out.println("generatePawnMoves");
 		ArrayList<Move> moves = new ArrayList<Move>();
 		if (row == 1 && board[3][col] == 'x'){
@@ -65,7 +111,7 @@ public class Game{
 		return copy;
 	}
 	
-	private static boolean contains(char[] array, char c){
+	public static boolean contains(char[] array, char c){
 		for (int i = 0; i<array.length; i++){
 			if (array[i] == c){
 				return true;
@@ -73,4 +119,5 @@ public class Game{
 		}
 		return false;
 	}
+	
 }
