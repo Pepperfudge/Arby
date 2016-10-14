@@ -12,12 +12,58 @@ public class Game{
 							 {'P','P','P','P','P','P','P','P'},
 							 {'R','H','B','Q','K','B','H','R'}};
 	
+private char sideToMove;
+	
 	private static char[] whitePieces = {'R','H','B','Q','K','P'};
 	
 	public Game(Game prevPosition,Move move){
 		board = copyBoard(prevPosition.board);
 		board[move.newRow][move.newColumn] = board[move.currRow][move.currColumn];
 		board[move.currRow][move.currColumn] = 'x';
+		if (prevPosition.sideToMove == 'w'){
+			this.sideToMove = 'b';
+		} else{
+			this.sideToMove = 'w';
+		}
+	}
+	/* Constructor to create game out of standard position format
+	   rnbqkbnr/pppppp1p/8/6p1/4P3/8/PPPP1PPP/RNBQKBNR w KQkq g6
+	   <Piece Placement>
+       ' ' <Side to move>
+       ' ' <Castling ability>
+       ' ' <En passant target square>
+	 */
+	public Game(String epdFormat){
+		String[] fields = epdFormat.split(" ");
+		
+		sideToMove = fields[1].charAt(0);
+		String[] piecePlacement = fields[0].split("/");
+		
+		
+		//iterate through every rank of the board
+		for(int i = 0; i < 8; i++){
+			String rank = piecePlacement[i];
+			int rowIndex = 7 - i;
+			int colIndex = 7;
+			//iterate through every piece of the rank
+			for (int j = 0; j < rank.length(); j++){
+				char piece = rank.charAt(j);
+				int emptySquares = Character.getNumericValue(piece);
+				//if piece is a number, fill empty squares with x's
+				if (Character.isDigit(piece)){
+					for (int k = 0; k < emptySquares; k++){
+						board[rowIndex][colIndex] = 'x';
+						colIndex--;
+					}
+				}else {
+					//otherwise add the piece to the matrix
+					board[rowIndex][colIndex] = piece;
+					colIndex--;
+				}
+			}
+		}
+		
+				
 	}
 	
 	public Game() {
@@ -131,6 +177,7 @@ public class Game{
 			moves.add(new Move(row,col,row -1, col +1));
 			}
 		}
+
 		if  (row -1 >=0 && col-1 >=0) {
 			if (board[row -1][ col -1] == 'x' || contains(whitePieces,board[row-1][col -1] )) {
 			moves.add(new Move(row,col,row -1, col -1));
@@ -338,7 +385,7 @@ public class Game{
 		}		
 		return moves;
 	}
-	
+
 	private static char[][] copyBoard(char[][] board){
 		char [][] copy = new char[board.length][];
 		for(int i = 0; i < board.length; i++){

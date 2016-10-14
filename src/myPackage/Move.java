@@ -27,6 +27,19 @@ public class Move {
 			   + colToLetter.get(newColumn) + Integer.toString( newRow + 1); 
 	}
 	
+	@Override
+	public boolean equals(Object obj){
+		if (obj == null) {
+	        return false;
+	    }
+	    if (!Move.class.isAssignableFrom(obj.getClass())) {
+	        return false;
+	    }
+	    final Move other = (Move) obj;
+	    return this.currColumn == other.currColumn && this.currRow == other.currRow 
+	    		&& this.newColumn == other.newColumn && this.newRow == other.newRow;
+	}
+	
 	private static HashMap<Character, Integer> createLettertoColumnMap(){
 		HashMap<Character, Integer> hash = new HashMap<Character, Integer> ();
 		hash.put('a', 7);
