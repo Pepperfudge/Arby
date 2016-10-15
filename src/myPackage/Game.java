@@ -72,7 +72,7 @@ public class Game{
 	}
 
 	public ArrayList<Move> generateLegalMoves(){
-		System.out.println("generateLegalMoves");
+//		System.out.println("generateLegalMoves");
 		ArrayList<Move> moves = new ArrayList<Move>();
 		for (int i = 0; i < 8; i++){
 			for (int j = 0; j < 8; j++){
@@ -120,7 +120,7 @@ public class Game{
 	}
 	
 	private ArrayList<Move> generatePawnMoves(int row, int col){
-		System.out.println("generatePawnMoves");
+//		System.out.println("generatePawnMoves");
 		ArrayList<Move> moves = new ArrayList<Move>();
 		if (row == 6 && board[5][col] == 'x' && board[4][col] == 'x'){
 			moves.add(new Move(row, col, 4, col));
@@ -140,7 +140,7 @@ public class Game{
 	}
 	
 	private ArrayList<Move> generateKingMoves(int row, int col){
-		System.out.println("generateKingMoves");
+//		System.out.println("generateKingMoves");
 		ArrayList<Move> moves = new ArrayList<Move>();
 		
 		if (col +1 <=7) {
@@ -188,7 +188,7 @@ public class Game{
 	}
 	
 	private ArrayList<Move> generateRookMoves(int row, int col){
-		System.out.println("generateRookMoves");
+//		System.out.println("generateRookMoves");
 		ArrayList<Move> moves = new ArrayList<Move>();
 		
 		for (int i = row +1; i<=7; i++) {
@@ -228,7 +228,7 @@ public class Game{
 	}
 	
 	private ArrayList<Move> generateBishopMoves(int row, int col){
-		System.out.println("generateBishopMoves");
+//		System.out.println("generateBishopMoves");
 		ArrayList<Move> moves = new ArrayList<Move>();
 		
 		for (int i = row +1, j = col + 1; i<=7 && j <=7; i++, j++) {
@@ -268,7 +268,7 @@ public class Game{
 	}
 	
 	private ArrayList<Move> generateQueenMoves(int row, int col){
-		System.out.println("generateQueenMoves");
+//		System.out.println("generateQueenMoves");
 		ArrayList<Move> moves = new ArrayList<Move>();
 		
 		for (int i = row +1, j = col + 1; i<=7 && j <=7; i++, j++) {
@@ -341,7 +341,7 @@ public class Game{
 	}
 	
 	private ArrayList<Move> generateKnightMoves(int row, int col){
-		System.out.println("generateKnightMoves");
+//		System.out.println("generateKnightMoves");
 		ArrayList<Move> moves = new ArrayList<Move>();
 		
 		if  (row +2 <= 7 && col+1 <=7) {

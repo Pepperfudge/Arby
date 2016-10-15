@@ -43,6 +43,9 @@ public class MoveGenerationTest {
 		return flag;
 	}
 	
+	/*Creates a list of Move objects out of the starting square 
+	 * and multiple destinations
+	 */
 	private static ArrayList<Move> makeMoves(String square, String destinations){
 		ArrayList<Move> moves = new ArrayList<Move>();
 		String[] destinationArray = destinations.split(" ");
@@ -54,8 +57,24 @@ public class MoveGenerationTest {
 	@Test
 	public void test() {
 		//rook can move in four directions 
-		assertTrue(checkLegalMoves("4k3/8/8/3r4/8/8/8/4K3 b - -",
+		assertTrue("Rook does not move correctly",
+				checkLegalMoves("4k3/8/8/3r4/8/8/8/4K3 b - -",
 				"d5", "c5 b5 a5 e5 f5 g5 h5 d6 d7 d8 d4 d3 d2 d1"));
+		assertTrue("Bishop does not move correctly",
+				checkLegalMoves("4k3/8/8/3b4/8/8/8/4K3 b - -",
+				"d5", "a8 b7 c6 e4 f3 g2 h1 a2 b3 c4 e6 f7 g8"));
+		assertTrue("Knight does not move correctly",
+				checkLegalMoves("4k3/8/8/3n4/8/8/8/4K3 b - - 0 1",
+				"d5", "c7 b6 b4 c3 e3 f4 f6 e7"));
+		assertTrue("Queen does not move correctly",
+				checkLegalMoves("4k3/8/8/3q4/8/8/8/4K3 b - - 0 1",
+				"d5", "c5 b5 a5 e5 f5 g5 h5 d6 d7 d8 d4 d3 d2 d1 "
+						+ "a8 b7 c6 e4 f3 g2 h1 a2 b3 c4 e6 f7 g8"));
+		assertTrue("King does not move correctly",
+				checkLegalMoves("8/8/8/3k4/8/8/8/4K3 b - - 0 1",
+				"d5", "c6 d6 e6 c5 e5 c4 d4 e4"));
+
+		
 	}
 		
 }
