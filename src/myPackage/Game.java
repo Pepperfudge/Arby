@@ -3,18 +3,19 @@ package myPackage;
 import java.util.ArrayList;
 
 public class Game{
-	private char[][] board = {{'r','h','b','q','k','b','h','r'},
-							 {'p','p','p','p','p','p','p','p'},
-							 {'x','x','x','x','x','x','x','x'},
-							 {'x','x','x','x','x','x','x','x'},
-							 {'x','x','x','x','x','x','x','x'},
-							 {'x','x','x','x','x','x','x','x'},
+	private char[][] board = {{'R','N','B','K','Q','B','N','R'},
 							 {'P','P','P','P','P','P','P','P'},
-							 {'R','H','B','Q','K','B','H','R'}};
+							 {'x','x','x','x','x','x','x','x'},
+							 {'x','x','x','x','x','x','x','x'},
+							 {'x','x','x','x','x','x','x','x'},
+							 {'x','x','x','x','x','x','x','x'},
+							 {'p','p','p','p','p','p','p','p'},
+							 {'r','n','b','k','q','b','n','r'}
+							 };
 	
-private char sideToMove;
+	private char sideToMove;
 	
-	private static char[] whitePieces = {'R','H','B','Q','K','P'};
+	private static char[] whitePieces = {'R','N','B','Q','K','P'};
 	
 	public Game(Game prevPosition,Move move){
 		board = copyBoard(prevPosition.board);
@@ -90,7 +91,7 @@ private char sideToMove;
 				if (board[i][j] == 'q'){ 	
 					moves.addAll(generateQueenMoves(i, j));
 				}
-				if (board[i][j] == 'h'){ 	
+				if (board[i][j] == 'n'){ 	
 					moves.addAll(generateKnightMoves(i, j));
 				}
 			}
@@ -121,18 +122,18 @@ private char sideToMove;
 	private ArrayList<Move> generatePawnMoves(int row, int col){
 		System.out.println("generatePawnMoves");
 		ArrayList<Move> moves = new ArrayList<Move>();
-		if (row == 1 && board[2][col] == 'x' && board[3][col] == 'x'){
-			moves.add(new Move(row, col, 3, col));
+		if (row == 6 && board[5][col] == 'x' && board[4][col] == 'x'){
+			moves.add(new Move(row, col, 4, col));
 		} 
-		if (row < 7){	
-			if (board[row+1][col] == 'x'){
-				moves.add(new Move(row,col,row+1,col ));
+		if (row > 0){	
+			if (board[row-1][col] == 'x'){
+				moves.add(new Move(row,col,row-1,col ));
 			}
-			if (col > 0 && contains(whitePieces,board[row+1][col -1]) ){
-				moves.add(new Move(row, col, row+1,col-1));
+			if (col > 0 && contains(whitePieces,board[row-1][col -1]) ){
+				moves.add(new Move(row, col, row-1,col-1));
 			} 
-			if (col < 7 && contains(whitePieces,board[row+1][col + 1]) ){
-				moves.add(new Move(row, col, row+1,col+1));
+			if (col < 7 && contains(whitePieces,board[row-1][col + 1]) ){
+				moves.add(new Move(row, col, row-1,col+1));
 			} 
 		}		
 		return moves;
