@@ -55,21 +55,37 @@ public class MoveGenerationTest {
 		return moves;
 	}
 	@Test
-	public void test() {
+	public void rookTest() {
 		//rook can move in four directions 
 		assertTrue("Rook does not move correctly",
 				checkLegalMoves("4k3/8/8/3r4/8/8/8/4K3 b - -",
-				"d5", "c5 b5 a5 e5 f5 g5 h5 d6 d7 d8 d4 d3 d2 d1"));
+				"d5", "c5 b5 a5 e5 f5 g5 h5 d6 d7 d8 d4 d3 d2 d1"));	
+	}
+	
+	@Test
+	public void bishopTest(){
 		assertTrue("Bishop does not move correctly",
 				checkLegalMoves("4k3/8/8/3b4/8/8/8/4K3 b - -",
 				"d5", "a8 b7 c6 e4 f3 g2 h1 a2 b3 c4 e6 f7 g8"));
+	}
+	
+	@Test
+	public void knightTest(){
 		assertTrue("Knight does not move correctly",
 				checkLegalMoves("4k3/8/8/3n4/8/8/8/4K3 b - - 0 1",
 				"d5", "c7 b6 b4 c3 e3 f4 f6 e7"));
+	}
+	
+	@Test
+	public void queenTest(){
 		assertTrue("Queen does not move correctly",
 				checkLegalMoves("4k3/8/8/3q4/8/8/8/4K3 b - - 0 1",
 				"d5", "c5 b5 a5 e5 f5 g5 h5 d6 d7 d8 d4 d3 d2 d1 "
 						+ "a8 b7 c6 e4 f3 g2 h1 a2 b3 c4 e6 f7 g8"));
+	}
+	
+	@Test
+	public void kingTest(){
 		assertTrue("King does not move correctly",
 				checkLegalMoves("8/8/8/3k4/8/8/8/4K3 b - - 0 1",
 				"d5", "c6 d6 e6 c5 e5 c4 d4 e4"));
@@ -77,7 +93,10 @@ public class MoveGenerationTest {
 				checkLegalMoves(
 				"rnbqk2r/ppppbppp/5n2/4p3/4P3/2N2N2/PPPP1PPP/R1BQKB1R w KQkq -",
 				"e8", "f8 g8"));
-
+	}
+	
+	@Test
+	public void pawnTest(){
 		
 	}
 		
