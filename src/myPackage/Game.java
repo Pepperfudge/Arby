@@ -3,24 +3,83 @@ package myPackage;
 import java.util.ArrayList;
 
 public class Game{
-	private char[][] board = {{'R','N','B','K','Q','B','N','R'},
-							 {'P','P','P','P','P','P','P','P'},
-							 {'x','x','x','x','x','x','x','x'},
-							 {'x','x','x','x','x','x','x','x'},
-							 {'x','x','x','x','x','x','x','x'},
-							 {'x','x','x','x','x','x','x','x'},
-							 {'p','p','p','p','p','p','p','p'},
-							 {'r','n','b','k','q','b','n','r'}
-							 };
+	private char[][] board;
 	
 	private char sideToMove;
 	
+	
+	//these variables are true if the castle is still possible
+	private boolean whiteQCastle;
+	private boolean whiteKCastle;
+	private boolean blackQCastle;
+	private boolean blackKCastle;
+	
+	
 	private static char[] whitePieces = {'R','N','B','Q','K','P'};
+	
+	/* default constructor to start a new game
+	 */
+	public Game() {
+		board =  new char[][] 
+				{{'R','N','B','K','Q','B','N','R'},
+				 {'P','P','P','P','P','P','P','P'},
+				 {'x','x','x','x','x','x','x','x'},
+				 {'x','x','x','x','x','x','x','x'},
+				 {'x','x','x','x','x','x','x','x'},
+				 {'x','x','x','x','x','x','x','x'},
+				 {'p','p','p','p','p','p','p','p'},
+				 {'r','n','b','k','q','b','n','r'}
+				 };
+				 
+		whiteQCastle = true;
+		whiteKCastle = true;
+		blackQCastle = true;
+		blackKCastle = true;
+	}
 	
 	public Game(Game prevPosition,Move move){
 		board = copyBoard(prevPosition.board);
-		board[move.newRow][move.newColumn] = board[move.currRow][move.currColumn];
-		board[move.currRow][move.currColumn] = 'x';
+		char piece = board[move.currRow][move.currColumn];
+		makeMove(move);
+
+		if (piece == 'k' || piece == 'K'){
+			//if the king moves it loses it's ability to castle
+			if (piece == 'k'){
+				blackQCastle = false;
+				blackKCastle = false;
+			} else{
+				whiteQCastle = false;
+				whiteKCastle = false;
+			}
+			if (Math.abs(move.currColumn - move.newColumn) == 2){
+				//king side castle
+				if (move.newColumn == 1){
+					//move the rook in addition to the king
+					makeMove(new Move(move.currRow, 0, move.currRow, 2));
+				} else{ //queen side castle
+					makeMove(new Move(move.currRow,7, move.currRow, 4 ));
+				}
+			}
+		}
+		
+		if (piece == 'r'){
+			if (blackKCastle && move.currColumn == 0 && move.currRow == 7){
+				blackKCastle = false;
+			}
+			else if (blackQCastle && move.currColumn == 7 && move.currRow == 7){
+				blackQCastle = false;
+			}
+		}
+		
+		if (piece == 'R'){
+			if (whiteKCastle && move.currColumn == 0 && move.currRow == 0){
+				whiteKCastle = false;
+			}
+			else if (whiteQCastle && move.currColumn == 7 && move.currRow == 0){
+				whiteQCastle = false;
+			}
+		}
+
 		if (prevPosition.sideToMove == 'w'){
 			this.sideToMove = 'b';
 		} else{
@@ -35,9 +94,12 @@ public class Game{
        ' ' <En passant target square>
 	 */
 	public Game(String epdFormat){
+		board = new char[8][8];
 		String[] fields = epdFormat.split(" ");
 		
 		sideToMove = fields[1].charAt(0);
+		parseCastling(fields[2]);
+
 		String[] piecePlacement = fields[0].split("/");
 		
 		
@@ -67,10 +129,30 @@ public class Game{
 				
 	}
 	
-	public Game() {
-		
+	private void parseCastling(String castling){
+		whiteKCastle = false;
+		whiteQCastle = false;
+		blackKCastle = false;
+		blackQCastle = false;
+		if (castling.contains("Q")){
+			whiteQCastle = true;
+		}
+		if (castling.contains("K")){
+			whiteKCastle = true;
+		}
+		if (castling.contains("q")){
+			blackQCastle = true;
+		}
+		if (castling.contains("k")){
+			blackKCastle = true;
+		}
 	}
-
+	
+	private void makeMove(Move move){
+		board[move.newRow][move.newColumn] = board[move.currRow][move.currColumn];
+		board[move.currRow][move.currColumn] = 'x';
+	}
+	
 	public ArrayList<Move> generateLegalMoves(){
 //		System.out.println("generateLegalMoves");
 		ArrayList<Move> moves = new ArrayList<Move>();
@@ -97,24 +179,16 @@ public class Game{
 			}
 		}
 		
-		/*if (blackShortCastle = on) {
-			if (board[0][1] == 'x' && board[0][2] == 'x'){
-				moves.add(new Move(0,3,0,1));
-				if (nextMove = (0, 3, 0, 1) && board [0][3] = 'k') {
-				board[0][2] = r;
-				board[0][0] = 'x';
-				}
+		if (blackKCastle) {
+			if (board[7][1] == 'x' && board[7][2] == 'x'){
+				moves.add(new Move(7,3,7,1));
 			}	
 		}
-		if (blackLongCastle = on) {
-			if (board[0][4] == 'x' && board[0][5] == 'x' && board[0][6] == 'x' ){
-				moves.add(new Move(0,3,0,5));
-				if (nextMove = (0, 3, 0, 5) && board [0][3] = 'k') {
-				board[0][4] = r;
-				board[0][7] = 'x';	
-				}
+		if (blackQCastle) {
+			if (board[7][4] == 'x' && board[7][5] == 'x' && board[7][6] == 'x' ){
+				moves.add(new Move(7,3,7,5));
 			}	
-		}*/
+		}
 		
 		return moves;
 	}

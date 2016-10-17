@@ -73,6 +73,10 @@ public class MoveGenerationTest {
 		assertTrue("King does not move correctly",
 				checkLegalMoves("8/8/8/3k4/8/8/8/4K3 b - - 0 1",
 				"d5", "c6 d6 e6 c5 e5 c4 d4 e4"));
+		assertTrue("King cannot castle king side",
+				checkLegalMoves(
+				"rnbqk2r/ppppbppp/5n2/4p3/4P3/2N2N2/PPPP1PPP/R1BQKB1R w KQkq -",
+				"e8", "f8 g8"));
 
 		
 	}
