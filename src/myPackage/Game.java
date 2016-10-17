@@ -153,6 +153,14 @@ public class Game{
 		board[move.currRow][move.currColumn] = 'x';
 	}
 	
+	/*
+	for (int i = 0; i < 8; i++){
+		for (int j = 0; j < 8; j++){
+			if (board[i][j] == 'k'){ 	
+				isKingInCheck(i, j);
+		}		
+	}*/
+	
 	public ArrayList<Move> generateLegalMoves(){
 //		System.out.println("generateLegalMoves");
 		ArrayList<Move> moves = new ArrayList<Move>();
@@ -179,6 +187,7 @@ public class Game{
 			}
 		}
 		
+
 		if (blackKCastle) {
 			if (board[7][1] == 'x' && board[7][2] == 'x'){
 				moves.add(new Move(7,3,7,1));
@@ -188,10 +197,10 @@ public class Game{
 			if (board[7][4] == 'x' && board[7][5] == 'x' && board[7][6] == 'x' ){
 				moves.add(new Move(7,3,7,5));
 			}	
-		}
-		
+		}	
 		return moves;
 	}
+
 	
 	private ArrayList<Move> generatePawnMoves(int row, int col){
 //		System.out.println("generatePawnMoves");
@@ -460,6 +469,90 @@ public class Game{
 		}		
 		return moves;
 	}
+	
+	private boolean isKingInCheck(int row, int col) {	
+		for (int i = row +1, j = col + 1; i<=7 && j <=7; i++, j++) {
+			if (board[i][j] == 'Q' || board[i][j] == 'B') {
+				return true;
+			}
+			else if (board[i][j] != 'x' ) {
+				break;
+			}
+		}
+		for (int i = row +1, j = col -1; i<=7 && j >=0; i++, j--) {
+			if (board[i][j] == 'Q' || board[i][j] == 'B') {
+				return true;
+			}
+			else if (board[i][j] != 'x' ) {
+				break;
+			}
+		}
+		for (int i = row -1, j = col +1; i>=0 && j <=7; i--, j++) {
+			if (board[i][j] == 'Q' ||board[i][j] == 'B') {
+				return true;
+			}
+				else if (board[i][j] != 'x' ) {
+					break;
+			}
+		}
+		for (int i = row -1, j = col -1; i>=0 && j>=0; i--, j--) {
+			if (board[i][j] == 'Q' || board[i][j] == 'B') {
+				return true;
+			}
+			else if (board[i][j] != 'x' ) {
+				break;
+			}
+		}
+			
+		for (int i = row +1; i<=7; i++) {
+			if (board[i][col] == 'Q' || board[i][col] == 'R') {
+				return true;
+			}
+				else if (board[i][col] != 'x' ) {
+				break;
+			}
+		}
+		for (int i = row -1; i>=0; i--) {
+			if (board[i][col] == 'Q' || board[i][col] == 'R') {
+				return true;
+			}
+			else if (board[i][col] != 'x' ) {
+				break;
+			} 
+		} 		
+		for (int i = col +1; i<=7; i++) {
+			if (board[row][i] == 'Q' || board[row][i] == 'R') {
+				return true;
+			}
+			else if (board[row][i] != 'x' ) {
+				break;
+			}
+		}
+		for (int i = col -1; i>=0; i--) {
+			if (board[row][i] == 'Q' || board[row][i] == 'R') {
+				return true;
+			}
+			else if (board[row][i] != 'x' ) {
+				break;
+			}  
+		}
+		if (board[row+1][col-1] == 'K' || board[row+1][col] == 'K' || board[row+1][col+1] == 'K'
+			|| board[row][col-1] == 'K' || board[row][col+1] == 'K'
+			|| board[row-1][col-1] == 'K' || board[row-1][col] == 'K' || board[row-1][col+1] == 'K') {
+			return true;	
+		}
+		if (board[row+2][col-1] == 'N' || board[row+2][col+1] == 'N'
+		|| board[row+1][col-2] == 'N' || board[row+1][col+2] == 'N'
+		|| board[row-1][col+-2] == 'N' || board[row-1][col+2] == 'N'
+		|| board[row-2][col-1] == 'N' || board[row-2][col+1] == 'N') {
+			return true;	
+		}
+		if (board[row+1][col-1] == 'P' || board[row+1][col+1] == 'P') {
+			return true;	
+		}
+		return false;
+	
+	}	
 
 	private static char[][] copyBoard(char[][] board){
 		char [][] copy = new char[board.length][];
