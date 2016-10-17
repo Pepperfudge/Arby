@@ -189,12 +189,14 @@ public class Game{
 		
 
 		if (blackKCastle) {
-			if (board[7][1] == 'x' && board[7][2] == 'x'){
+			if (board[7][1] == 'x' && board[7][2] == 'x' && isKingInCheck(7,3) == false && isKingInCheck(7,2) == false 
+			&& isKingInCheck(7,1) == false){
 				moves.add(new Move(7,3,7,1));
 			}	
 		}
 		if (blackQCastle) {
-			if (board[7][4] == 'x' && board[7][5] == 'x' && board[7][6] == 'x' ){
+			if (board[7][4] == 'x' && board[7][5] == 'x' && board[7][6] == 'x' && isKingInCheck(7,3) == false 
+			&& isKingInCheck(7,4) == false && isKingInCheck(7,5) == false && isKingInCheck(7,6) == false ){
 				moves.add(new Move(7,3,7,5));
 			}	
 		}	
@@ -228,43 +230,59 @@ public class Game{
 		
 		if (col +1 <=7) {
 			if (board[row][col +1] == 'x' || contains(whitePieces,board[row][col +1])) {
-			moves.add(new Move(row,col,row,col +1));
+				if (isKingInCheck(row,col +1) == false) {
+					moves.add(new Move(row,col,row,col +1));
+				}
 			}
 		}	
 		if (col -1 >=0) {
-			if (board[row][col -1] == 'x' || contains(whitePieces,board[row][col -1]) ){
-			moves.add(new Move(row,col,row,col -1));
+			if (board[row][col -1] == 'x' || contains(whitePieces,board[row][col -1])) {
+				if (isKingInCheck(row,col -1) == false) {
+					moves.add(new Move(row,col,row,col -1));
+				}
 			}
 		}	
 		if (row+1<=7){
 			if (board[row +1][col] == 'x' || contains(whitePieces,board[row+1][col] )){
-			moves.add(new Move(row, col, row +1,col));
+				if (isKingInCheck(row+1,col) == false) {
+					moves.add(new Move(row, col, row +1,col));
+				}
 			}
 		}
 		if	(row-1>=0) {
 			if (board[row -1][col] == 'x' || contains(whitePieces,board[row-1][col] )){
-			moves.add(new Move(row,col,row -1,col));
+				if (isKingInCheck(row-1,col) == false) {
+					moves.add(new Move(row,col,row -1,col));
+				}	
 			}
 		}
 		if  (row +1 <= 7 && col+1 <=7) {
 			if (board[row +1][col +1] == 'x' || contains(whitePieces,board[row+1][col +1] )) {
-			moves.add(new Move(row,col,row +1,col +1));
+				if (isKingInCheck(row+1,col+1) == false) {
+					moves.add(new Move(row,col,row +1,col +1));
+				}
 			}
 		}	
 		if  (row +1 <= 7 && col-1 >=0) {
-			if (board[row +1][ col -1] == 'x' || contains(whitePieces,board[row+1][col -1] )) {
-			moves.add(new Move(row,col,row +1, col -1));
+			if (board[row +1][col-1] == 'x' || contains(whitePieces,board[row+1][col-1] )) {
+				if (isKingInCheck(row+1,col-1) == false) {
+					moves.add(new Move(row,col,row +1, col -1));
+				}
 			}
 		}
 		if  (row -1 >= 0 && col+1 <=7) {
 			if (board[row -1][ col +1] == 'x' || contains(whitePieces,board[row-1][col +1] )) {
-			moves.add(new Move(row,col,row -1, col +1));
+				if (isKingInCheck(row-1,col+1) == false) {
+					moves.add(new Move(row,col,row -1, col +1));
+				}
 			}
 		}
 
 		if  (row -1 >=0 && col-1 >=0) {
 			if (board[row -1][ col -1] == 'x' || contains(whitePieces,board[row-1][col -1] )) {
-			moves.add(new Move(row,col,row -1, col -1));
+				if (isKingInCheck(row-1,col-1) == false) {
+					moves.add(new Move(row,col,row -1, col -1));
+				}
 			}
 		}		
 		return moves;
@@ -426,7 +444,6 @@ public class Game{
 	private ArrayList<Move> generateKnightMoves(int row, int col){
 //		System.out.println("generateKnightMoves");
 		ArrayList<Move> moves = new ArrayList<Move>();
-		
 		if  (row +2 <= 7 && col+1 <=7) {
 			if (board[row+2][col +1] == 'x' || contains(whitePieces,board[row+2][col +1])) {
 			moves.add(new Move(row,col,row+2,col +1));
@@ -471,6 +488,7 @@ public class Game{
 	}
 	
 	private boolean isKingInCheck(int row, int col) {	
+//Diagonals test		
 		for (int i = row +1, j = col + 1; i<=7 && j <=7; i++, j++) {
 			if (board[i][j] == 'Q' || board[i][j] == 'B') {
 				return true;
@@ -503,7 +521,7 @@ public class Game{
 				break;
 			}
 		}
-			
+// Rows and columns test			
 		for (int i = row +1; i<=7; i++) {
 			if (board[i][col] == 'Q' || board[i][col] == 'R') {
 				return true;
@@ -534,22 +552,91 @@ public class Game{
 			}
 			else if (board[row][i] != 'x' ) {
 				break;
-			}  
+			}
+// King and Pawn test			
 		}
-		if (board[row+1][col-1] == 'K' || board[row+1][col] == 'K' || board[row+1][col+1] == 'K'
-			|| board[row][col-1] == 'K' || board[row][col+1] == 'K'
-			|| board[row-1][col-1] == 'K' || board[row-1][col] == 'K' || board[row-1][col+1] == 'K') {
-			return true;	
+		if (row+1 <=7 && col-1 >= 0) {
+			if (board[row+1][col-1] == 'K' || board[row+1][col-1] == 'P' ){
+				return true;
+			}
+		}	
+		if (row+1 <= 7) {
+			if (board[row+1][col] == 'K'){ 
+				return true;
+			}
 		}
-		if (board[row+2][col-1] == 'N' || board[row+2][col+1] == 'N'
-		|| board[row+1][col-2] == 'N' || board[row+1][col+2] == 'N'
-		|| board[row-1][col+-2] == 'N' || board[row-1][col+2] == 'N'
-		|| board[row-2][col-1] == 'N' || board[row-2][col+1] == 'N') {
-			return true;	
+		if (row +1 <=7 && col+1 <= 7) {
+			if (board[row+1][col+1] == 'K' || board[row+1][col+1] == 'P'){
+				return true;
+			}
 		}
-		if (board[row+1][col-1] == 'P' || board[row+1][col+1] == 'P') {
-			return true;	
+		if (col-1 >= 0) {
+			if (board[row][col-1] == 'K') {
+				return true;
+			}
 		}
+		if (col+1 <= 7) {
+			if (board[row][col+1] == 'K') {
+				return true;
+			}
+		}
+		if (row -1 >=0 && col-1 >= 0) {
+			if (board[row-1][col-1] == 'K') {
+				return true;
+			}
+		}
+		if (row -1 >=0) {
+			if (board[row-1][col] == 'K') {
+				return true;
+			}
+		}
+		if (row -1 >=0 && col+1 <= 7) {
+			if (board[row-1][col+1] == 'K') {
+				return true;	
+			}
+		}	
+// Knight test
+		if  (row +2 <= 7 && col+1 <=7) {
+			if (board[row+2][col+1] == 'N'){
+				return true;
+			}
+		}
+		if  (row +2 <= 7 && col-1 >=0) { 
+			if (board[row+2][col-1] == 'N'){
+				return true;
+			}
+		}
+		if  (row +1 <= 7 && col+2 <=7) {
+			if (board[row+1][col+2] == 'N'){
+				return true;
+			}
+		}
+		if  (row +1 <= 7 && col-2 >=0) {
+			if (board[row+1][col-2] == 'N'){
+				return true;
+			}
+		}
+		if  (row -1 >= 0 && col+2 <=7) { 
+			if (board[row-1][col+2] == 'N'){
+				return true;
+			}
+		}
+		if  (row -1 >= 0 && col-2 >=0) {
+			if (board[row-1][col-2] == 'N'){ 
+				return true;
+			}
+		}
+		if  (row -2 >= 0 && col+1 <=7) { 
+			if (board[row-2][col+1] == 'N') {
+				return true;
+			}
+		}
+		if  (row -2 >=0 && col-1 >=0) {
+			if (board[row-2][col-1] == 'N') {
+				return true;		
+			}
+		}
+		
 		return false;
 	
 	}	
