@@ -96,6 +96,7 @@ public class Game{
 		board[move.currRow][move.currColumn] = 'x';
 	}
 	
+	
 	/* Constructor to create game out of standard position format
 	   rnbqkbnr/pppppp1p/8/6p1/4P3/8/PPPP1PPP/RNBQKBNR w KQkq g6
 	   <Piece Placement>
@@ -158,12 +159,23 @@ public class Game{
 		}
 	}
 	
-//	for (int i = 0; i < 8; i++){
-//		for (int j = 0; j < 8; j++){
-//			if (board[i][j] == 'k'){ 	
-//				isKingInCheck(i, j);
-//		}		
-//	}
+
+
+	
+	/*public ArrayList<Integer> findKing(){
+		ArrayList<Integer> kingLocation = new ArrayList<Integer>();
+		for (int i = 0; i < 8; i++){
+			for (int j = 0; j < 8; j++){
+				if (board[i][j] == 'k'){
+					kingLocation.add(i);
+					kingLocation.add(j);
+				}
+			}
+		}
+	return kingLocation;	
+	}
+	*/
+
 	
 	public ArrayList<Move> generateLegalMoves(){
 //		System.out.println("generateLegalMoves");
@@ -181,7 +193,7 @@ public class Game{
 		for (int i = 0; i < 8; i++){
 			for (int j = 0; j < 8; j++){
 				if (board[i][j] == 'P'){
-					moves.addAll(generatePawnMoves(i, j,blackPieces));
+					moves.addAll(generateWhitePawnMoves(i, j));
 				}	
 				if (board[i][j] == 'K'){ 	
 					moves.addAll(generateKingMoves(i, j,blackPieces));
@@ -211,7 +223,7 @@ public class Game{
 		for (int i = 0; i < 8; i++){
 			for (int j = 0; j < 8; j++){
 				if (board[i][j] == 'p'){
-					moves.addAll(generatePawnMoves(i, j,whitePieces));
+					moves.addAll(generateBlackPawnMoves(i, j));
 				}	
 				if (board[i][j] == 'k'){ 	
 					moves.addAll(generateKingMoves(i, j,whitePieces));
@@ -273,21 +285,53 @@ public class Game{
 	}
 
 	
-	private ArrayList<Move> generatePawnMoves(int row, int col, char[] opponentPieces){
+	private ArrayList<Move> generateBlackPawnMoves(int row, int col){
 //		System.out.println("generatePawnMoves");
 		ArrayList<Move> moves = new ArrayList<Move>();
 		if (row == 6 && board[5][col] == 'x' && board[4][col] == 'x'){
-			moves.add(new Move(row, col, 4, col));
+			moves.add(new Move(6, col, 4, col));
 		} 
 		if (row > 0){	
 			if (board[row-1][col] == 'x'){
-				moves.add(new Move(row,col,row-1,col ));
+				
+				/*if (row == 6 && board[5][col] == 'x' && board[4][col] == 'x'){
+		            Move interimMove = new Move(row, col, 4, col);
+		            Game nextPosition = new Game(this, interimMove)
+		                 if (nextPosition.isKingInCheck(kingLocation[0], kingLocation[1]) == false){ */
+							moves.add(new Move(row,col,row-1,col ));
+				// }
 			}
-			if (col > 0 && contains(opponentPieces,board[row-1][col -1]) ){
+			if (col > 0 && contains(whitePieces,board[row-1][col -1]) ){
 				moves.add(new Move(row, col, row-1,col-1));
 			} 
-			if (col < 7 && contains(opponentPieces,board[row-1][col + 1]) ){
+			if (col < 7 && contains(whitePieces,board[row-1][col + 1]) ){
 				moves.add(new Move(row, col, row-1,col+1));
+			} 
+		}		
+		return moves;
+	}
+	
+	private ArrayList<Move> generateWhitePawnMoves(int row, int col){
+//		System.out.println("generatePawnMoves");
+		ArrayList<Move> moves = new ArrayList<Move>();
+		if (row == 1 && board[2][col] == 'x' && board[3][col] == 'x'){
+			moves.add(new Move(1, col, 3, col));
+		} 
+		if (row > 0){	
+			if (board[row+1][col] == 'x'){
+				
+				/*if (row == 6 && board[5][col] == 'x' && board[4][col] == 'x'){
+		            Move interimMove = new Move(row, col, 4, col);
+		            Game nextPosition = new Game(this, interimMove)
+		                 if (nextPosition.isKingInCheck(kingLocation[0], kingLocation[1]) == false){ */
+							moves.add(new Move(row,col,row+1,col ));
+				// }
+			}
+			if (col > 0 && contains(blackPieces,board[row+1][col -1]) ){
+				moves.add(new Move(row, col, row+1,col-1));
+			} 
+			if (col < 7 && contains(blackPieces,board[row+1][col + 1]) ){
+				moves.add(new Move(row, col, row+1,col+1));
 			} 
 		}		
 		return moves;
@@ -565,309 +609,292 @@ public class Game{
 	}	
 	
 	private boolean isWhiteKingInCheck(int row, int col){
-		//Diagonals test		
-				for (int i = row +1, j = col + 1; i<=7 && j <=7; i++, j++) {
-					if (board[i][j] == 'q' || board[i][j] == 'b') {
-						return true;
-					}
-					else if (board[i][j] != 'x' ) {
-						break;
-					}
-				}
-				for (int i = row +1, j = col -1; i<=7 && j >=0; i++, j--) {
-					if (board[i][j] == 'q' || board[i][j] == 'b') {
-						return true;
-					}
-					else if (board[i][j] != 'x' ) {
-						break;
-					}
-				}
-				for (int i = row -1, j = col +1; i>=0 && j <=7; i--, j++) {
-					if (board[i][j] == 'q' || board[i][j] == 'b') {
-						return true;
-					}
-						else if (board[i][j] != 'x' ) {
-							break;
-					}
-				}
-				for (int i = row -1, j = col -1; i>=0 && j>=0; i--, j--) {
-					if (board[i][j] == 'q' || board[i][j] == 'b') {
-						return true;
-					}
-					else if (board[i][j] != 'x' ) {
-						break;
-					}
-				}
-		// Rows and columns test			
-				for (int i = row +1; i<=7; i++) {
-					if (board[i][col] == 'q' || board[i][col] == 'r') {
-						return true;
-					}
-						else if (board[i][col] != 'x' ) {
-						break;
-					}
-				}
-				for (int i = row -1; i>=0; i--) {
-					if (board[i][col] == 'q' || board[i][col] == 'r') {
-						return true;
-					}
-					else if (board[i][col] != 'x' ) {
-						break;
-					} 
-				} 		
-				for (int i = col +1; i<=7; i++) {
-					if (board[row][i] == 'q' || board[row][i] == 'r') {
-						return true;
-					}
-					else if (board[row][i] != 'x' ) {
-						break;
-					}
-				}
-				for (int i = col -1; i>=0; i--) {
-					if (board[row][i] == 'q' || board[row][i] == 'r') {
-						return true;
-					}
-					else if (board[row][i] != 'x' ) {
-						break;
-					}
-		// King and Pawn test			
-				}
-				if (row+1 <=7 && col-1 >= 0) {
-					if (board[row+1][col-1] == 'k' || board[row+1][col-1] == 'p' ){
-						return true;
-					}
-				}	
-				if (row+1 <= 7) {
-					if (board[row+1][col] == 'p'){ 
-						return true;
-					}
-				}
-				if (row +1 <=7 && col+1 <= 7) {
-					if (board[row+1][col+1] == 'k' || board[row+1][col+1] == 'p'){
-						return true;
-					}
-				}
-				if (col-1 >= 0) {
-					if (board[row][col-1] == 'k') {
-						return true;
-					}
-				}
-				if (col+1 <= 7) {
-					if (board[row][col+1] == 'k') {
-						return true;
-					}
-				}
-				if (row -1 >=0 && col-1 >= 0) {
-					if (board[row-1][col-1] == 'k') {
-						return true;
-					}
-				}
-				if (row -1 >=0) {
-					if (board[row-1][col] == 'k') {
-						return true;
-					}
-				}
-				if (row -1 >=0 && col+1 <= 7) {
-					if (board[row-1][col+1] == 'k') {
-						return true;	
-					}
-				}	
-		// Knight test
-				if  (row +2 <= 7 && col+1 <=7) {
-					if (board[row+2][col+1] == 'n'){
-						return true;
-					}
-				}
-				if  (row +2 <= 7 && col-1 >=0) { 
-					if (board[row+2][col-1] == 'n'){
-						return true;
-					}
-				}
-				if  (row +1 <= 7 && col+2 <=7) {
-					if (board[row+1][col+2] == 'n'){
-						return true;
-					}
-				}
-				if  (row +1 <= 7 && col-2 >=0) {
-					if (board[row+1][col-2] == 'n'){
-						return true;
-					}
-				}
-				if  (row -1 >= 0 && col+2 <=7) { 
-					if (board[row-1][col+2] == 'n'){
-						return true;
-					}
-				}
-				if  (row -1 >= 0 && col-2 >=0) {
-					if (board[row-1][col-2] == 'n'){ 
-						return true;
-					}
-				}
-				if  (row -2 >= 0 && col+1 <=7) { 
-					if (board[row-2][col+1] == 'n') {
-						return true;
-					}
-				}
-				if  (row -2 >=0 && col-1 >=0) {
-					if (board[row-2][col-1] == 'n') {
-						return true;		
-					}
-				}
-				
-				return false;
+		for (int i = row +1, j = col -1; i<=7 && j >=0; i++, j--) {
+			if (board[i][j] == 'q' || board[i][j] == 'b') {
+				return true;
+			}
+			else if (board[i][j] != 'x' ) {
+				break;
+			}
+		}
+		for (int i = row -1, j = col +1; i>=0 && j <=7; i--, j++) {
+			if (board[i][j] == 'q' ||board[i][j] == 'b') {
+				return true;
+			}
+				else if (board[i][j] != 'x' ) {
+					break;
+			}
+		}
+		for (int i = row -1, j = col -1; i>=0 && j>=0; i--, j--) {
+			if (board[i][j] == 'q' || board[i][j] == 'b') {
+				return true;
+			}
+			else if (board[i][j] != 'x' ) {
+				break;
+			}
+		}
+// Rows and columns test			
+		for (int i = row +1; i<=7; i++) {
+			if (board[i][col] == 'q' || board[i][col] == 'r') {
+				return true;
+			}
+				else if (board[i][col] != 'x' ) {
+				break;
+			}
+		}
+		for (int i = row -1; i>=0; i--) {
+			if (board[i][col] == 'q' || board[i][col] == 'r') {
+				return true;
+			}
+			else if (board[i][col] != 'x' ) {
+				break;
+			} 
+		} 		
+		for (int i = col +1; i<=7; i++) {
+			if (board[row][i] == 'q' || board[row][i] == 'r') {
+				return true;
+			}
+			else if (board[row][i] != 'x' ) {
+				break;
+			}
+		}
+		for (int i = col -1; i>=0; i--) {
+			if (board[row][i] == 'q' || board[row][i] == 'r') {
+				return true;
+			}
+			else if (board[row][i] != 'x' ) {
+				break;
+			}
+// King and Pawn test			
+		}
+		if (row+1 <=7 && col-1 >= 0) {
+			if (board[row+1][col-1] == 'k'){
+				return true;
+			}
+		}	
+		if (row+1 <= 7) {
+			if (board[row+1][col] == 'k'){ 
+				return true;
+			}
+		}
+		if (row +1 <=7 && col+1 <= 7) {
+			if (board[row+1][col+1] == 'k'){
+				return true;
+			}
+		}
+		if (col-1 >= 0) {
+			if (board[row][col-1] == 'k') {
+				return true;
+			}
+		}
+		if (col+1 <= 7) {
+			if (board[row][col+1] == 'k') {
+				return true;
+			}
+		}
+		if (row -1 >=0 && col-1 >= 0) {
+			if (board[row-1][col-1] == 'k' || board[row-1][col-1] == 'p') {
+				return true;
+			}
+		}
+		if (row -1 >=0) {
+			if (board[row-1][col] == 'k') {
+				return true;
+			}
+		}
+		if (row -1 >=0 && col+1 <= 7) {
+			if (board[row-1][col+1] == 'k' || board[row-1][col+1] == 'p'){
+				return true;	
+			}
+		}	
+// Knight test
+		if  (row +2 <= 7 && col+1 <=7) {
+			if (board[row+2][col+1] == 'n'){
+				return true;
+			}
+		}
+		if  (row +2 <= 7 && col-1 >=0) { 
+			if (board[row+2][col-1] == 'n'){
+				return true;
+			}
+		}
+		if  (row +1 <= 7 && col+2 <=7) {
+			if (board[row+1][col+2] == 'n'){
+				return true;
+			}
+		}
+		if  (row +1 <= 7 && col-2 >=0) {
+			if (board[row+1][col-2] == 'n'){
+				return true;
+			}
+		}
+		if  (row -1 >= 0 && col+2 <=7) { 
+			if (board[row-1][col+2] == 'n'){
+				return true;
+			}
+		}
+		if  (row -1 >= 0 && col-2 >=0) {
+			if (board[row-1][col-2] == 'n'){ 
+				return true;
+			}
+		}
+		if  (row -2 >= 0 && col+1 <=7) { 
+			if (board[row-2][col+1] == 'n') {
+				return true;
+			}
+		}
+		if  (row -2 >=0 && col-1 >=0) {
+			if (board[row-2][col-1] == 'n') {
+				return true;		
+			}
+		}
+		
+		return false;
 	}
 
 	private boolean isBlackKingInCheck(int row, int col){
 		//Diagonals test		
-				for (int i = row +1, j = col + 1; i<=7 && j <=7; i++, j++) {
-					if (board[i][j] == 'Q' || board[i][j] == 'B') {
-						return true;
-					}
-					else if (board[i][j] != 'x' ) {
-						break;
-					}
-				}
-				for (int i = row +1, j = col -1; i<=7 && j >=0; i++, j--) {
-					if (board[i][j] == 'Q' || board[i][j] == 'B') {
-						return true;
-					}
-					else if (board[i][j] != 'x' ) {
-						break;
-					}
-				}
-				for (int i = row -1, j = col +1; i>=0 && j <=7; i--, j++) {
-					if (board[i][j] == 'Q' ||board[i][j] == 'B') {
-						return true;
-					}
-						else if (board[i][j] != 'x' ) {
-							break;
-					}
-				}
-				for (int i = row -1, j = col -1; i>=0 && j>=0; i--, j--) {
-					if (board[i][j] == 'Q' || board[i][j] == 'B') {
-						return true;
-					}
-					else if (board[i][j] != 'x' ) {
-						break;
-					}
-				}
-		// Rows and columns test			
-				for (int i = row +1; i<=7; i++) {
-					if (board[i][col] == 'Q' || board[i][col] == 'R') {
-						return true;
-					}
-						else if (board[i][col] != 'x' ) {
-						break;
-					}
-				}
-				for (int i = row -1; i>=0; i--) {
-					if (board[i][col] == 'Q' || board[i][col] == 'R') {
-						return true;
-					}
-					else if (board[i][col] != 'x' ) {
-						break;
-					} 
-				} 		
-				for (int i = col +1; i<=7; i++) {
-					if (board[row][i] == 'Q' || board[row][i] == 'R') {
-						return true;
-					}
-					else if (board[row][i] != 'x' ) {
-						break;
-					}
-				}
-				for (int i = col -1; i>=0; i--) {
-					if (board[row][i] == 'Q' || board[row][i] == 'R') {
-						return true;
-					}
-					else if (board[row][i] != 'x' ) {
-						break;
-					}
-		// King and Pawn test			
-				}
-				if (row+1 <=7 && col-1 >= 0) {
-					if (board[row+1][col-1] == 'K' || board[row+1][col-1] == 'P' ){
-						return true;
-					}
-				}	
-				if (row+1 <= 7) {
-					if (board[row+1][col] == 'K'){ 
-						return true;
-					}
-				}
-				if (row +1 <=7 && col+1 <= 7) {
-					if (board[row+1][col+1] == 'K' || board[row+1][col+1] == 'P'){
-						return true;
-					}
-				}
-				if (col-1 >= 0) {
-					if (board[row][col-1] == 'K') {
-						return true;
-					}
-				}
-				if (col+1 <= 7) {
-					if (board[row][col+1] == 'K') {
-						return true;
-					}
-				}
-				if (row -1 >=0 && col-1 >= 0) {
-					if (board[row-1][col-1] == 'K') {
-						return true;
-					}
-				}
-				if (row -1 >=0) {
-					if (board[row-1][col] == 'K') {
-						return true;
-					}
-				}
-				if (row -1 >=0 && col+1 <= 7) {
-					if (board[row-1][col+1] == 'K') {
-						return true;	
-					}
-				}	
-		// Knight test
-				if  (row +2 <= 7 && col+1 <=7) {
-					if (board[row+2][col+1] == 'N'){
-						return true;
-					}
-				}
-				if  (row +2 <= 7 && col-1 >=0) { 
-					if (board[row+2][col-1] == 'N'){
-						return true;
-					}
-				}
-				if  (row +1 <= 7 && col+2 <=7) {
-					if (board[row+1][col+2] == 'N'){
-						return true;
-					}
-				}
-				if  (row +1 <= 7 && col-2 >=0) {
-					if (board[row+1][col-2] == 'N'){
-						return true;
-					}
-				}
-				if  (row -1 >= 0 && col+2 <=7) { 
-					if (board[row-1][col+2] == 'N'){
-						return true;
-					}
-				}
-				if  (row -1 >= 0 && col-2 >=0) {
-					if (board[row-1][col-2] == 'N'){ 
-						return true;
-					}
-				}
-				if  (row -2 >= 0 && col+1 <=7) { 
-					if (board[row-2][col+1] == 'N') {
-						return true;
-					}
-				}
-				if  (row -2 >=0 && col-1 >=0) {
-					if (board[row-2][col-1] == 'N') {
-						return true;		
-					}
-				}
-				
-				return false;
+		for (int i = row +1, j = col -1; i<=7 && j >=0; i++, j--) {
+			if (board[i][j] == 'Q' || board[i][j] == 'B') {
+				return true;
+			}
+			else if (board[i][j] != 'x' ) {
+				break;
+			}
+		}
+		for (int i = row -1, j = col +1; i>=0 && j <=7; i--, j++) {
+			if (board[i][j] == 'Q' ||board[i][j] == 'B') {
+				return true;
+			}
+				else if (board[i][j] != 'x' ) {
+					break;
+			}
+		}
+		for (int i = row -1, j = col -1; i>=0 && j>=0; i--, j--) {
+			if (board[i][j] == 'Q' || board[i][j] == 'B') {
+				return true;
+			}
+			else if (board[i][j] != 'x' ) {
+				break;
+			}
+		}
+// Rows and columns test			
+		for (int i = row +1; i<=7; i++) {
+			if (board[i][col] == 'Q' || board[i][col] == 'R') {
+				return true;
+			}
+				else if (board[i][col] != 'x' ) {
+				break;
+			}
+		}
+		for (int i = row -1; i>=0; i--) {
+			if (board[i][col] == 'Q' || board[i][col] == 'R') {
+				return true;
+			}
+			else if (board[i][col] != 'x' ) {
+				break;
+			} 
+		} 		
+		for (int i = col +1; i<=7; i++) {
+			if (board[row][i] == 'Q' || board[row][i] == 'R') {
+				return true;
+			}
+			else if (board[row][i] != 'x' ) {
+				break;
+			}
+		}
+		for (int i = col -1; i>=0; i--) {
+			if (board[row][i] == 'Q' || board[row][i] == 'R') {
+				return true;
+			}
+			else if (board[row][i] != 'x' ) {
+				break;
+			}
+// King and Pawn test			
+		}
+		if (row+1 <=7 && col-1 >= 0) {
+			if (board[row+1][col-1] == 'K'){
+				return true;
+			}
+		}	
+		if (row+1 <= 7) {
+			if (board[row+1][col] == 'K'){ 
+				return true;
+			}
+		}
+		if (row +1 <=7 && col+1 <= 7) {
+			if (board[row+1][col+1] == 'K'){
+				return true;
+			}
+		}
+		if (col-1 >= 0) {
+			if (board[row][col-1] == 'K') {
+				return true;
+			}
+		}
+		if (col+1 <= 7) {
+			if (board[row][col+1] == 'K') {
+				return true;
+			}
+		}
+		if (row -1 >=0 && col-1 >= 0) {
+			if (board[row-1][col-1] == 'K' || board[row-1][col-1] == 'P') {
+				return true;
+			}
+		}
+		if (row -1 >=0) {
+			if (board[row-1][col] == 'K') {
+				return true;
+			}
+		}
+		if (row -1 >=0 && col+1 <= 7) {
+			if (board[row-1][col+1] == 'K' || board[row-1][col+1] == 'P'){
+				return true;	
+			}
+		}	
+// Knight test
+		if  (row +2 <= 7 && col+1 <=7) {
+			if (board[row+2][col+1] == 'N'){
+				return true;
+			}
+		}
+		if  (row +2 <= 7 && col-1 >=0) { 
+			if (board[row+2][col-1] == 'N'){
+				return true;
+			}
+		}
+		if  (row +1 <= 7 && col+2 <=7) {
+			if (board[row+1][col+2] == 'N'){
+				return true;
+			}
+		}
+		if  (row +1 <= 7 && col-2 >=0) {
+			if (board[row+1][col-2] == 'N'){
+				return true;
+			}
+		}
+		if  (row -1 >= 0 && col+2 <=7) { 
+			if (board[row-1][col+2] == 'N'){
+				return true;
+			}
+		}
+		if  (row -1 >= 0 && col-2 >=0) {
+			if (board[row-1][col-2] == 'N'){ 
+				return true;
+			}
+		}
+		if  (row -2 >= 0 && col+1 <=7) { 
+			if (board[row-2][col+1] == 'N') {
+				return true;
+			}
+		}
+		if  (row -2 >=0 && col-1 >=0) {
+			if (board[row-2][col-1] == 'N') {
+				return true;		
+			}
+		}
+		
+		return false;
 	}
 
 	private static char[][] copyBoard(char[][] board){

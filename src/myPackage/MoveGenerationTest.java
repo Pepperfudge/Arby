@@ -87,8 +87,8 @@ public class MoveGenerationTest {
 	@Test
 	public void kingTest(){
 		assertTrue("King does not move correctly",
-				checkLegalMoves("8/8/8/3k4/8/8/8/4K3 b - - 0 1",
-				"d5", "c6 d6 e6 c5 e5 c4 d4 e4"));
+				checkLegalMoves("3k4/8/1P3K2/8/8/8/8/8 b - - 0 1",
+				"d8", "c8 d7 e8"));
 		assertTrue("King cannot castle king side",
 				checkLegalMoves(
 				"rnbqk2r/ppppppbp/5n1N/6p1/8/8/PPPPPPPP/RNBQKB1R b KQkq - 5 4",
