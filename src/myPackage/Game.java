@@ -153,13 +153,19 @@ public class Game{
 		board[move.currRow][move.currColumn] = 'x';
 	}
 	
-	/*
-	for (int i = 0; i < 8; i++){
-		for (int j = 0; j < 8; j++){
-			if (board[i][j] == 'k'){ 	
-				isKingInCheck(i, j);
-		}		
-	}*/
+	/*public ArrayList<Integer> findKing(){
+		ArrayList<Integer> kingLocation = new ArrayList<Integer>();
+		for (int i = 0; i < 8; i++){
+			for (int j = 0; j < 8; j++){
+				if (board[i][j] == 'k'){
+					kingLocation.add(i);
+					kingLocation.add(j);
+				}
+			}
+		}
+	return kingLocation;	
+	}
+	*/
 	
 	public ArrayList<Move> generateLegalMoves(){
 //		System.out.println("generateLegalMoves");
@@ -212,7 +218,13 @@ public class Game{
 		} 
 		if (row > 0){	
 			if (board[row-1][col] == 'x'){
-				moves.add(new Move(row,col,row-1,col ));
+				
+				/*if (row == 6 && board[5][col] == 'x' && board[4][col] == 'x'){
+		            Move interimMove = new Move(row, col, 4, col);
+		            Game nextPosition = new Game(this, interimMove)
+		                 if (nextPosition.isKingInCheck(kingLocation[0], kingLocation[1]) == false){ */
+							moves.add(new Move(row,col,row-1,col ));
+				// }
 			}
 			if (col > 0 && contains(whitePieces,board[row-1][col -1]) ){
 				moves.add(new Move(row, col, row-1,col-1));
@@ -556,7 +568,7 @@ public class Game{
 // King and Pawn test			
 		}
 		if (row+1 <=7 && col-1 >= 0) {
-			if (board[row+1][col-1] == 'K' || board[row+1][col-1] == 'P' ){
+			if (board[row+1][col-1] == 'K'){
 				return true;
 			}
 		}	
@@ -566,7 +578,7 @@ public class Game{
 			}
 		}
 		if (row +1 <=7 && col+1 <= 7) {
-			if (board[row+1][col+1] == 'K' || board[row+1][col+1] == 'P'){
+			if (board[row+1][col+1] == 'K'){
 				return true;
 			}
 		}
@@ -581,7 +593,7 @@ public class Game{
 			}
 		}
 		if (row -1 >=0 && col-1 >= 0) {
-			if (board[row-1][col-1] == 'K') {
+			if (board[row-1][col-1] == 'K' || board[row-1][col-1] == 'P') {
 				return true;
 			}
 		}
@@ -591,7 +603,7 @@ public class Game{
 			}
 		}
 		if (row -1 >=0 && col+1 <= 7) {
-			if (board[row-1][col+1] == 'K') {
+			if (board[row-1][col+1] == 'K' || board[row-1][col+1] == 'P'){
 				return true;	
 			}
 		}	
