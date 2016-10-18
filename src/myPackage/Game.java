@@ -16,6 +16,7 @@ public class Game{
 	
 	
 	private static char[] whitePieces = {'R','N','B','Q','K','P'};
+	private static char[] blackPieces = {'r','n','b','q','k','p'};
 	
 	/* default constructor to start a new game
 	 */
@@ -30,6 +31,7 @@ public class Game{
 				 {'p','p','p','p','p','p','p','p'},
 				 {'r','n','b','k','q','b','n','r'}
 				 };
+		sideToMove = 'w';
 				 
 		whiteQCastle = true;
 		whiteKCastle = true;
@@ -62,6 +64,7 @@ public class Game{
 			}
 		}
 		
+		
 		if (piece == 'r'){
 			if (blackKCastle && move.currColumn == 0 && move.currRow == 7){
 				blackKCastle = false;
@@ -85,7 +88,14 @@ public class Game{
 		} else{
 			this.sideToMove = 'w';
 		}
+		System.out.format("Turn to move: %s\n", sideToMove);
 	}
+	
+	private void makeMove(Move move){
+		board[move.newRow][move.newColumn] = board[move.currRow][move.currColumn];
+		board[move.currRow][move.currColumn] = 'x';
+	}
+	
 	/* Constructor to create game out of standard position format
 	   rnbqkbnr/pppppp1p/8/6p1/4P3/8/PPPP1PPP/RNBQKBNR w KQkq g6
 	   <Piece Placement>
@@ -148,63 +158,122 @@ public class Game{
 		}
 	}
 	
-	private void makeMove(Move move){
-		board[move.newRow][move.newColumn] = board[move.currRow][move.currColumn];
-		board[move.currRow][move.currColumn] = 'x';
-	}
-	
-	/*
-	for (int i = 0; i < 8; i++){
-		for (int j = 0; j < 8; j++){
-			if (board[i][j] == 'k'){ 	
-				isKingInCheck(i, j);
-		}		
-	}*/
+//	for (int i = 0; i < 8; i++){
+//		for (int j = 0; j < 8; j++){
+//			if (board[i][j] == 'k'){ 	
+//				isKingInCheck(i, j);
+//		}		
+//	}
 	
 	public ArrayList<Move> generateLegalMoves(){
 //		System.out.println("generateLegalMoves");
 		ArrayList<Move> moves = new ArrayList<Move>();
+		if (sideToMove == 'w'){
+			moves.addAll(generateWhiteMoves());
+		} else {
+			moves.addAll(generateBlackMoves());
+		}
+		return moves;
+	}
+	
+	private ArrayList<Move> generateWhiteMoves(){
+		ArrayList<Move> moves = new ArrayList<Move>();
 		for (int i = 0; i < 8; i++){
 			for (int j = 0; j < 8; j++){
-				if (board[i][j] == 'p'){
-					moves.addAll(generatePawnMoves(i, j));
+				if (board[i][j] == 'P'){
+					moves.addAll(generatePawnMoves(i, j,blackPieces));
 				}	
-				if (board[i][j] == 'k'){ 	
-					moves.addAll(generateKingMoves(i, j));
+				if (board[i][j] == 'K'){ 	
+					moves.addAll(generateKingMoves(i, j,blackPieces));
 				}
-				if (board[i][j] == 'r'){ 	
-					moves.addAll(generateRookMoves(i, j));
+				if (board[i][j] == 'R'){ 	
+					moves.addAll(generateRookMoves(i, j,blackPieces));
 				}
-				if (board[i][j] == 'b'){ 	
-					moves.addAll(generateBishopMoves(i, j));
+				if (board[i][j] == 'B'){ 	
+					moves.addAll(generateBishopMoves(i, j,blackPieces));
 				}
-				if (board[i][j] == 'q'){ 	
-					moves.addAll(generateQueenMoves(i, j));
+				if (board[i][j] == 'Q'){ 	
+					moves.addAll(generateQueenMoves(i, j,blackPieces));
 				}
-				if (board[i][j] == 'n'){ 	
-					moves.addAll(generateKnightMoves(i, j));
+				if (board[i][j] == 'N'){ 	
+					moves.addAll(generateKnightMoves(i, j,blackPieces));
 				}
 			}
 		}
 		
-
-		if (blackKCastle) {
-			if (board[7][1] == 'x' && board[7][2] == 'x' && isKingInCheck(7,3) == false && isKingInCheck(7,2) == false 
-			&& isKingInCheck(7,1) == false){
-				moves.add(new Move(7,3,7,1));
+		moves.addAll(generateCastleMoves());
+		
+		return moves;
+	}
+	
+	private ArrayList<Move> generateBlackMoves(){
+		ArrayList<Move> moves = new ArrayList<>();
+		for (int i = 0; i < 8; i++){
+			for (int j = 0; j < 8; j++){
+				if (board[i][j] == 'p'){
+					moves.addAll(generatePawnMoves(i, j,whitePieces));
+				}	
+				if (board[i][j] == 'k'){ 	
+					moves.addAll(generateKingMoves(i, j,whitePieces));
+				}
+				if (board[i][j] == 'r'){ 	
+					moves.addAll(generateRookMoves(i, j,whitePieces));
+				}
+				if (board[i][j] == 'b'){ 	
+					moves.addAll(generateBishopMoves(i, j,whitePieces));
+				}
+				if (board[i][j] == 'q'){ 	
+					moves.addAll(generateQueenMoves(i, j,whitePieces));
+				}
+				if (board[i][j] == 'n'){ 	
+					moves.addAll(generateKnightMoves(i, j,whitePieces));
+				}
+			}
+		}
+		
+		moves.addAll(generateCastleMoves());
+		
+		return moves;
+	}
+	
+	private ArrayList<Move> generateCastleMoves(){
+		ArrayList<Move> moves = new ArrayList<Move>();
+		boolean kingCastle, queenCastle;
+		int kingRow;
+		if (sideToMove == 'w'){
+			kingCastle = whiteKCastle;
+			queenCastle = whiteQCastle;
+			kingRow = 0;
+		} else {
+			kingCastle = blackKCastle;
+			queenCastle = blackQCastle;
+			kingRow = 7;
+		}
+		
+		if (kingCastle) {
+			if (board[kingRow][1] == 'x' && board[kingRow][2] == 'x' 
+					&& !isKingInCheck(kingRow,3,sideToMove)
+					&& !isKingInCheck(kingRow,2,sideToMove) 
+					&& !isKingInCheck(kingRow,1,sideToMove)){
+				moves.add(new Move(kingRow,3,kingRow,1));
 			}	
 		}
-		if (blackQCastle) {
-			if (board[7][4] == 'x' && board[7][5] == 'x' && board[7][6] == 'x' && isKingInCheck(7,3) == false 
-			&& isKingInCheck(7,4) == false && isKingInCheck(7,5) == false && isKingInCheck(7,6) == false ){
-				moves.add(new Move(7,3,7,5));
+		if (queenCastle) {
+			if (board[kingRow][4] == 'x' && board[kingRow][5] == 'x' 
+					&& board[7][6] == 'x' 
+					&& !isKingInCheck(kingRow,3,sideToMove) 
+					&& !isKingInCheck(kingRow,4,sideToMove) 
+					&& !isKingInCheck(kingRow,5,sideToMove) 
+					&& !isKingInCheck(kingRow,6,sideToMove)){
+				moves.add(new Move(kingRow,3,kingRow,5));
 			}	
 		}	
+		
 		return moves;
 	}
 
 	
-	private ArrayList<Move> generatePawnMoves(int row, int col){
+	private ArrayList<Move> generatePawnMoves(int row, int col, char[] opponentPieces){
 //		System.out.println("generatePawnMoves");
 		ArrayList<Move> moves = new ArrayList<Move>();
 		if (row == 6 && board[5][col] == 'x' && board[4][col] == 'x'){
@@ -214,73 +283,73 @@ public class Game{
 			if (board[row-1][col] == 'x'){
 				moves.add(new Move(row,col,row-1,col ));
 			}
-			if (col > 0 && contains(whitePieces,board[row-1][col -1]) ){
+			if (col > 0 && contains(opponentPieces,board[row-1][col -1]) ){
 				moves.add(new Move(row, col, row-1,col-1));
 			} 
-			if (col < 7 && contains(whitePieces,board[row-1][col + 1]) ){
+			if (col < 7 && contains(opponentPieces,board[row-1][col + 1]) ){
 				moves.add(new Move(row, col, row-1,col+1));
 			} 
 		}		
 		return moves;
 	}
 	
-	private ArrayList<Move> generateKingMoves(int row, int col){
+	private ArrayList<Move> generateKingMoves(int row, int col, char[] opponentPieces){
 //		System.out.println("generateKingMoves");
 		ArrayList<Move> moves = new ArrayList<Move>();
 		
 		if (col +1 <=7) {
-			if (board[row][col +1] == 'x' || contains(whitePieces,board[row][col +1])) {
-				if (isKingInCheck(row,col +1) == false) {
+			if (board[row][col +1] == 'x' || contains(opponentPieces,board[row][col +1])) {
+				if (isKingInCheck(row,col +1, sideToMove) == false) {
 					moves.add(new Move(row,col,row,col +1));
 				}
 			}
 		}	
 		if (col -1 >=0) {
-			if (board[row][col -1] == 'x' || contains(whitePieces,board[row][col -1])) {
-				if (isKingInCheck(row,col -1) == false) {
+			if (board[row][col -1] == 'x' || contains(opponentPieces,board[row][col -1])) {
+				if (isKingInCheck(row,col -1,sideToMove) == false) {
 					moves.add(new Move(row,col,row,col -1));
 				}
 			}
 		}	
 		if (row+1<=7){
-			if (board[row +1][col] == 'x' || contains(whitePieces,board[row+1][col] )){
-				if (isKingInCheck(row+1,col) == false) {
+			if (board[row +1][col] == 'x' || contains(opponentPieces,board[row+1][col] )){
+				if (isKingInCheck(row+1,col,sideToMove) == false) {
 					moves.add(new Move(row, col, row +1,col));
 				}
 			}
 		}
 		if	(row-1>=0) {
-			if (board[row -1][col] == 'x' || contains(whitePieces,board[row-1][col] )){
-				if (isKingInCheck(row-1,col) == false) {
+			if (board[row -1][col] == 'x' || contains(opponentPieces,board[row-1][col] )){
+				if (isKingInCheck(row-1,col,sideToMove) == false) {
 					moves.add(new Move(row,col,row -1,col));
 				}	
 			}
 		}
 		if  (row +1 <= 7 && col+1 <=7) {
-			if (board[row +1][col +1] == 'x' || contains(whitePieces,board[row+1][col +1] )) {
-				if (isKingInCheck(row+1,col+1) == false) {
+			if (board[row +1][col +1] == 'x' || contains(opponentPieces,board[row+1][col +1] )) {
+				if (isKingInCheck(row+1,col+1,sideToMove) == false) {
 					moves.add(new Move(row,col,row +1,col +1));
 				}
 			}
 		}	
 		if  (row +1 <= 7 && col-1 >=0) {
-			if (board[row +1][col-1] == 'x' || contains(whitePieces,board[row+1][col-1] )) {
-				if (isKingInCheck(row+1,col-1) == false) {
+			if (board[row +1][col-1] == 'x' || contains(opponentPieces,board[row+1][col-1] )) {
+				if (isKingInCheck(row+1,col-1,sideToMove) == false) {
 					moves.add(new Move(row,col,row +1, col -1));
 				}
 			}
 		}
 		if  (row -1 >= 0 && col+1 <=7) {
-			if (board[row -1][ col +1] == 'x' || contains(whitePieces,board[row-1][col +1] )) {
-				if (isKingInCheck(row-1,col+1) == false) {
+			if (board[row -1][ col +1] == 'x' || contains(opponentPieces,board[row-1][col +1] )) {
+				if (isKingInCheck(row-1,col+1,sideToMove) == false) {
 					moves.add(new Move(row,col,row -1, col +1));
 				}
 			}
 		}
 
 		if  (row -1 >=0 && col-1 >=0) {
-			if (board[row -1][ col -1] == 'x' || contains(whitePieces,board[row-1][col -1] )) {
-				if (isKingInCheck(row-1,col-1) == false) {
+			if (board[row -1][ col -1] == 'x' || contains(opponentPieces,board[row-1][col -1] )) {
+				if (isKingInCheck(row-1,col-1,sideToMove) == false) {
 					moves.add(new Move(row,col,row -1, col -1));
 				}
 			}
@@ -288,12 +357,12 @@ public class Game{
 		return moves;
 	}
 	
-	private ArrayList<Move> generateRookMoves(int row, int col){
+	private ArrayList<Move> generateRookMoves(int row, int col, char[] opponentPieces){
 //		System.out.println("generateRookMoves");
 		ArrayList<Move> moves = new ArrayList<Move>();
 		
 		for (int i = row +1; i<=7; i++) {
-		    if (board[i][col] == 'x' || contains(whitePieces,board[i][col]) ) {
+		    if (board[i][col] == 'x' || contains(opponentPieces,board[i][col]) ) {
 			moves.add(new Move(row,col,i, col));
 			} 
 			if (board[i][col] != 'x' ) {
@@ -301,7 +370,7 @@ public class Game{
 			}
 		}
 		for (int i = row -1; i>=0; i--) {
-		    if (board[i][col] == 'x' || contains(whitePieces,board[i][col] )) {
+		    if (board[i][col] == 'x' || contains(opponentPieces,board[i][col] )) {
 			moves.add(new Move(row,col,i, col));
 			} 
 			if (board[i][col] != 'x')  {
@@ -309,7 +378,7 @@ public class Game{
 			} 
 		} 		
 		for (int i = col +1; i<=7; i++) {
-			if (board[row][i] == 'x' || contains(whitePieces,board[row][i] )) {
+			if (board[row][i] == 'x' || contains(opponentPieces,board[row][i] )) {
 			moves.add(new Move(row,col,row, i));
 			} 
 			if (board[row][i] != 'x' ) {
@@ -317,7 +386,7 @@ public class Game{
 			}
 		}
 		for (int i = col -1; i>=0; i--) {
-		    if (board[row][i] == 'x' || contains(whitePieces,board[row][i] )) {
+		    if (board[row][i] == 'x' || contains(opponentPieces,board[row][i] )) {
 			moves.add(new Move(row,col,row, i));
 			} 
 			if (board[row][i] != 'x' ) {
@@ -328,12 +397,12 @@ public class Game{
 		return moves;
 	}
 	
-	private ArrayList<Move> generateBishopMoves(int row, int col){
+	private ArrayList<Move> generateBishopMoves(int row, int col, char[] opponentPieces){
 //		System.out.println("generateBishopMoves");
 		ArrayList<Move> moves = new ArrayList<Move>();
 		
 		for (int i = row +1, j = col + 1; i<=7 && j <=7; i++, j++) {
-			if (board[i][j] == 'x' || contains(whitePieces,board[i][j] )) {
+			if (board[i][j] == 'x' || contains(opponentPieces,board[i][j] )) {
 			moves.add(new Move(row,col,i, j));
 			} 
 			if (board[i][j] != 'x' ) {
@@ -341,7 +410,7 @@ public class Game{
 			}
 		}
 		for (int i = row +1, j = col -1; i<=7 && j >=0; i++, j--) {
-			if (board[i][j] == 'x' || contains(whitePieces,board[i][j] )) {
+			if (board[i][j] == 'x' || contains(opponentPieces,board[i][j] )) {
 			moves.add(new Move(row,col,i, j));
 			} 
 			if (board[i][j] != 'x' ) {
@@ -349,7 +418,7 @@ public class Game{
 			}
 		}
 		for (int i = row -1, j = col +1; i>=0 && j <=7; i--, j++) {
-			if (board[i][j] == 'x' || contains(whitePieces,board[i][j] )) {
+			if (board[i][j] == 'x' || contains(opponentPieces,board[i][j] )) {
 			moves.add(new Move(row,col,i, j));
 			} 
 			if (board[i][j] != 'x')  {
@@ -357,7 +426,7 @@ public class Game{
 			}
 		}
 		for (int i = row -1, j = col -1; i>=0 && j>=0; i--, j--) {
-			if (board[i][j] == 'x' || contains(whitePieces,board[i][j] )) {
+			if (board[i][j] == 'x' || contains(opponentPieces,board[i][j] )) {
 			moves.add(new Move(row,col,i, j));
 			} 
 			if (board[i][j] != 'x' ) {
@@ -368,12 +437,12 @@ public class Game{
 		return moves;
 	}
 	
-	private ArrayList<Move> generateQueenMoves(int row, int col){
+	private ArrayList<Move> generateQueenMoves(int row, int col, char[] opponentPieces){
 //		System.out.println("generateQueenMoves");
 		ArrayList<Move> moves = new ArrayList<Move>();
 		
 		for (int i = row +1, j = col + 1; i<=7 && j <=7; i++, j++) {
-			if (board[i][j] == 'x' || contains(whitePieces,board[i][j] )) {
+			if (board[i][j] == 'x' || contains(opponentPieces,board[i][j] )) {
 			moves.add(new Move(row,col,i, j));
 			} 
 			if (board[i][j] != 'x' ) {
@@ -381,7 +450,7 @@ public class Game{
 			}
 		}
 		for (int i = row +1, j = col -1; i<=7 && j >=0; i++, j--) {
-			if (board[i][j] == 'x' || contains(whitePieces,board[i][j] )) {
+			if (board[i][j] == 'x' || contains(opponentPieces,board[i][j] )) {
 			moves.add(new Move(row,col,i, j));
 			} 
 			if (board[i][j] != 'x' ) {
@@ -389,7 +458,7 @@ public class Game{
 			}
 		}
 		for (int i = row -1, j = col +1; i>=0 && j <=7; i--, j++) {
-			if (board[i][j] == 'x' || contains(whitePieces,board[i][j] )) {
+			if (board[i][j] == 'x' || contains(opponentPieces,board[i][j] )) {
 			moves.add(new Move(row,col,i, j));
 			} 
 			if (board[i][j] != 'x')  {
@@ -397,7 +466,7 @@ public class Game{
 			}
 		}
 		for (int i = row -1, j = col -1; i>=0 && j>=0; i--, j--) {
-			if (board[i][j] == 'x' || contains(whitePieces,board[i][j] )) {
+			if (board[i][j] == 'x' || contains(opponentPieces,board[i][j] )) {
 			moves.add(new Move(row,col,i, j));
 			} 
 			if (board[i][j] != 'x' ) {
@@ -406,7 +475,7 @@ public class Game{
 		}
 		
 		for (int i = row +1; i<=7; i++) {
-		    if (board[i][col] == 'x' || contains(whitePieces,board[i][col]) ) {
+		    if (board[i][col] == 'x' || contains(opponentPieces,board[i][col]) ) {
 			moves.add(new Move(row,col,i, col));
 			} 
 			if (board[i][col] != 'x' ) {
@@ -414,7 +483,7 @@ public class Game{
 			}
 		}
 		for (int i = row -1; i>=0; i--) {
-		    if (board[i][col] == 'x' || contains(whitePieces,board[i][col] )) {
+		    if (board[i][col] == 'x' || contains(opponentPieces,board[i][col] )) {
 			moves.add(new Move(row,col,i, col));
 			} 
 			if (board[i][col] != 'x')  {
@@ -422,7 +491,7 @@ public class Game{
 			} 
 		} 		
 		for (int i = col +1; i<=7; i++) {
-			if (board[row][i] == 'x' || contains(whitePieces,board[row][i] )) {
+			if (board[row][i] == 'x' || contains(opponentPieces,board[row][i] )) {
 			moves.add(new Move(row,col,row, i));
 			} 
 			if (board[row][i] != 'x' ) {
@@ -430,7 +499,7 @@ public class Game{
 			}
 		}
 		for (int i = col -1; i>=0; i--) {
-		    if (board[row][i] == 'x' || contains(whitePieces,board[row][i] )) {
+		    if (board[row][i] == 'x' || contains(opponentPieces,board[row][i] )) {
 			moves.add(new Move(row,col,row, i));
 			} 
 			if (board[row][i] != 'x' ) {
@@ -441,205 +510,365 @@ public class Game{
 		return moves;
 	}
 	
-	private ArrayList<Move> generateKnightMoves(int row, int col){
+	private ArrayList<Move> generateKnightMoves(int row, int col, char[] opponentPieces){
 //		System.out.println("generateKnightMoves");
 		ArrayList<Move> moves = new ArrayList<Move>();
 		if  (row +2 <= 7 && col+1 <=7) {
-			if (board[row+2][col +1] == 'x' || contains(whitePieces,board[row+2][col +1])) {
+			if (board[row+2][col +1] == 'x' || contains(opponentPieces,board[row+2][col +1])) {
 			moves.add(new Move(row,col,row+2,col +1));
 			}
 		}	
 		if  (row +2 <= 7 && col-1 >=0) {
-			if (board[row+2][col -1] == 'x' || contains(whitePieces,board[row+2][col -1]) ){
+			if (board[row+2][col -1] == 'x' || contains(opponentPieces,board[row+2][col -1]) ){
 			moves.add(new Move(row,col,row+2,col -1));
 			}
 		}	
 		if  (row +1 <= 7 && col+2 <=7) {
-			if (board[row +1][col+2] == 'x' || contains(whitePieces,board[row+1][col+2] )){
+			if (board[row +1][col+2] == 'x' || contains(opponentPieces,board[row+1][col+2] )){
 			moves.add(new Move(row, col, row +1,col+2));
 			}
 		}
 		if  (row +1 <= 7 && col-2 >=0) {
-			if (board[row +1][col-2] == 'x' || contains(whitePieces,board[row+1][col-2] )){
+			if (board[row +1][col-2] == 'x' || contains(opponentPieces,board[row+1][col-2] )){
 			moves.add(new Move(row,col,row +1,col-2));
 			}
 		}
 		if  (row -1 >= 0 && col+2 <=7) {
-			if (board[row -1][col +2] == 'x' || contains(whitePieces,board[row-1][col +2] )) {
+			if (board[row -1][col +2] == 'x' || contains(opponentPieces,board[row-1][col +2] )) {
 			moves.add(new Move(row,col,row -1,col +2));
 			}
 		}	
 		if  (row -1 >= 0 && col-2 >=0) {
-			if (board[row -1][ col -2] == 'x' || contains(whitePieces,board[row-1][col -2] )) {
+			if (board[row -1][ col -2] == 'x' || contains(opponentPieces,board[row-1][col -2] )) {
 			moves.add(new Move(row,col,row -1, col -2));
 			}
 		}
 		if  (row -2 >= 0 && col+1 <=7) {
-			if (board[row -2][ col +1] == 'x' || contains(whitePieces,board[row-2][col +1] )) {
+			if (board[row -2][ col +1] == 'x' || contains(opponentPieces,board[row-2][col +1] )) {
 			moves.add(new Move(row,col,row -2, col +1));
 			}
 		}
 		if  (row -2 >=0 && col-1 >=0) {
-			if (board[row -2][ col -1] == 'x' || contains(whitePieces,board[row-2][col -1] )) {
+			if (board[row -2][ col -1] == 'x' || contains(opponentPieces,board[row-2][col -1] )) {
 			moves.add(new Move(row,col,row -2, col -1));
 			}
 		}		
 		return moves;
 	}
 	
-	private boolean isKingInCheck(int row, int col) {	
-//Diagonals test		
-		for (int i = row +1, j = col + 1; i<=7 && j <=7; i++, j++) {
-			if (board[i][j] == 'Q' || board[i][j] == 'B') {
-				return true;
-			}
-			else if (board[i][j] != 'x' ) {
-				break;
-			}
+	private boolean isKingInCheck(int row, int col,char color) {
+		if (color == 'w'){
+			return isWhiteKingInCheck(row, col);
+		} else {
+			return isBlackKingInCheck(row, col);
 		}
-		for (int i = row +1, j = col -1; i<=7 && j >=0; i++, j--) {
-			if (board[i][j] == 'Q' || board[i][j] == 'B') {
-				return true;
-			}
-			else if (board[i][j] != 'x' ) {
-				break;
-			}
-		}
-		for (int i = row -1, j = col +1; i>=0 && j <=7; i--, j++) {
-			if (board[i][j] == 'Q' ||board[i][j] == 'B') {
-				return true;
-			}
-				else if (board[i][j] != 'x' ) {
-					break;
-			}
-		}
-		for (int i = row -1, j = col -1; i>=0 && j>=0; i--, j--) {
-			if (board[i][j] == 'Q' || board[i][j] == 'B') {
-				return true;
-			}
-			else if (board[i][j] != 'x' ) {
-				break;
-			}
-		}
-// Rows and columns test			
-		for (int i = row +1; i<=7; i++) {
-			if (board[i][col] == 'Q' || board[i][col] == 'R') {
-				return true;
-			}
-				else if (board[i][col] != 'x' ) {
-				break;
-			}
-		}
-		for (int i = row -1; i>=0; i--) {
-			if (board[i][col] == 'Q' || board[i][col] == 'R') {
-				return true;
-			}
-			else if (board[i][col] != 'x' ) {
-				break;
-			} 
-		} 		
-		for (int i = col +1; i<=7; i++) {
-			if (board[row][i] == 'Q' || board[row][i] == 'R') {
-				return true;
-			}
-			else if (board[row][i] != 'x' ) {
-				break;
-			}
-		}
-		for (int i = col -1; i>=0; i--) {
-			if (board[row][i] == 'Q' || board[row][i] == 'R') {
-				return true;
-			}
-			else if (board[row][i] != 'x' ) {
-				break;
-			}
-// King and Pawn test			
-		}
-		if (row+1 <=7 && col-1 >= 0) {
-			if (board[row+1][col-1] == 'K' || board[row+1][col-1] == 'P' ){
-				return true;
-			}
-		}	
-		if (row+1 <= 7) {
-			if (board[row+1][col] == 'K'){ 
-				return true;
-			}
-		}
-		if (row +1 <=7 && col+1 <= 7) {
-			if (board[row+1][col+1] == 'K' || board[row+1][col+1] == 'P'){
-				return true;
-			}
-		}
-		if (col-1 >= 0) {
-			if (board[row][col-1] == 'K') {
-				return true;
-			}
-		}
-		if (col+1 <= 7) {
-			if (board[row][col+1] == 'K') {
-				return true;
-			}
-		}
-		if (row -1 >=0 && col-1 >= 0) {
-			if (board[row-1][col-1] == 'K') {
-				return true;
-			}
-		}
-		if (row -1 >=0) {
-			if (board[row-1][col] == 'K') {
-				return true;
-			}
-		}
-		if (row -1 >=0 && col+1 <= 7) {
-			if (board[row-1][col+1] == 'K') {
-				return true;	
-			}
-		}	
-// Knight test
-		if  (row +2 <= 7 && col+1 <=7) {
-			if (board[row+2][col+1] == 'N'){
-				return true;
-			}
-		}
-		if  (row +2 <= 7 && col-1 >=0) { 
-			if (board[row+2][col-1] == 'N'){
-				return true;
-			}
-		}
-		if  (row +1 <= 7 && col+2 <=7) {
-			if (board[row+1][col+2] == 'N'){
-				return true;
-			}
-		}
-		if  (row +1 <= 7 && col-2 >=0) {
-			if (board[row+1][col-2] == 'N'){
-				return true;
-			}
-		}
-		if  (row -1 >= 0 && col+2 <=7) { 
-			if (board[row-1][col+2] == 'N'){
-				return true;
-			}
-		}
-		if  (row -1 >= 0 && col-2 >=0) {
-			if (board[row-1][col-2] == 'N'){ 
-				return true;
-			}
-		}
-		if  (row -2 >= 0 && col+1 <=7) { 
-			if (board[row-2][col+1] == 'N') {
-				return true;
-			}
-		}
-		if  (row -2 >=0 && col-1 >=0) {
-			if (board[row-2][col-1] == 'N') {
-				return true;		
-			}
-		}
-		
-		return false;
-	
 	}	
+	
+	private boolean isWhiteKingInCheck(int row, int col){
+		//Diagonals test		
+				for (int i = row +1, j = col + 1; i<=7 && j <=7; i++, j++) {
+					if (board[i][j] == 'q' || board[i][j] == 'b') {
+						return true;
+					}
+					else if (board[i][j] != 'x' ) {
+						break;
+					}
+				}
+				for (int i = row +1, j = col -1; i<=7 && j >=0; i++, j--) {
+					if (board[i][j] == 'q' || board[i][j] == 'b') {
+						return true;
+					}
+					else if (board[i][j] != 'x' ) {
+						break;
+					}
+				}
+				for (int i = row -1, j = col +1; i>=0 && j <=7; i--, j++) {
+					if (board[i][j] == 'q' || board[i][j] == 'b') {
+						return true;
+					}
+						else if (board[i][j] != 'x' ) {
+							break;
+					}
+				}
+				for (int i = row -1, j = col -1; i>=0 && j>=0; i--, j--) {
+					if (board[i][j] == 'q' || board[i][j] == 'b') {
+						return true;
+					}
+					else if (board[i][j] != 'x' ) {
+						break;
+					}
+				}
+		// Rows and columns test			
+				for (int i = row +1; i<=7; i++) {
+					if (board[i][col] == 'q' || board[i][col] == 'r') {
+						return true;
+					}
+						else if (board[i][col] != 'x' ) {
+						break;
+					}
+				}
+				for (int i = row -1; i>=0; i--) {
+					if (board[i][col] == 'q' || board[i][col] == 'r') {
+						return true;
+					}
+					else if (board[i][col] != 'x' ) {
+						break;
+					} 
+				} 		
+				for (int i = col +1; i<=7; i++) {
+					if (board[row][i] == 'q' || board[row][i] == 'r') {
+						return true;
+					}
+					else if (board[row][i] != 'x' ) {
+						break;
+					}
+				}
+				for (int i = col -1; i>=0; i--) {
+					if (board[row][i] == 'q' || board[row][i] == 'r') {
+						return true;
+					}
+					else if (board[row][i] != 'x' ) {
+						break;
+					}
+		// King and Pawn test			
+				}
+				if (row+1 <=7 && col-1 >= 0) {
+					if (board[row+1][col-1] == 'k' || board[row+1][col-1] == 'p' ){
+						return true;
+					}
+				}	
+				if (row+1 <= 7) {
+					if (board[row+1][col] == 'p'){ 
+						return true;
+					}
+				}
+				if (row +1 <=7 && col+1 <= 7) {
+					if (board[row+1][col+1] == 'k' || board[row+1][col+1] == 'p'){
+						return true;
+					}
+				}
+				if (col-1 >= 0) {
+					if (board[row][col-1] == 'k') {
+						return true;
+					}
+				}
+				if (col+1 <= 7) {
+					if (board[row][col+1] == 'k') {
+						return true;
+					}
+				}
+				if (row -1 >=0 && col-1 >= 0) {
+					if (board[row-1][col-1] == 'k') {
+						return true;
+					}
+				}
+				if (row -1 >=0) {
+					if (board[row-1][col] == 'k') {
+						return true;
+					}
+				}
+				if (row -1 >=0 && col+1 <= 7) {
+					if (board[row-1][col+1] == 'k') {
+						return true;	
+					}
+				}	
+		// Knight test
+				if  (row +2 <= 7 && col+1 <=7) {
+					if (board[row+2][col+1] == 'n'){
+						return true;
+					}
+				}
+				if  (row +2 <= 7 && col-1 >=0) { 
+					if (board[row+2][col-1] == 'n'){
+						return true;
+					}
+				}
+				if  (row +1 <= 7 && col+2 <=7) {
+					if (board[row+1][col+2] == 'n'){
+						return true;
+					}
+				}
+				if  (row +1 <= 7 && col-2 >=0) {
+					if (board[row+1][col-2] == 'n'){
+						return true;
+					}
+				}
+				if  (row -1 >= 0 && col+2 <=7) { 
+					if (board[row-1][col+2] == 'n'){
+						return true;
+					}
+				}
+				if  (row -1 >= 0 && col-2 >=0) {
+					if (board[row-1][col-2] == 'n'){ 
+						return true;
+					}
+				}
+				if  (row -2 >= 0 && col+1 <=7) { 
+					if (board[row-2][col+1] == 'n') {
+						return true;
+					}
+				}
+				if  (row -2 >=0 && col-1 >=0) {
+					if (board[row-2][col-1] == 'n') {
+						return true;		
+					}
+				}
+				
+				return false;
+	}
+
+	private boolean isBlackKingInCheck(int row, int col){
+		//Diagonals test		
+				for (int i = row +1, j = col + 1; i<=7 && j <=7; i++, j++) {
+					if (board[i][j] == 'Q' || board[i][j] == 'B') {
+						return true;
+					}
+					else if (board[i][j] != 'x' ) {
+						break;
+					}
+				}
+				for (int i = row +1, j = col -1; i<=7 && j >=0; i++, j--) {
+					if (board[i][j] == 'Q' || board[i][j] == 'B') {
+						return true;
+					}
+					else if (board[i][j] != 'x' ) {
+						break;
+					}
+				}
+				for (int i = row -1, j = col +1; i>=0 && j <=7; i--, j++) {
+					if (board[i][j] == 'Q' ||board[i][j] == 'B') {
+						return true;
+					}
+						else if (board[i][j] != 'x' ) {
+							break;
+					}
+				}
+				for (int i = row -1, j = col -1; i>=0 && j>=0; i--, j--) {
+					if (board[i][j] == 'Q' || board[i][j] == 'B') {
+						return true;
+					}
+					else if (board[i][j] != 'x' ) {
+						break;
+					}
+				}
+		// Rows and columns test			
+				for (int i = row +1; i<=7; i++) {
+					if (board[i][col] == 'Q' || board[i][col] == 'R') {
+						return true;
+					}
+						else if (board[i][col] != 'x' ) {
+						break;
+					}
+				}
+				for (int i = row -1; i>=0; i--) {
+					if (board[i][col] == 'Q' || board[i][col] == 'R') {
+						return true;
+					}
+					else if (board[i][col] != 'x' ) {
+						break;
+					} 
+				} 		
+				for (int i = col +1; i<=7; i++) {
+					if (board[row][i] == 'Q' || board[row][i] == 'R') {
+						return true;
+					}
+					else if (board[row][i] != 'x' ) {
+						break;
+					}
+				}
+				for (int i = col -1; i>=0; i--) {
+					if (board[row][i] == 'Q' || board[row][i] == 'R') {
+						return true;
+					}
+					else if (board[row][i] != 'x' ) {
+						break;
+					}
+		// King and Pawn test			
+				}
+				if (row+1 <=7 && col-1 >= 0) {
+					if (board[row+1][col-1] == 'K' || board[row+1][col-1] == 'P' ){
+						return true;
+					}
+				}	
+				if (row+1 <= 7) {
+					if (board[row+1][col] == 'K'){ 
+						return true;
+					}
+				}
+				if (row +1 <=7 && col+1 <= 7) {
+					if (board[row+1][col+1] == 'K' || board[row+1][col+1] == 'P'){
+						return true;
+					}
+				}
+				if (col-1 >= 0) {
+					if (board[row][col-1] == 'K') {
+						return true;
+					}
+				}
+				if (col+1 <= 7) {
+					if (board[row][col+1] == 'K') {
+						return true;
+					}
+				}
+				if (row -1 >=0 && col-1 >= 0) {
+					if (board[row-1][col-1] == 'K') {
+						return true;
+					}
+				}
+				if (row -1 >=0) {
+					if (board[row-1][col] == 'K') {
+						return true;
+					}
+				}
+				if (row -1 >=0 && col+1 <= 7) {
+					if (board[row-1][col+1] == 'K') {
+						return true;	
+					}
+				}	
+		// Knight test
+				if  (row +2 <= 7 && col+1 <=7) {
+					if (board[row+2][col+1] == 'N'){
+						return true;
+					}
+				}
+				if  (row +2 <= 7 && col-1 >=0) { 
+					if (board[row+2][col-1] == 'N'){
+						return true;
+					}
+				}
+				if  (row +1 <= 7 && col+2 <=7) {
+					if (board[row+1][col+2] == 'N'){
+						return true;
+					}
+				}
+				if  (row +1 <= 7 && col-2 >=0) {
+					if (board[row+1][col-2] == 'N'){
+						return true;
+					}
+				}
+				if  (row -1 >= 0 && col+2 <=7) { 
+					if (board[row-1][col+2] == 'N'){
+						return true;
+					}
+				}
+				if  (row -1 >= 0 && col-2 >=0) {
+					if (board[row-1][col-2] == 'N'){ 
+						return true;
+					}
+				}
+				if  (row -2 >= 0 && col+1 <=7) { 
+					if (board[row-2][col+1] == 'N') {
+						return true;
+					}
+				}
+				if  (row -2 >=0 && col-1 >=0) {
+					if (board[row-2][col-1] == 'N') {
+						return true;		
+					}
+				}
+				
+				return false;
+	}
 
 	private static char[][] copyBoard(char[][] board){
 		char [][] copy = new char[board.length][];
