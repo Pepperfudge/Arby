@@ -915,6 +915,8 @@ public class Game{
 		for (int i = row +1, j = col -1; i<=7 && j >=0; i++, j--) {
 			if (board[i][j] == 'q' || board[i][j] == 'b') {
 				return true;
+			}	
+			else if (board[i][j] != 'K' ) {		
 			}
 			else if (board[i][j] != 'x' ) {
 				break;
@@ -924,13 +926,17 @@ public class Game{
 			if (board[i][j] == 'q' ||board[i][j] == 'b') {
 				return true;
 			}
-				else if (board[i][j] != 'x' ) {
+			else if (board[i][j] != 'K' ) {		
+			}
+			else if (board[i][j] != 'x' ) {
 					break;
 			}
 		}
 		for (int i = row -1, j = col -1; i>=0 && j>=0; i--, j--) {
 			if (board[i][j] == 'q' || board[i][j] == 'b') {
 				return true;
+			}
+			else if (board[i][j] != 'K' ) {		
 			}
 			else if (board[i][j] != 'x' ) {
 				break;
@@ -939,6 +945,8 @@ public class Game{
 		for (int i = row +1, j = col +1; i<=7 && j<=7; i++, j++) {
 			if (board[i][j] == 'q' || board[i][j] == 'b') {
 				return true;
+			}
+			else if (board[i][j] != 'K' ) {		
 			}
 			else if (board[i][j] != 'x' ) {
 				break;
@@ -949,13 +957,17 @@ public class Game{
 			if (board[i][col] == 'q' || board[i][col] == 'r') {
 				return true;
 			}
-				else if (board[i][col] != 'x' ) {
+			else if (board[i][col] != 'K' ) {		
+			}
+			else if (board[i][col] != 'x' ) {
 				break;
 			}
 		}
 		for (int i = row -1; i>=0; i--) {
 			if (board[i][col] == 'q' || board[i][col] == 'r') {
 				return true;
+			}
+			else if (board[i][col] != 'K' ) {		
 			}
 			else if (board[i][col] != 'x' ) {
 				break;
@@ -965,6 +977,8 @@ public class Game{
 			if (board[row][i] == 'q' || board[row][i] == 'r') {
 				return true;
 			}
+			else if (board[row][i] != 'K' ) {		
+			}
 			else if (board[row][i] != 'x' ) {
 				break;
 			}
@@ -972,7 +986,9 @@ public class Game{
 		for (int i = col -1; i>=0; i--) {
 			if (board[row][i] == 'q' || board[row][i] == 'r') {
 				return true;
-			}
+			}	
+			else if (board[row][i] != 'K' ) {		
+			}	
 			else if (board[row][i] != 'x' ) {
 				break;
 			}
@@ -1069,6 +1085,8 @@ public class Game{
 			if (board[i][j] == 'Q' || board[i][j] == 'B') {
 				return true;
 			}
+			else if (board[i][j] != 'k' ) {		
+			}
 			else if (board[i][j] != 'x' ) {
 				break;
 			}
@@ -1077,13 +1095,17 @@ public class Game{
 			if (board[i][j] == 'Q' ||board[i][j] == 'B') {
 				return true;
 			}
-				else if (board[i][j] != 'x' ) {
-					break;
+			else if (board[i][j] != 'k' ) {		
+			}
+			else if (board[i][j] != 'x' ) {
+				break;
 			}
 		}
 		for (int i = row -1, j = col -1; i>=0 && j>=0; i--, j--) {
 			if (board[i][j] == 'Q' || board[i][j] == 'B') {
 				return true;
+			}
+			else if (board[i][j] != 'k' ) {		
 			}
 			else if (board[i][j] != 'x' ) {
 				break;
@@ -1093,8 +1115,10 @@ public class Game{
 			if (board[i][j] == 'Q' ||board[i][j] == 'B') {
 				return true;
 			}
-				else if (board[i][j] != 'x' ) {
-					break;
+			else if (board[i][j] != 'k' ) {		
+			}
+			else if (board[i][j] != 'x' ) {
+				break;
 			}
 		}
 // Rows and columns test			
@@ -1102,13 +1126,17 @@ public class Game{
 			if (board[i][col] == 'Q' || board[i][col] == 'R') {
 				return true;
 			}
-				else if (board[i][col] != 'x' ) {
+			else if (board[i][col] != 'k' ) {		
+			}
+			else if (board[i][col] != 'x' ) {
 				break;
 			}
 		}
 		for (int i = row -1; i>=0; i--) {
 			if (board[i][col] == 'Q' || board[i][col] == 'R') {
 				return true;
+			}
+			else if (board[i][col] != 'k' ) {		
 			}
 			else if (board[i][col] != 'x' ) {
 				break;
@@ -1118,6 +1146,8 @@ public class Game{
 			if (board[row][i] == 'Q' || board[row][i] == 'R') {
 				return true;
 			}
+			else if (board[row][i] != 'k' ) {		
+			}
 			else if (board[row][i] != 'x' ) {
 				break;
 			}
@@ -1125,6 +1155,8 @@ public class Game{
 		for (int i = col -1; i>=0; i--) {
 			if (board[row][i] == 'Q' || board[row][i] == 'R') {
 				return true;
+			}
+			else if (board[row][i] != 'k' ) {		
 			}
 			else if (board[row][i] != 'x' ) {
 				break;
