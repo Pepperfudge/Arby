@@ -979,7 +979,7 @@ public class Game{
 // King and Pawn test			
 		}
 		if (row+1 <=7 && col-1 >= 0) {
-			if (board[row+1][col-1] == 'k'){
+			if (board[row+1][col-1] == 'k' || board[row+1][col-1] == 'p'){
 				return true;
 			}
 		}	
@@ -989,7 +989,7 @@ public class Game{
 			}
 		}
 		if (row +1 <=7 && col+1 <= 7) {
-			if (board[row+1][col+1] == 'k'){
+			if (board[row+1][col+1] == 'k' || board[row+1][col+1] == 'p'){
 				return true;
 			}
 		}
@@ -1004,7 +1004,7 @@ public class Game{
 			}
 		}
 		if (row -1 >=0 && col-1 >= 0) {
-			if (board[row-1][col-1] == 'k' || board[row-1][col-1] == 'p') {
+			if (board[row-1][col-1] == 'k' ) {
 				return true;
 			}
 		}
@@ -1014,7 +1014,7 @@ public class Game{
 			}
 		}
 		if (row -1 >=0 && col+1 <= 7) {
-			if (board[row-1][col+1] == 'k' || board[row-1][col+1] == 'p'){
+			if (board[row-1][col+1] == 'k' ){
 				return true;	
 			}
 		}	
