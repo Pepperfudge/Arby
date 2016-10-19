@@ -58,8 +58,8 @@ public class MoveGenerationTest {
 	public void rookTest() {
 		//rook can move in four directions 
 		assertTrue("Rook does not move correctly",
-				checkLegalMoves("4k3/8/8/3r4/8/8/8/4K3 b - -",
-				"d5", "c5 b5 a5 e5 f5 g5 h5 d6 d7 d8 d4 d3 d2 d1"));	
+				checkLegalMoves("8/1k3R2/2r5/8/8/8/8/4K3 b - - 0 1 ",
+				"c6", "c7"));	
 	}
 	
 	@Test
@@ -97,6 +97,9 @@ public class MoveGenerationTest {
 	
 	@Test
 	public void pawnTest(){
+		assertTrue("Pawn does not move correctly",
+				checkLegalMoves("8/2p2R2/1k6/8/8/8/8/4K3 b - - 0 1",
+				"c7", "c6 c5"));
 		
 	}
 		
