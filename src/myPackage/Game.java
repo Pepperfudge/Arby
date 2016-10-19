@@ -916,7 +916,7 @@ public class Game{
 			if (board[i][j] == 'q' || board[i][j] == 'b') {
 				return true;
 			}	
-			else if (board[i][j] != 'K' ) {		
+			else if (board[i][j] == 'K' ) {		
 			}
 			else if (board[i][j] != 'x' ) {
 				break;
@@ -926,7 +926,7 @@ public class Game{
 			if (board[i][j] == 'q' ||board[i][j] == 'b') {
 				return true;
 			}
-			else if (board[i][j] != 'K' ) {		
+			else if (board[i][j] == 'K' ) {		
 			}
 			else if (board[i][j] != 'x' ) {
 					break;
@@ -936,7 +936,7 @@ public class Game{
 			if (board[i][j] == 'q' || board[i][j] == 'b') {
 				return true;
 			}
-			else if (board[i][j] != 'K' ) {		
+			else if (board[i][j] == 'K' ) {		
 			}
 			else if (board[i][j] != 'x' ) {
 				break;
@@ -946,7 +946,7 @@ public class Game{
 			if (board[i][j] == 'q' || board[i][j] == 'b') {
 				return true;
 			}
-			else if (board[i][j] != 'K' ) {		
+			else if (board[i][j] == 'K' ) {		
 			}
 			else if (board[i][j] != 'x' ) {
 				break;
