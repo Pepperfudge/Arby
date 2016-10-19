@@ -7,12 +7,18 @@ public class Move {
 	private static HashMap<Integer, Character> colToLetter = createColumntoLetterMap();
 
 	public int currRow, currColumn, newRow, newColumn;
+	public char promotionPiece;
 	
 	public Move(String UCIFormat){
 		currColumn = letterToCol.get(UCIFormat.charAt(0));
 		currRow = Character.getNumericValue(UCIFormat.charAt(1)) - 1;
 		newColumn = letterToCol.get(UCIFormat.charAt(2));
 		newRow = Character.getNumericValue(UCIFormat.charAt(3)) - 1;
+		if (UCIFormat.length() == 5){
+			promotionPiece = UCIFormat.charAt(4);
+		} else {
+			promotionPiece = 'x';
+		}
 	}
 	
 	public Move(int currRow, int currColumn, int newRow, int newColumn){
@@ -20,11 +26,25 @@ public class Move {
 		this.currColumn  = currColumn;
 		this.newRow = newRow;
 		this.newColumn = newColumn;
+		this.promotionPiece = 'x';
 	}
 	
+	public Move(int currRow, int currColumn, int newRow, int newColumn, char promotionPiece){
+		this.currRow = currRow;
+		this.currColumn  = currColumn;
+		this.newRow = newRow;
+		this.newColumn = newColumn;
+		this.promotionPiece = promotionPiece;
+	}
 	public String convertToUCIFormat(){
-		return colToLetter.get(currColumn) + Integer.toString(currRow + 1) 
+		if (promotionPiece != 'x'){
+			return colToLetter.get(currColumn) + Integer.toString(currRow + 1) 
+			   + colToLetter.get(newColumn) + Integer.toString( newRow + 1)
+			   + promotionPiece;  
+		} else{
+			return colToLetter.get(currColumn) + Integer.toString(currRow + 1) 
 			   + colToLetter.get(newColumn) + Integer.toString( newRow + 1); 
+		}
 	}
 	
 	@Override
@@ -37,7 +57,8 @@ public class Move {
 	    }
 	    final Move other = (Move) obj;
 	    return this.currColumn == other.currColumn && this.currRow == other.currRow 
-	    		&& this.newColumn == other.newColumn && this.newRow == other.newRow;
+	    		&& this.newColumn == other.newColumn && this.newRow == other.newRow
+	    		&& this.promotionPiece == other.promotionPiece;
 	}
 	
 	private static HashMap<Character, Integer> createLettertoColumnMap(){
