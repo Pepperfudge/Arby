@@ -36,6 +36,7 @@ public class UCI {
 	            	}
 	            }  else if (inputString.startsWith("go")){
 	            	System.out.format("bestmove %s \n", findMove());
+	            	
 	            } else if (inputString.equals("quit")){
 	            	System.out.println("engine quitting");
 	            	break;
