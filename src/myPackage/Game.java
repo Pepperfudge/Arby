@@ -187,6 +187,93 @@ public class Game {
 			blackKCastle = true;
 		}
 	}
+	
+	public Move findBestMove(int depth){
+		if (sideToMove == 'w'){
+			return findBestMoveWhite(depth);
+		} else {
+			return findBestMoveBlack(depth);
+		}
+	}
+	
+	public Move findBestMoveWhite(int depth){
+		ArrayList<Move> moves = generateLegalMoves();
+		
+		int maxValue = Integer.MIN_VALUE;
+		Move bestMove = null;
+		for (int i = 0; i < moves.size(); i++){
+			Move move = moves.get(i);
+			int moveValue = evaluateMoveWhite( move, depth);
+			if (moveValue > maxValue){
+				maxValue = moveValue;
+				bestMove = move;
+			}
+		}
+		return bestMove;
+	}
+	
+	public Move findBestMoveBlack(int depth){
+		ArrayList<Move> moves = generateLegalMoves();
+		
+		int minValue = Integer.MAX_VALUE;
+		Move bestMove = null;
+		for (int i = 0; i < moves.size(); i++){
+			Move move = moves.get(i);
+			int moveValue = evaluateMoveBlack( move, depth);
+			if (moveValue < minValue){
+				minValue = moveValue;
+				bestMove = move;
+			}
+		}
+		return bestMove;
+	}
+	
+	private int evaluateMoveWhite(Move whiteMove, int depth){
+		Game newPosition = new Game(this, whiteMove);
+		if (depth == 0){
+			return newPosition.evaluateBoard();
+		} else {
+			//to evaluate whites move we must evaluate black's response
+			//Black should pick the move with the minimum value
+			ArrayList<Move> blackMoves = newPosition.generateLegalMoves();
+			int minValue = Integer.MAX_VALUE;
+			for (int i = 0; i < blackMoves.size(); i++){
+				Move blackMove = blackMoves.get(i);
+				int moveValue = newPosition.evaluateMoveBlack(blackMove, depth-1);
+				if (moveValue < minValue){
+					minValue = moveValue;
+				}
+			}
+			return minValue;
+		}
+
+	}
+	private int evaluateMoveBlack(Move blackMove, int depth){
+		Game newPosition = new Game(this, blackMove);
+		if (depth == 0){
+			//if the max depth has been reached we simply return 
+			//the value of the board
+			return newPosition.evaluateBoard();
+		} else {
+			//to evaluate blacks move we must evaluate whites's response
+			//White should pick the move with the maximum value
+			ArrayList<Move> whiteMoves = newPosition.generateLegalMoves();
+			int maxValue = Integer.MIN_VALUE;
+			for (int i = 0; i < whiteMoves.size(); i++){
+				Move whiteMove = whiteMoves.get(i);
+				int moveValue = newPosition.evaluateMoveWhite(whiteMove, depth-1);
+				if (moveValue > maxValue){
+					maxValue = moveValue;
+				}
+			}
+			return maxValue;
+		}
+
+	}
+	
+	private int evaluateBoard(){
+		return 0;
+	}
 
 	/*
 	 * public ArrayList<Integer> findKing(){ ArrayList<Integer> kingLocation =
@@ -197,8 +284,8 @@ public class Game {
 
 	public ArrayList<Move> generateLegalMoves() {
 		// System.out.println("generateLegalMoves");
-		System.out.println(enPassant);
-		System.out.println(enPassantTarget);
+		//System.out.println(enPassant);
+		//System.out.println(enPassantTarget);
 		ArrayList<Move> moves = new ArrayList<Move>();
 		if (sideToMove == 'w') {
 			moves.addAll(generateWhiteMoves());
