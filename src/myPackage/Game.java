@@ -245,7 +245,7 @@ public class Game {
 		Move bestMove = null;
 		for (int i = 0; i < moves.size(); i++){
 			Move move = moves.get(i);
-			double moveValue = evaluateMoveWhite( move, depth);
+			double moveValue = evaluateMoveWhite( move, depth-1);
 			if (moveValue > maxValue){
 				maxValue = moveValue;
 				bestMove = move;
@@ -262,7 +262,7 @@ public class Game {
 		Move bestMove = null;
 		for (int i = 0; i < moves.size(); i++){
 			Move move = moves.get(i);
-			double moveValue = evaluateMoveBlack( move, depth);
+			double moveValue = evaluateMoveBlack( move, depth-1);
 			
 			if (moveValue < minValue){
 				minValue = moveValue;
