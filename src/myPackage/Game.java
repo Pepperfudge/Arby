@@ -452,7 +452,7 @@ public class Game {
 			positionScore = whiteScore - blackScore;
 		}	
 		
-		return whiteKingSafety;
+		return positionScore;
 	}
 
 	/*
