@@ -12,6 +12,9 @@ public class Game {
 	
 	private boolean enPassant;
 	private int enPassantTarget;
+	
+	private int whiteMaterialScore = 39;
+	private int blackMaterialScore = 39; 
 
 	// these variables are true if the castle is still possible
 	private boolean whiteQCastle;
@@ -103,6 +106,22 @@ public class Game {
 			this.sideToMove = 'w';
 		}
 		// System.out.format("Turn to move: %s\n", sideToMove);
+		
+		if (prevPosition.board[move.newRow][move.newColumn] == 'Q') { this.whiteMaterialScore = prevPosition.whiteMaterialScore - 9; }
+		else if (prevPosition.board[move.newRow][move.newColumn] == 'R') { this.whiteMaterialScore = prevPosition.whiteMaterialScore - 5; }
+		else if (prevPosition.board[move.newRow][move.newColumn] == 'B') { this.whiteMaterialScore = prevPosition.whiteMaterialScore - 3; }
+		else if (prevPosition.board[move.newRow][move.newColumn] == 'N') { this.whiteMaterialScore = prevPosition.whiteMaterialScore - 3; }
+		else if (prevPosition.board[move.newRow][move.newColumn] == 'P') { this.whiteMaterialScore = prevPosition.whiteMaterialScore - 1; }
+		else {this.whiteMaterialScore = prevPosition.whiteMaterialScore;}
+		
+		if (prevPosition.board[move.newRow][move.newColumn] == 'q') {
+		this.blackMaterialScore = prevPosition.blackMaterialScore - 9; }
+		else if (prevPosition.board[move.newRow][move.newColumn] == 'r') { this.blackMaterialScore = prevPosition.blackMaterialScore - 5; }
+		else if (prevPosition.board[move.newRow][move.newColumn] == 'b') { this.blackMaterialScore = prevPosition.blackMaterialScore - 3; }
+		else if (prevPosition.board[move.newRow][move.newColumn] == 'n') { this.blackMaterialScore = prevPosition.blackMaterialScore - 3; }
+		else if (prevPosition.board[move.newRow][move.newColumn] == 'p') { this.blackMaterialScore = prevPosition.blackMaterialScore - 1; }
+		else {this.blackMaterialScore = prevPosition.blackMaterialScore;}
+		
 	}
 
 	private void makeMove(Move move) {
@@ -199,11 +218,11 @@ public class Game {
 	public Move findBestMoveWhite(int depth){
 		ArrayList<Move> moves = generateLegalMoves();
 		
-		int maxValue = Integer.MIN_VALUE;
+		double maxValue = Integer.MIN_VALUE;
 		Move bestMove = null;
 		for (int i = 0; i < moves.size(); i++){
 			Move move = moves.get(i);
-			int moveValue = evaluateMoveWhite( move, depth);
+			double moveValue = evaluateMoveWhite( move, depth);
 			if (moveValue > maxValue){
 				maxValue = moveValue;
 				bestMove = move;
@@ -215,11 +234,11 @@ public class Game {
 	public Move findBestMoveBlack(int depth){
 		ArrayList<Move> moves = generateLegalMoves();
 		
-		int minValue = Integer.MAX_VALUE;
+		double minValue = Integer.MAX_VALUE;
 		Move bestMove = null;
 		for (int i = 0; i < moves.size(); i++){
 			Move move = moves.get(i);
-			int moveValue = evaluateMoveBlack( move, depth);
+			double moveValue = evaluateMoveBlack( move, depth);
 			if (moveValue < minValue){
 				minValue = moveValue;
 				bestMove = move;
@@ -228,7 +247,7 @@ public class Game {
 		return bestMove;
 	}
 	
-	private int evaluateMoveWhite(Move whiteMove, int depth){
+	private double evaluateMoveWhite(Move whiteMove, int depth){
 		Game newPosition = new Game(this, whiteMove);
 		if (depth == 0){
 			return newPosition.evaluateBoard();
@@ -236,10 +255,10 @@ public class Game {
 			//to evaluate whites move we must evaluate black's response
 			//Black should pick the move with the minimum value
 			ArrayList<Move> blackMoves = newPosition.generateLegalMoves();
-			int minValue = Integer.MAX_VALUE;
+			double minValue = Integer.MAX_VALUE;
 			for (int i = 0; i < blackMoves.size(); i++){
 				Move blackMove = blackMoves.get(i);
-				int moveValue = newPosition.evaluateMoveBlack(blackMove, depth-1);
+				double moveValue = newPosition.evaluateMoveBlack(blackMove, depth-1);
 				if (moveValue < minValue){
 					minValue = moveValue;
 				}
@@ -248,7 +267,7 @@ public class Game {
 		}
 
 	}
-	private int evaluateMoveBlack(Move blackMove, int depth){
+	private double evaluateMoveBlack(Move blackMove, int depth){
 		Game newPosition = new Game(this, blackMove);
 		if (depth == 0){
 			//if the max depth has been reached we simply return 
@@ -258,10 +277,10 @@ public class Game {
 			//to evaluate blacks move we must evaluate whites's response
 			//White should pick the move with the maximum value
 			ArrayList<Move> whiteMoves = newPosition.generateLegalMoves();
-			int maxValue = Integer.MIN_VALUE;
+			double maxValue = Integer.MIN_VALUE;
 			for (int i = 0; i < whiteMoves.size(); i++){
 				Move whiteMove = whiteMoves.get(i);
-				int moveValue = newPosition.evaluateMoveWhite(whiteMove, depth-1);
+				double moveValue = newPosition.evaluateMoveWhite(whiteMove, depth-1);
 				if (moveValue > maxValue){
 					maxValue = moveValue;
 				}
@@ -271,8 +290,98 @@ public class Game {
 
 	}
 	
-	private int evaluateBoard(){
-		return 0;
+	private double evaluateBoard(){
+		double positionScore=0;
+		double blackScore=0;
+		double whiteScore=0;
+		double blackKingSafety=0;
+		double whiteKingSafety=0;
+		double blackDevelopment=0;
+		double whiteDevelopment=0;
+		double blackPawnStructure=0;
+		double whitePawnStructure=0;
+		
+		//blackKingSafety
+		if ((board[7][1] == 'k' || board[7][0] == 'k') && board[7][0] != 'r'){ 
+			blackKingSafety = blackKingSafety + 0.2;
+			if (board[6][1] != 'p' && board[6][0] != 'p')
+				blackKingSafety = blackKingSafety - 0.1;
+		}
+		else if ((board[7][5] == 'k' || board[7][6] == 'k' || board[7][7] == 'k') && board[7][0] != 'r'){ 
+			blackKingSafety = blackKingSafety + 0.2;
+		}	
+		/*else if (blackKCastle == false && blackQCastle == false) {
+			blackKingSafety = blackKingSafety - 0.2;
+		}*/	
+		
+		//whiteKingSafety
+		if ((board[0][1] == 'K' || board[0][0] == 'K') && board[7][0] != 'R'){ 
+			whiteKingSafety = whiteKingSafety + 0.2;	
+			if (board[1][1] != 'P' && board[1][0] != 'P')
+				whiteKingSafety = whiteKingSafety - 0.1;
+		}
+		else if ((board[0][5] == 'K' || board[0][6] == 'K' || board[0][7] == 'K') && board[7][0] != 'R'){ 
+			whiteKingSafety = whiteKingSafety + 0.2;
+		}	
+		/*else if (whiteKCastle == false && whiteQCastle == false) {
+			whiteKingSafety = whiteKingSafety - 0.2;
+		}*/	
+		
+		//blackDevelopment
+		if (board[7][1] != 'n') { blackDevelopment = blackDevelopment + 0.1; }
+		if (board[7][2] != 'b') { blackDevelopment = blackDevelopment + 0.1; }
+		if (board[7][5] != 'b')	{ blackDevelopment = blackDevelopment + 0.1; }
+		if (board[7][6] != 'n')	{ blackDevelopment = blackDevelopment + 0.1; }
+		
+		//whiteDevelopment
+		if (board[0][1] != 'N') { whiteDevelopment = whiteDevelopment + 0.1; }
+		if (board[0][2] != 'B') { whiteDevelopment = whiteDevelopment + 0.1; }
+		if (board[0][5] != 'B')	{ whiteDevelopment = whiteDevelopment + 0.1; }
+		if (board[0][6] != 'N')	{ whiteDevelopment = whiteDevelopment + 0.1; }
+		
+		//blackPawnStructure
+		if (board[5][3]=='p') {
+			blackPawnStructure = blackPawnStructure + 0.05;
+		}
+		if (board[5][4] =='p') {
+			blackPawnStructure = blackPawnStructure + 0.05;
+		}
+		if (board[4][3]=='p' || board[3][3] =='p') {
+			blackPawnStructure = blackPawnStructure + 0.1;
+		}
+		if (board[4][4] =='p' || board[3][4] == 'p') {
+			blackPawnStructure = blackPawnStructure + 0.1;
+		}
+		
+		//whitePawnStructure
+		if (board[2][3]=='P') {
+			whitePawnStructure = whitePawnStructure + 0.05;
+		}
+		if (board[2][4] =='P') {
+			whitePawnStructure = whitePawnStructure + 0.05;
+		}
+		if (board[4][3]=='P' || board[3][3] =='P') {
+			whitePawnStructure = whitePawnStructure + 0.1;
+		}
+		if (board[4][4] =='P' || board[3][4] == 'P') {
+			whitePawnStructure = whitePawnStructure + 0.1;
+		}
+		
+		blackScore = blackMaterialScore + blackKingSafety + blackDevelopment + blackPawnStructure;
+		whiteScore = whiteMaterialScore + whiteKingSafety + whiteDevelopment + whitePawnStructure;
+		
+		if (sideToMove == 'w'){
+			/*if (iswhiteKingInCheck && can't move){ positionScore = -1000} 
+			 else if (isWhiteKingInCheck == false && can't move) {positionScore = 0}   else*/
+			positionScore = whiteScore - blackScore;
+		}
+		else{
+			/*if (!isBlackKingIsInCheck && checkmated){positionScore) = 1000} 
+			  else if (isBlackKingInCheck == false && can't move) {positionScore = 0}  else */
+			positionScore = whiteScore - blackScore;
+		}	
+		
+		return positionScore;
 	}
 
 	/*
@@ -284,8 +393,8 @@ public class Game {
 
 	public ArrayList<Move> generateLegalMoves() {
 		// System.out.println("generateLegalMoves");
-		//System.out.println(enPassant);
-		//System.out.println(enPassantTarget);
+		System.out.println("positionScore is" + evaluateBoard());
+		System.out.println("whiteKcastle is" + whiteKCastle);
 		ArrayList<Move> moves = new ArrayList<Move>();
 		if (sideToMove == 'w') {
 			moves.addAll(generateWhiteMoves());
