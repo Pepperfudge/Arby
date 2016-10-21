@@ -4,6 +4,7 @@ import java.util.*;
 public class UCI {
 	static Game currGame = new Game();
 	static int num_moves;
+	static final int DEPTH = 4;
 	public static void main(String[] args) {
 		Scanner input = new Scanner(System.in);
 		System.out.println("Whitey has arrived");
@@ -49,7 +50,10 @@ public class UCI {
 	}
 	
 	public static String findMove(){
-		return currGame.findBestMove(4).convertToUCIFormat();
+//		if (num_moves == 1){
+//			return "e7e5";
+//		}
+		return currGame.findBestMove(DEPTH).convertToUCIFormat();
 //		ArrayList<Move> possibleMoves = currGame.generateLegalMoves();
 //    	int rnd = new Random().nextInt(possibleMoves.size());
 //    	Move nextMove =  possibleMoves.get(rnd);
