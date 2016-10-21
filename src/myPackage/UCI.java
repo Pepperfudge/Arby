@@ -50,14 +50,14 @@ public class UCI {
 	}
 	
 	public static String findMove(){
-//		if (num_moves == 1){
-//			return "e7e5";
-//		}
+		if (num_moves == 0 || num_moves == 1){
+			ArrayList<Move> possibleMoves = currGame.generateLegalMoves();
+			int rnd = new Random().nextInt(possibleMoves.size());
+			Move nextMove =  possibleMoves.get(rnd);
+			return nextMove.convertToUCIFormat();
+		}
 		return currGame.findBestMove(DEPTH).convertToUCIFormat();
-//		ArrayList<Move> possibleMoves = currGame.generateLegalMoves();
-//    	int rnd = new Random().nextInt(possibleMoves.size());
-//    	Move nextMove =  possibleMoves.get(rnd);
-//    	return nextMove.convertToUCIFormat();
+
 	}
 
 }
