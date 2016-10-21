@@ -113,6 +113,18 @@ public class Game {
 		else if (prevPosition.board[move.newRow][move.newColumn] == 'N') { this.whiteMaterialScore = prevPosition.whiteMaterialScore - 3; }
 		else if (prevPosition.board[move.newRow][move.newColumn] == 'P') { this.whiteMaterialScore = prevPosition.whiteMaterialScore - 1; }
 		else {this.whiteMaterialScore = prevPosition.whiteMaterialScore;}
+		if (prevPosition.board[move.currRow][move.currColumn] == 'P' && this.board[move.newRow][move.newColumn] == 'Q') {
+			this.whiteMaterialScore = prevPosition.whiteMaterialScore + 8;
+		}
+		if (prevPosition.board[move.currRow][move.currColumn] == 'P' && this.board[move.newRow][move.newColumn] == 'N') {
+			this.whiteMaterialScore = prevPosition.whiteMaterialScore + 2;
+		}
+		if (prevPosition.board[move.currRow][move.currColumn] == 'P' && this.board[move.newRow][move.newColumn] == 'R') {
+			this.whiteMaterialScore = prevPosition.whiteMaterialScore + 4;
+		}
+		if (prevPosition.board[move.currRow][move.currColumn] == 'P' && this.board[move.newRow][move.newColumn] == 'B') {
+			this.whiteMaterialScore = prevPosition.whiteMaterialScore + 2;
+		}
 		
 		if (prevPosition.board[move.newRow][move.newColumn] == 'q') {
 		this.blackMaterialScore = prevPosition.blackMaterialScore - 9; }
@@ -121,7 +133,18 @@ public class Game {
 		else if (prevPosition.board[move.newRow][move.newColumn] == 'n') { this.blackMaterialScore = prevPosition.blackMaterialScore - 3; }
 		else if (prevPosition.board[move.newRow][move.newColumn] == 'p') { this.blackMaterialScore = prevPosition.blackMaterialScore - 1; }
 		else {this.blackMaterialScore = prevPosition.blackMaterialScore;}
-		
+		if (prevPosition.board[move.currRow][move.currColumn] == 'p' && this.board[move.newRow][move.newColumn] == 'q') {
+			this.blackMaterialScore = prevPosition.blackMaterialScore + 8;
+		}
+		if (prevPosition.board[move.currRow][move.currColumn] == 'p' && this.board[move.newRow][move.newColumn] == 'n') {
+			this.blackMaterialScore = prevPosition.blackMaterialScore + 2;
+		}
+		if (prevPosition.board[move.currRow][move.currColumn] == 'p' && this.board[move.newRow][move.newColumn] == 'r') {
+			this.blackMaterialScore = prevPosition.blackMaterialScore + 4;
+		}
+		if (prevPosition.board[move.currRow][move.currColumn] == 'p' && this.board[move.newRow][move.newColumn] == 'b') {
+			this.blackMaterialScore = prevPosition.blackMaterialScore + 2;
+		}
 	}
 
 	private void makeMove(Move move) {
@@ -332,13 +355,18 @@ public class Game {
 		if (board[7][2] != 'b') { blackDevelopment = blackDevelopment + 0.1; }
 		if (board[7][5] != 'b')	{ blackDevelopment = blackDevelopment + 0.1; }
 		if (board[7][6] != 'n')	{ blackDevelopment = blackDevelopment + 0.1; }
+		if (board[7][1] != 'n' && board[7][2] != 'b' && board[7][5] != 'b' && board[7][6] != 'n'){
+			if (board[7][4] != 'q'){ blackDevelopment = blackDevelopment + 0.05; }
+		}
 		
 		//whiteDevelopment
 		if (board[0][1] != 'N') { whiteDevelopment = whiteDevelopment + 0.1; }
 		if (board[0][2] != 'B') { whiteDevelopment = whiteDevelopment + 0.1; }
 		if (board[0][5] != 'B')	{ whiteDevelopment = whiteDevelopment + 0.1; }
 		if (board[0][6] != 'N')	{ whiteDevelopment = whiteDevelopment + 0.1; }
-		
+		if (board[0][1] != 'n' && board[0][2] != 'b' && board[0][5] != 'b' && board[0][6] != 'n'){
+			if (board[0][4] != 'Q'){ whiteDevelopment = whiteDevelopment + 0.05; }
+		}	
 		//blackPawnStructure
 		if (board[5][3]=='p') {
 			blackPawnStructure = blackPawnStructure + 0.05;
