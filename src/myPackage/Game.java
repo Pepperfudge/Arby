@@ -327,26 +327,69 @@ public class Game {
 		//blackKingSafety
 		if ((board[7][1] == 'k' || board[7][0] == 'k') && board[7][0] != 'r'){ 
 			blackKingSafety = blackKingSafety + 0.2;
-			if (board[6][1] != 'p' && board[6][0] != 'p')
+			if (board[6][1] != 'p' && board[6][0] != 'p'){
 				blackKingSafety = blackKingSafety - 0.1;
+			}	
+			if (board[6][1] !='p' && board[5][1] !='p'){
+				blackKingSafety = blackKingSafety - 0.1;
+			}
+			if (board[6][0] !='p' && board[5][0] !='p'){
+				blackKingSafety = blackKingSafety - 0.1;
+			}
 		}
 		else if ((board[7][5] == 'k' || board[7][6] == 'k' || board[7][7] == 'k') && board[7][0] != 'r'){ 
 			blackKingSafety = blackKingSafety + 0.2;
+			if (board[7][5] == 'k') { 
+				blackKingSafety = blackKingSafety - 0.05;
+				if (board[6][5] != 'P' && board[5][5] != 'p'){blackKingSafety = blackKingSafety - 0.1;}
+				if (board[6][5] != 'P' && board[6][6] != 'p'){blackKingSafety = blackKingSafety - 0.1;}
+			}
+			if (board[6][5] != 'p' && board[6][6] != 'p'){
+				blackKingSafety = blackKingSafety - 0.1;
+			}
+			if (board[6][6] != 'p' && board[5][6] != 'p'){
+				blackKingSafety = blackKingSafety - 0.1;
+			}
+			if (board[6][7] != 'p' && board[5][7] != 'p'){
+				blackKingSafety = blackKingSafety - 0.1;
+			}
 		}	
-		/*else if (blackKCastle == false && blackQCastle == false) {
+		/*else if (blackKCastle == false && blackQCastle == false && board[6][7] != 'k' && board[6][6] != 'k' && board[6][1] != 'k' && board[6][0] != 'k') {
 			blackKingSafety = blackKingSafety - 0.2;
 		}*/	
 		
 		//whiteKingSafety
 		if ((board[0][1] == 'K' || board[0][0] == 'K') && board[7][0] != 'R'){ 
 			whiteKingSafety = whiteKingSafety + 0.2;	
-			if (board[1][1] != 'P' && board[1][0] != 'P')
+			if (board[1][1] != 'P' && board[1][0] != 'P'){
 				whiteKingSafety = whiteKingSafety - 0.1;
+			}	
+			if (board[1][1] != 'P' && board[2][1] != 'P'){
+				whiteKingSafety = whiteKingSafety - 0.1;
+			}
+			if (board[1][0] != 'P' && board[2][0] != 'P'){
+				whiteKingSafety = whiteKingSafety - 0.1;
+			}
 		}
 		else if ((board[0][5] == 'K' || board[0][6] == 'K' || board[0][7] == 'K') && board[7][0] != 'R'){ 
 			whiteKingSafety = whiteKingSafety + 0.2;
+			if (board[0][5] == 'K') { 
+				whiteKingSafety = whiteKingSafety - 0.05;
+				if (board[1][5] != 'P' && board[2][5] != 'P'){whiteKingSafety = whiteKingSafety - 0.1;}
+				if (board[1][5] != 'P' && board[1][6] != 'P'){whiteKingSafety = whiteKingSafety - 0.1;}
+			}
+			
+			if (board[1][6] != 'P' && board[1][7] != 'P'){
+				whiteKingSafety = whiteKingSafety - 0.1;
+			}
+			if (board[1][6] != 'P' && board[2][6] != 'P'){
+				whiteKingSafety = whiteKingSafety - 0.1;
+			}
+			if (board[1][7] != 'P' && board[2][7] != 'P'){
+				whiteKingSafety = whiteKingSafety - 0.1;
+			}
 		}	
-		/*else if (whiteKCastle == false && whiteQCastle == false) {
+		/*else if (whiteKCastle == false && whiteQCastle == false && board[1][7] != 'K' && board[1][6] != 'K' && board[1][1] != 'K' && board[1][0] != 'K') {
 			whiteKingSafety = whiteKingSafety - 0.2;
 		}*/	
 		
@@ -409,7 +452,7 @@ public class Game {
 			positionScore = whiteScore - blackScore;
 		}	
 		
-		return positionScore;
+		return whiteKingSafety;
 	}
 
 	/*
