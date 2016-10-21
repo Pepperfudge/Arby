@@ -16,7 +16,7 @@ public class UCI {
 	            {
 	                System.out.println("id name Whitie");
 	                System.out.println("id author LuckyAC");
-	                System.out.println("version pawnPromoter");
+	                System.out.println("version Deep");
 	                System.out.println("uciok");
 	            }  else if (inputString.equals("ucinewgame")){
 	            	currGame = new Game();
@@ -49,10 +49,11 @@ public class UCI {
 	}
 	
 	public static String findMove(){
-		ArrayList<Move> possibleMoves = currGame.generateLegalMoves();
-    	int rnd = new Random().nextInt(possibleMoves.size());
-    	Move nextMove =  possibleMoves.get(rnd);
-    	return nextMove.convertToUCIFormat();
+		return currGame.findBestMove(4).convertToUCIFormat();
+//		ArrayList<Move> possibleMoves = currGame.generateLegalMoves();
+//    	int rnd = new Random().nextInt(possibleMoves.size());
+//    	Move nextMove =  possibleMoves.get(rnd);
+//    	return nextMove.convertToUCIFormat();
 	}
 
 }

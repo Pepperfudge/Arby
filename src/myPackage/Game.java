@@ -251,6 +251,7 @@ public class Game {
 				bestMove = move;
 			}
 		}
+//		System.out.printf("W, depth %d: %f\n", depth, maxValue);
 		return bestMove;
 	}
 	
@@ -262,17 +263,21 @@ public class Game {
 		for (int i = 0; i < moves.size(); i++){
 			Move move = moves.get(i);
 			double moveValue = evaluateMoveBlack( move, depth);
+			
 			if (moveValue < minValue){
 				minValue = moveValue;
 				bestMove = move;
 			}
 		}
+//		System.out.printf("B, depth %d: %f\n", depth, minValue);
 		return bestMove;
 	}
 	
 	private double evaluateMoveWhite(Move whiteMove, int depth){
 		Game newPosition = new Game(this, whiteMove);
 		if (depth == 0){
+//			System.out.println(whiteMove.convertToUCIFormat());
+//			System.out.printf("B depth %d: %f\n", depth, newPosition.evaluateBoard());
 			return newPosition.evaluateBoard();
 		} else {
 			//to evaluate whites move we must evaluate black's response
@@ -286,6 +291,8 @@ public class Game {
 					minValue = moveValue;
 				}
 			}
+//			System.out.println(whiteMove.convertToUCIFormat());
+//			System.out.printf("B, depth %d: %f\n", depth, minValue);
 			return minValue;
 		}
 
@@ -295,6 +302,8 @@ public class Game {
 		if (depth == 0){
 			//if the max depth has been reached we simply return 
 			//the value of the board
+//			System.out.println(blackMove.convertToUCIFormat());
+//			System.out.printf("W, depth %d: %f\n", depth, newPosition.evaluateBoard());
 			return newPosition.evaluateBoard();
 		} else {
 			//to evaluate blacks move we must evaluate whites's response
@@ -308,6 +317,8 @@ public class Game {
 					maxValue = moveValue;
 				}
 			}
+//			System.out.println(blackMove.convertToUCIFormat());
+//			System.out.printf("W, depth %d: %f\n", depth, maxValue);
 			return maxValue;
 		}
 
@@ -464,8 +475,8 @@ public class Game {
 
 	public ArrayList<Move> generateLegalMoves() {
 		// System.out.println("generateLegalMoves");
-		System.out.println("positionScore is" + evaluateBoard());
-		System.out.println("whiteKcastle is" + whiteKCastle);
+//		System.out.println("positionScore is" + evaluateBoard());
+//		System.out.println("whiteKcastle is" + whiteKCastle);
 		ArrayList<Move> moves = new ArrayList<Move>();
 		if (sideToMove == 'w') {
 			moves.addAll(generateWhiteMoves());
