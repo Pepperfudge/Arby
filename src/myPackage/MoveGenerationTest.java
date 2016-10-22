@@ -108,5 +108,22 @@ public class MoveGenerationTest {
 						+ " b7 c6 d5 e4 f3 g2 h1"));
 		
 	}
+	
+	@Test
+	public void castleToggleTest(){
+		
+		Game castleGame = new Game();
+		castleGame = new Game(castleGame, new Move("e2e4"));
+		castleGame = new Game(castleGame, new Move("e7e5"));
+		castleGame = new Game(castleGame, new Move("f1e2"));
+		castleGame = new Game(castleGame, new Move("d7d5"));
+		castleGame = new Game(castleGame, new Move("g1h3"));
+		castleGame = new Game(castleGame, new Move("g8h6"));
+;
+//		System.out.print(castleGame);
+		ArrayList<Move> moves = castleGame.generateLegalMoves();
+		assertTrue("Castling move not found", 
+				moves.contains(new Move("e1g1")));		
+	}
 		
 }

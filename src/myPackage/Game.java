@@ -1,7 +1,6 @@
 package myPackage;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 public class Game {
 	private char[][] board;
@@ -10,12 +9,12 @@ public class Game {
 
 	private int[] whiteKingLocation = new int[2];
 	private int[] blackKingLocation = new int[2];
-	
+
 	private boolean enPassant;
 	private int enPassantTarget;
-	
+
 	private int whiteMaterialScore = 39;
-	private int blackMaterialScore = 39; 
+	private int blackMaterialScore = 39;
 
 	// these variables are true if the castle is still possible
 	private boolean whiteQCastle;
@@ -43,6 +42,18 @@ public class Game {
 	}
 
 	public Game(Game prevPosition, Move move) {
+		
+		whiteQCastle = prevPosition.whiteQCastle;
+		whiteKCastle = prevPosition.whiteKCastle;
+		blackQCastle = prevPosition.blackQCastle;
+		blackKCastle = prevPosition.blackKCastle;
+		
+		if (prevPosition.sideToMove == 'w') {
+			this.sideToMove = 'b';
+		} else {
+			this.sideToMove = 'w';
+		}
+		
 		board = copyBoard(prevPosition.board);
 		char piece = board[move.currRow][move.currColumn];
 		makeMove(move);
@@ -83,73 +94,93 @@ public class Game {
 			}
 		}
 
-		if (piece == 'p' || piece == 'P'){
-			if (Math.abs(move.currRow - move.newRow) == 2){
+		if (piece == 'p' || piece == 'P') {
+			if (Math.abs(move.currRow - move.newRow) == 2) {
 				enPassantTarget = move.newColumn;
 				enPassant = true;
-			}
-			else {
+			} else {
 				enPassant = false;
 			}
-			if (Math.abs(move.currColumn - move.newColumn) == 1 && prevPosition.board[move.newRow][move.newColumn] =='x'){
-				if (move.newRow == 2){
-					//black en passant
+			if (Math.abs(move.currColumn - move.newColumn) == 1
+					&& prevPosition.board[move.newRow][move.newColumn] == 'x') {
+				if (move.newRow == 2) {
+					// black en passant
 					board[3][move.newColumn] = 'x';
-				} else{ //white en passant
+				} else { // white en passant
 					board[4][move.newColumn] = 'x';
 				}
 			}
 		}
-		
-		if (prevPosition.sideToMove == 'w') {
-			this.sideToMove = 'b';
-		} else {
-			this.sideToMove = 'w';
-		}
+
+
 		// System.out.format("Turn to move: %s\n", sideToMove);
-		
-		if (prevPosition.board[move.newRow][move.newColumn] == 'Q') { this.whiteMaterialScore = prevPosition.whiteMaterialScore - 9; }
-		else if (prevPosition.board[move.newRow][move.newColumn] == 'R') { this.whiteMaterialScore = prevPosition.whiteMaterialScore - 5; }
-		else if (prevPosition.board[move.newRow][move.newColumn] == 'B') { this.whiteMaterialScore = prevPosition.whiteMaterialScore - 3; }
-		else if (prevPosition.board[move.newRow][move.newColumn] == 'N') { this.whiteMaterialScore = prevPosition.whiteMaterialScore - 3; }
-		else if (prevPosition.board[move.newRow][move.newColumn] == 'P') { this.whiteMaterialScore = prevPosition.whiteMaterialScore - 1; }
-		else {this.whiteMaterialScore = prevPosition.whiteMaterialScore;}
-		if (prevPosition.board[move.currRow][move.currColumn] == 'P' && this.board[move.newRow][move.newColumn] == 'Q') {
+
+		if (prevPosition.board[move.newRow][move.newColumn] == 'Q') {
+			this.whiteMaterialScore = prevPosition.whiteMaterialScore - 9;
+		} else if (prevPosition.board[move.newRow][move.newColumn] == 'R') {
+			this.whiteMaterialScore = prevPosition.whiteMaterialScore - 5;
+		} else if (prevPosition.board[move.newRow][move.newColumn] == 'B') {
+			this.whiteMaterialScore = prevPosition.whiteMaterialScore - 3;
+		} else if (prevPosition.board[move.newRow][move.newColumn] == 'N') {
+			this.whiteMaterialScore = prevPosition.whiteMaterialScore - 3;
+		} else if (prevPosition.board[move.newRow][move.newColumn] == 'P') {
+			this.whiteMaterialScore = prevPosition.whiteMaterialScore - 1;
+		} else {
+			this.whiteMaterialScore = prevPosition.whiteMaterialScore;
+		}
+		if (prevPosition.board[move.currRow][move.currColumn] == 'P'
+				&& this.board[move.newRow][move.newColumn] == 'Q') {
 			this.whiteMaterialScore = prevPosition.whiteMaterialScore + 8;
 		}
-		if (prevPosition.board[move.currRow][move.currColumn] == 'P' && this.board[move.newRow][move.newColumn] == 'N') {
+		if (prevPosition.board[move.currRow][move.currColumn] == 'P'
+				&& this.board[move.newRow][move.newColumn] == 'N') {
 			this.whiteMaterialScore = prevPosition.whiteMaterialScore + 2;
 		}
-		if (prevPosition.board[move.currRow][move.currColumn] == 'P' && this.board[move.newRow][move.newColumn] == 'R') {
+		if (prevPosition.board[move.currRow][move.currColumn] == 'P'
+				&& this.board[move.newRow][move.newColumn] == 'R') {
 			this.whiteMaterialScore = prevPosition.whiteMaterialScore + 4;
 		}
-		if (prevPosition.board[move.currRow][move.currColumn] == 'P' && this.board[move.newRow][move.newColumn] == 'B') {
+		if (prevPosition.board[move.currRow][move.currColumn] == 'P'
+				&& this.board[move.newRow][move.newColumn] == 'B') {
 			this.whiteMaterialScore = prevPosition.whiteMaterialScore + 2;
 		}
-		
+
 		if (prevPosition.board[move.newRow][move.newColumn] == 'q') {
-		this.blackMaterialScore = prevPosition.blackMaterialScore - 9; }
-		else if (prevPosition.board[move.newRow][move.newColumn] == 'r') { this.blackMaterialScore = prevPosition.blackMaterialScore - 5; }
-		else if (prevPosition.board[move.newRow][move.newColumn] == 'b') { this.blackMaterialScore = prevPosition.blackMaterialScore - 3; }
-		else if (prevPosition.board[move.newRow][move.newColumn] == 'n') { this.blackMaterialScore = prevPosition.blackMaterialScore - 3; }
-		else if (prevPosition.board[move.newRow][move.newColumn] == 'p') { this.blackMaterialScore = prevPosition.blackMaterialScore - 1; }
-		else {this.blackMaterialScore = prevPosition.blackMaterialScore;}
-		if (prevPosition.board[move.currRow][move.currColumn] == 'p' && this.board[move.newRow][move.newColumn] == 'q') {
+			this.blackMaterialScore = prevPosition.blackMaterialScore - 9;
+		} else if (prevPosition.board[move.newRow][move.newColumn] == 'r') {
+			this.blackMaterialScore = prevPosition.blackMaterialScore - 5;
+		} else if (prevPosition.board[move.newRow][move.newColumn] == 'b') {
+			this.blackMaterialScore = prevPosition.blackMaterialScore - 3;
+		} else if (prevPosition.board[move.newRow][move.newColumn] == 'n') {
+			this.blackMaterialScore = prevPosition.blackMaterialScore - 3;
+		} else if (prevPosition.board[move.newRow][move.newColumn] == 'p') {
+			this.blackMaterialScore = prevPosition.blackMaterialScore - 1;
+		} else {
+			this.blackMaterialScore = prevPosition.blackMaterialScore;
+		}
+		if (prevPosition.board[move.currRow][move.currColumn] == 'p'
+				&& this.board[move.newRow][move.newColumn] == 'q') {
 			this.blackMaterialScore = prevPosition.blackMaterialScore + 8;
 		}
-		if (prevPosition.board[move.currRow][move.currColumn] == 'p' && this.board[move.newRow][move.newColumn] == 'n') {
+		if (prevPosition.board[move.currRow][move.currColumn] == 'p'
+				&& this.board[move.newRow][move.newColumn] == 'n') {
 			this.blackMaterialScore = prevPosition.blackMaterialScore + 2;
 		}
-		if (prevPosition.board[move.currRow][move.currColumn] == 'p' && this.board[move.newRow][move.newColumn] == 'r') {
+		if (prevPosition.board[move.currRow][move.currColumn] == 'p'
+				&& this.board[move.newRow][move.newColumn] == 'r') {
 			this.blackMaterialScore = prevPosition.blackMaterialScore + 4;
 		}
-		if (prevPosition.board[move.currRow][move.currColumn] == 'p' && this.board[move.newRow][move.newColumn] == 'b') {
+		if (prevPosition.board[move.currRow][move.currColumn] == 'p'
+				&& this.board[move.newRow][move.newColumn] == 'b') {
 			this.blackMaterialScore = prevPosition.blackMaterialScore + 2;
 		}
 	}
 
 	private void makeMove(Move move) {
 		char piece = board[move.currRow][move.currColumn];
+		if (piece == 'x'){
+			throw new IllegalArgumentException("No piece found to move");
+		}
 		char promotionPiece;
 
 		// promotion piece defaults to a queen
@@ -230,27 +261,26 @@ public class Game {
 			blackKCastle = true;
 		}
 	}
-	
-	public Move findBestMove(int depth){
-		if (sideToMove == 'w'){
+
+	public Move findBestMove(int depth) {
+		if (sideToMove == 'w') {
 			return findBestMoveWhite(depth);
 		} else {
 			return findBestMoveBlack(depth);
 		}
 	}
-	
-	public Move findBestMoveWhite(int depth){
+
+	public Move findBestMoveWhite(int depth) {
 		ArrayList<Move> moves = generateLegalMoves();
-		
+
 		double maxValue = Double.NEGATIVE_INFINITY;
 		Move bestMove = null;
-		for (int i = 0; i < moves.size(); i++){
-//		for (int i = 0; i < 2; i++){
+		for (int i = 0; i < moves.size(); i++) {
+			// for (int i = 0; i < 2; i++){
 			Move move = moves.get(i);
-//			Move move = moves.get(new Random().nextInt(moves.size()));
-			double moveValue = evaluateMoveWhite( move, depth-1,
-					maxValue, Double.POSITIVE_INFINITY);
-			if (moveValue >= maxValue){
+			// Move move = moves.get(new Random().nextInt(moves.size()));
+			double moveValue = evaluateMoveWhite(move, depth - 1, maxValue, Double.POSITIVE_INFINITY);
+			if (moveValue >= maxValue) {
 				maxValue = moveValue;
 				bestMove = move;
 			}
@@ -259,20 +289,19 @@ public class Game {
 		System.out.printf("W, depth %d: %f\n", depth, maxValue);
 		return bestMove;
 	}
-	
-	public Move findBestMoveBlack(int depth){
+
+	public Move findBestMoveBlack(int depth) {
 		ArrayList<Move> moves = generateLegalMoves();
-		
+
 		double minValue = Double.POSITIVE_INFINITY;
 		Move bestMove = null;
-		for (int i = 0; i < moves.size(); i++){
-//		for (int i = 0; i < 2; i++){
+		for (int i = 0; i < moves.size(); i++) {
+			// for (int i = 0; i < 2; i++){
 			Move move = moves.get(i);
-//			Move move = moves.get(new Random().nextInt(moves.size()));
-			double moveValue = evaluateMoveBlack( move, depth-1,
-						Double.NEGATIVE_INFINITY, minValue);
-			
-			if (moveValue < minValue){
+			// Move move = moves.get(new Random().nextInt(moves.size()));
+			double moveValue = evaluateMoveBlack(move, depth - 1, Double.NEGATIVE_INFINITY, minValue);
+
+			if (moveValue < minValue) {
 				minValue = moveValue;
 				bestMove = move;
 			}
@@ -281,29 +310,29 @@ public class Game {
 		System.out.printf("B, depth %d: %f\n", depth, minValue);
 		return bestMove;
 	}
-	
-	private double evaluateMoveWhite(Move whiteMove, int depth, double alpha, double beta){
+
+	private double evaluateMoveWhite(Move whiteMove, int depth, double alpha, double beta) {
 		Game newPosition = new Game(this, whiteMove);
-		if (depth == 0){
+		if (depth == 0) {
 			System.out.println(whiteMove.convertToUCIFormat());
 			System.out.printf("W depth %d: %f\n", depth, newPosition.evaluateBoard());
 			return newPosition.evaluateBoard();
 		} else {
-			//to evaluate whites move we must evaluate black's response
-			//Black should pick the move with the minimum value
+			// to evaluate whites move we must evaluate black's response
+			// Black should pick the move with the minimum value
 			ArrayList<Move> blackMoves = newPosition.generateLegalMoves();
 			double minValue = Double.POSITIVE_INFINITY;
-			for (int i = 0; i < blackMoves.size(); i++){
-//			for (int i = 0; i < 2; i++){
+			for (int i = 0; i < blackMoves.size(); i++) {
+				// for (int i = 0; i < 2; i++){
 				Move blackMove = blackMoves.get(i);
-//				Move blackMove = blackMoves.get(new Random().nextInt(blackMoves.size()));
-				double moveValue = newPosition.evaluateMoveBlack(blackMove,
-						depth-1, alpha, Math.min(minValue,beta));
-				
-				if (moveValue < minValue){
+				// Move blackMove = blackMoves.get(new
+				// Random().nextInt(blackMoves.size()));
+				double moveValue = newPosition.evaluateMoveBlack(blackMove, depth - 1, alpha, Math.min(minValue, beta));
+
+				if (moveValue < minValue) {
 					minValue = moveValue;
-				} 
-				if (moveValue < alpha){
+				}
+				if (moveValue < alpha) {
 					System.out.printf("Trim alpha %f depth %d\n", alpha, depth);
 					break;
 				}
@@ -315,29 +344,30 @@ public class Game {
 		}
 
 	}
-	private double evaluateMoveBlack(Move blackMove, int depth, double alpha, double beta){
+
+	private double evaluateMoveBlack(Move blackMove, int depth, double alpha, double beta) {
 		Game newPosition = new Game(this, blackMove);
-		if (depth == 0){
-			//if the max depth has been reached we simply return 
-			//the value of the board
+		if (depth == 0) {
+			// if the max depth has been reached we simply return
+			// the value of the board
 			System.out.println(blackMove.convertToUCIFormat());
 			System.out.printf("B, depth %d: %f\n", depth, newPosition.evaluateBoard());
 			return newPosition.evaluateBoard();
 		} else {
-			//to evaluate blacks move we must evaluate whites's response
-			//White should pick the move with the maximum value
+			// to evaluate blacks move we must evaluate whites's response
+			// White should pick the move with the maximum value
 			ArrayList<Move> whiteMoves = newPosition.generateLegalMoves();
 			double maxValue = Double.NEGATIVE_INFINITY;
-			for (int i = 0; i < whiteMoves.size(); i++){
-//			for (int i = 0; i < 2; i++){
+			for (int i = 0; i < whiteMoves.size(); i++) {
+				// for (int i = 0; i < 2; i++){
 				Move whiteMove = whiteMoves.get(i);
-//				Move whiteMove = whiteMoves.get(new Random().nextInt(whiteMoves.size()));
-				double moveValue = newPosition.evaluateMoveWhite(whiteMove,
-						depth-1, Math.max(alpha, maxValue), beta);
-				if (moveValue > maxValue){
+				// Move whiteMove = whiteMoves.get(new
+				// Random().nextInt(whiteMoves.size()));
+				double moveValue = newPosition.evaluateMoveWhite(whiteMove, depth - 1, Math.max(alpha, maxValue), beta);
+				if (moveValue > maxValue) {
 					maxValue = moveValue;
 				}
-				if (moveValue > beta){
+				if (moveValue > beta) {
 					System.out.printf("Trim beta %f depth %d\n", beta, depth);
 					break;
 				}
@@ -348,146 +378,181 @@ public class Game {
 		}
 
 	}
-	
-	private double evaluateBoard(){
-		double positionScore=0;
-		double blackScore=0;
-		double whiteScore=0;
-		double blackKingSafety=0;
-		double whiteKingSafety=0;
-		double blackDevelopment=0;
-		double whiteDevelopment=0;
-		double blackPawnStructure=0;
-		double whitePawnStructure=0;
-		
-		//blackKingSafety
-		if ((board[7][1] == 'k' || board[7][0] == 'k') && board[7][0] != 'r'){ 
+
+	private double evaluateBoard() {
+		double positionScore = 0;
+		double blackScore = 0;
+		double whiteScore = 0;
+		double blackKingSafety = 0;
+		double whiteKingSafety = 0;
+		double blackDevelopment = 0;
+		double whiteDevelopment = 0;
+		double blackPawnStructure = 0;
+		double whitePawnStructure = 0;
+
+		// blackKingSafety
+		if ((board[7][1] == 'k' || board[7][0] == 'k') && board[7][0] != 'r') {
 			blackKingSafety = blackKingSafety + 0.2;
-			if (board[6][1] != 'p' && board[6][0] != 'p'){
-				blackKingSafety = blackKingSafety - 0.1;
-			}	
-			if (board[6][1] !='p' && board[5][1] !='p'){
+			if (board[6][1] != 'p' && board[6][0] != 'p') {
 				blackKingSafety = blackKingSafety - 0.1;
 			}
-			if (board[6][0] !='p' && board[5][0] !='p'){
+			if (board[6][1] != 'p' && board[5][1] != 'p') {
 				blackKingSafety = blackKingSafety - 0.1;
 			}
-		}
-		else if ((board[7][5] == 'k' || board[7][6] == 'k' || board[7][7] == 'k') && board[7][0] != 'r'){ 
+			if (board[6][0] != 'p' && board[5][0] != 'p') {
+				blackKingSafety = blackKingSafety - 0.1;
+			}
+		} else if ((board[7][5] == 'k' || board[7][6] == 'k' || board[7][7] == 'k') && board[7][0] != 'r') {
 			blackKingSafety = blackKingSafety + 0.2;
-			if (board[7][5] == 'k') { 
+			if (board[7][5] == 'k') {
 				blackKingSafety = blackKingSafety - 0.05;
-				if (board[6][5] != 'P' && board[5][5] != 'p'){blackKingSafety = blackKingSafety - 0.1;}
-				if (board[6][5] != 'P' && board[6][6] != 'p'){blackKingSafety = blackKingSafety - 0.1;}
+				if (board[6][5] != 'P' && board[5][5] != 'p') {
+					blackKingSafety = blackKingSafety - 0.1;
+				}
+				if (board[6][5] != 'P' && board[6][6] != 'p') {
+					blackKingSafety = blackKingSafety - 0.1;
+				}
 			}
-			if (board[6][5] != 'p' && board[6][6] != 'p'){
+			if (board[6][5] != 'p' && board[6][6] != 'p') {
 				blackKingSafety = blackKingSafety - 0.1;
 			}
-			if (board[6][6] != 'p' && board[5][6] != 'p'){
+			if (board[6][6] != 'p' && board[5][6] != 'p') {
 				blackKingSafety = blackKingSafety - 0.1;
 			}
-			if (board[6][7] != 'p' && board[5][7] != 'p'){
+			if (board[6][7] != 'p' && board[5][7] != 'p') {
 				blackKingSafety = blackKingSafety - 0.1;
-			}
-		}	
-		/*else if (blackKCastle == false && blackQCastle == false && board[6][7] != 'k' && board[6][6] != 'k' && board[6][1] != 'k' && board[6][0] != 'k') {
-			blackKingSafety = blackKingSafety - 0.2;
-		}*/	
-		
-		//whiteKingSafety
-		if ((board[0][1] == 'K' || board[0][0] == 'K') && board[7][0] != 'R'){ 
-			whiteKingSafety = whiteKingSafety + 0.2;	
-			if (board[1][1] != 'P' && board[1][0] != 'P'){
-				whiteKingSafety = whiteKingSafety - 0.1;
-			}	
-			if (board[1][1] != 'P' && board[2][1] != 'P'){
-				whiteKingSafety = whiteKingSafety - 0.1;
-			}
-			if (board[1][0] != 'P' && board[2][0] != 'P'){
-				whiteKingSafety = whiteKingSafety - 0.1;
 			}
 		}
-		else if ((board[0][5] == 'K' || board[0][6] == 'K' || board[0][7] == 'K') && board[7][0] != 'R'){ 
+		/*
+		 * else if (blackKCastle == false && blackQCastle == false &&
+		 * board[6][7] != 'k' && board[6][6] != 'k' && board[6][1] != 'k' &&
+		 * board[6][0] != 'k') { blackKingSafety = blackKingSafety - 0.2; }
+		 */
+
+		// whiteKingSafety
+		if ((board[0][1] == 'K' || board[0][0] == 'K') && board[7][0] != 'R') {
 			whiteKingSafety = whiteKingSafety + 0.2;
-			if (board[0][5] == 'K') { 
+			if (board[1][1] != 'P' && board[1][0] != 'P') {
+				whiteKingSafety = whiteKingSafety - 0.1;
+			}
+			if (board[1][1] != 'P' && board[2][1] != 'P') {
+				whiteKingSafety = whiteKingSafety - 0.1;
+			}
+			if (board[1][0] != 'P' && board[2][0] != 'P') {
+				whiteKingSafety = whiteKingSafety - 0.1;
+			}
+		} else if ((board[0][5] == 'K' || board[0][6] == 'K' || board[0][7] == 'K') && board[7][0] != 'R') {
+			whiteKingSafety = whiteKingSafety + 0.2;
+			if (board[0][5] == 'K') {
 				whiteKingSafety = whiteKingSafety - 0.05;
-				if (board[1][5] != 'P' && board[2][5] != 'P'){whiteKingSafety = whiteKingSafety - 0.1;}
-				if (board[1][5] != 'P' && board[1][6] != 'P'){whiteKingSafety = whiteKingSafety - 0.1;}
+				if (board[1][5] != 'P' && board[2][5] != 'P') {
+					whiteKingSafety = whiteKingSafety - 0.1;
+				}
+				if (board[1][5] != 'P' && board[1][6] != 'P') {
+					whiteKingSafety = whiteKingSafety - 0.1;
+				}
 			}
-			
-			if (board[1][6] != 'P' && board[1][7] != 'P'){
+
+			if (board[1][6] != 'P' && board[1][7] != 'P') {
 				whiteKingSafety = whiteKingSafety - 0.1;
 			}
-			if (board[1][6] != 'P' && board[2][6] != 'P'){
+			if (board[1][6] != 'P' && board[2][6] != 'P') {
 				whiteKingSafety = whiteKingSafety - 0.1;
 			}
-			if (board[1][7] != 'P' && board[2][7] != 'P'){
+			if (board[1][7] != 'P' && board[2][7] != 'P') {
 				whiteKingSafety = whiteKingSafety - 0.1;
 			}
-		}	
-		/*else if (whiteKCastle == false && whiteQCastle == false && board[1][7] != 'K' && board[1][6] != 'K' && board[1][1] != 'K' && board[1][0] != 'K') {
-			whiteKingSafety = whiteKingSafety - 0.2;
-		}*/	
-		
-		//blackDevelopment
-		if (board[7][1] != 'n') { blackDevelopment = blackDevelopment + 0.1; }
-		if (board[7][2] != 'b') { blackDevelopment = blackDevelopment + 0.1; }
-		if (board[7][5] != 'b')	{ blackDevelopment = blackDevelopment + 0.1; }
-		if (board[7][6] != 'n')	{ blackDevelopment = blackDevelopment + 0.1; }
-		if (board[7][1] != 'n' && board[7][2] != 'b' && board[7][5] != 'b' && board[7][6] != 'n'){
-			if (board[7][4] != 'q'){ blackDevelopment = blackDevelopment + 0.05; }
 		}
-		
-		//whiteDevelopment
-		if (board[0][1] != 'N') { whiteDevelopment = whiteDevelopment + 0.1; }
-		if (board[0][2] != 'B') { whiteDevelopment = whiteDevelopment + 0.1; }
-		if (board[0][5] != 'B')	{ whiteDevelopment = whiteDevelopment + 0.1; }
-		if (board[0][6] != 'N')	{ whiteDevelopment = whiteDevelopment + 0.1; }
-		if (board[0][1] != 'n' && board[0][2] != 'b' && board[0][5] != 'b' && board[0][6] != 'n'){
-			if (board[0][4] != 'Q'){ whiteDevelopment = whiteDevelopment + 0.05; }
-		}	
-		//blackPawnStructure
-		if (board[5][3]=='p') {
+		/*
+		 * else if (whiteKCastle == false && whiteQCastle == false &&
+		 * board[1][7] != 'K' && board[1][6] != 'K' && board[1][1] != 'K' &&
+		 * board[1][0] != 'K') { whiteKingSafety = whiteKingSafety - 0.2; }
+		 */
+
+		// blackDevelopment
+		if (board[7][1] != 'n') {
+			blackDevelopment = blackDevelopment + 0.1;
+		}
+		if (board[7][2] != 'b') {
+			blackDevelopment = blackDevelopment + 0.1;
+		}
+		if (board[7][5] != 'b') {
+			blackDevelopment = blackDevelopment + 0.1;
+		}
+		if (board[7][6] != 'n') {
+			blackDevelopment = blackDevelopment + 0.1;
+		}
+		if (board[7][1] != 'n' && board[7][2] != 'b' && board[7][5] != 'b' && board[7][6] != 'n') {
+			if (board[7][4] != 'q') {
+				blackDevelopment = blackDevelopment + 0.05;
+			}
+		}
+
+		// whiteDevelopment
+		if (board[0][1] != 'N') {
+			whiteDevelopment = whiteDevelopment + 0.1;
+		}
+		if (board[0][2] != 'B') {
+			whiteDevelopment = whiteDevelopment + 0.1;
+		}
+		if (board[0][5] != 'B') {
+			whiteDevelopment = whiteDevelopment + 0.1;
+		}
+		if (board[0][6] != 'N') {
+			whiteDevelopment = whiteDevelopment + 0.1;
+		}
+		if (board[0][1] != 'n' && board[0][2] != 'b' && board[0][5] != 'b' && board[0][6] != 'n') {
+			if (board[0][4] != 'Q') {
+				whiteDevelopment = whiteDevelopment + 0.05;
+			}
+		}
+		// blackPawnStructure
+		if (board[5][3] == 'p') {
 			blackPawnStructure = blackPawnStructure + 0.05;
 		}
-		if (board[5][4] =='p') {
+		if (board[5][4] == 'p') {
 			blackPawnStructure = blackPawnStructure + 0.05;
 		}
-		if (board[4][3]=='p' || board[3][3] =='p') {
+		if (board[4][3] == 'p' || board[3][3] == 'p') {
 			blackPawnStructure = blackPawnStructure + 0.1;
 		}
-		if (board[4][4] =='p' || board[3][4] == 'p') {
+		if (board[4][4] == 'p' || board[3][4] == 'p') {
 			blackPawnStructure = blackPawnStructure + 0.1;
 		}
-		
-		//whitePawnStructure
-		if (board[2][3]=='P') {
+
+		// whitePawnStructure
+		if (board[2][3] == 'P') {
 			whitePawnStructure = whitePawnStructure + 0.05;
 		}
-		if (board[2][4] =='P') {
+		if (board[2][4] == 'P') {
 			whitePawnStructure = whitePawnStructure + 0.05;
 		}
-		if (board[4][3]=='P' || board[3][3] =='P') {
+		if (board[4][3] == 'P' || board[3][3] == 'P') {
 			whitePawnStructure = whitePawnStructure + 0.1;
 		}
-		if (board[4][4] =='P' || board[3][4] == 'P') {
+		if (board[4][4] == 'P' || board[3][4] == 'P') {
 			whitePawnStructure = whitePawnStructure + 0.1;
 		}
-		
+
 		blackScore = blackMaterialScore + blackKingSafety + blackDevelopment + blackPawnStructure;
 		whiteScore = whiteMaterialScore + whiteKingSafety + whiteDevelopment + whitePawnStructure;
-		
-		if (sideToMove == 'w'){
-			/*if (iswhiteKingInCheck && can't move){ positionScore = -1000} 
-			 else if (isWhiteKingInCheck == false && can't move) {positionScore = 0}   else*/
+
+		if (sideToMove == 'w') {
+			/*
+			 * if (iswhiteKingInCheck && can't move){ positionScore = -1000}
+			 * else if (isWhiteKingInCheck == false && can't move)
+			 * {positionScore = 0} else
+			 */
+			positionScore = whiteScore - blackScore;
+		} else {
+			/*
+			 * if (!isBlackKingIsInCheck && checkmated){positionScore) = 1000}
+			 * else if (isBlackKingInCheck == false && can't move)
+			 * {positionScore = 0} else
+			 */
 			positionScore = whiteScore - blackScore;
 		}
-		else{
-			/*if (!isBlackKingIsInCheck && checkmated){positionScore) = 1000} 
-			  else if (isBlackKingInCheck == false && can't move) {positionScore = 0}  else */
-			positionScore = whiteScore - blackScore;
-		}	
-		
+
 		return positionScore;
 	}
 
@@ -500,8 +565,8 @@ public class Game {
 
 	public ArrayList<Move> generateLegalMoves() {
 		// System.out.println("generateLegalMoves");
-//		System.out.println("positionScore is" + evaluateBoard());
-//		System.out.println("whiteKcastle is" + whiteKCastle);
+		// System.out.println("positionScore is" + evaluateBoard());
+		// System.out.println("whiteKcastle is" + whiteKCastle);
 		ArrayList<Move> moves = new ArrayList<Move>();
 		if (sideToMove == 'w') {
 			moves.addAll(generateWhiteMoves());
@@ -652,12 +717,12 @@ public class Game {
 				moves.add(new Move(row, col, row - 1, col + 1));
 			}
 		}
-		if (enPassant== true && row == 3 && (col == enPassantTarget -1 || col == enPassantTarget+1)){
-			Move interimMove = new Move(row,col,2, enPassantTarget);
-            Game nextPosition = new Game(this, interimMove);
-            if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false){	
-            	moves.add(new Move(row,col,2, enPassantTarget));
-            }	
+		if (enPassant == true && row == 3 && (col == enPassantTarget - 1 || col == enPassantTarget + 1)) {
+			Move interimMove = new Move(row, col, 2, enPassantTarget);
+			Game nextPosition = new Game(this, interimMove);
+			if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+				moves.add(new Move(row, col, 2, enPassantTarget));
+			}
 		}
 
 		return moves;
@@ -695,12 +760,12 @@ public class Game {
 				moves.add(new Move(row, col, row + 1, col + 1));
 			}
 		}
-		if (enPassant== true && row == 4 && (col == enPassantTarget-1 || col == enPassantTarget+1)){
-			Move interimMove = new Move(row,col,5, enPassantTarget);
-            Game nextPosition = new Game(this, interimMove);
-            if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false){	
-            	moves.add(new Move(row,col,5, enPassantTarget));
-            }	
+		if (enPassant == true && row == 4 && (col == enPassantTarget - 1 || col == enPassantTarget + 1)) {
+			Move interimMove = new Move(row, col, 5, enPassantTarget);
+			Game nextPosition = new Game(this, interimMove);
+			if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+				moves.add(new Move(row, col, 5, enPassantTarget));
+			}
 		}
 
 		return moves;
