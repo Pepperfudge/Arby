@@ -280,14 +280,18 @@ public class Game {
 			Move move = moves.get(i);
 			// Move move = moves.get(new Random().nextInt(moves.size()));
 			double moveValue = evaluateMoveWhite(move, depth - 1, maxValue, Double.POSITIVE_INFINITY);
-			if (moveValue >= maxValue) {
+			if (moveValue > maxValue) {
 				maxValue = moveValue;
 				bestMove = move;
 			}
 		}
 		// System.out.println(bestMove.convertToUCIFormat());
 		// System.out.printf("W, depth %d: %f\n", depth, maxValue);
-		return bestMove;
+		if (bestMove != null){
+			return bestMove;
+		} else {
+			return moves.get(0);
+		}
 	}
 
 	public Move findBestMoveBlack(int depth) {
@@ -308,7 +312,11 @@ public class Game {
 		}
 		//System.out.println(bestMove.convertToUCIFormat());
 		//System.out.printf("B, depth %d: %f\n", depth, minValue);
-		return bestMove;
+		if (bestMove != null){
+			return bestMove;
+		} else {
+			return moves.get(0);
+		}
 	}
 
 	private double evaluateMoveWhite(Move whiteMove, int depth, double alpha, double beta) {
@@ -332,7 +340,7 @@ public class Game {
 				if (moveValue < minValue) {
 					minValue = moveValue;
 				}
-				if (moveValue < alpha) {
+				if (moveValue <= alpha) {
 					//System.out.printf("Trim alpha %f depth %d\n", alpha, depth);
 					break;
 				}
@@ -367,7 +375,7 @@ public class Game {
 				if (moveValue > maxValue) {
 					maxValue = moveValue;
 				}
-				if (moveValue > beta) {
+				if (moveValue >= beta) {
 					//System.out.printf("Trim beta %f depth %d\n", beta, depth);
 					break;
 				}

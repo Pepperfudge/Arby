@@ -4,7 +4,7 @@ import java.util.*;
 public class UCI {
 	static Game currGame = new Game();
 	static int num_moves;
-	static final int DEPTH = 6;
+	static final int DEPTH = 4;
 	public static void main(String[] args) {
 		Scanner input = new Scanner(System.in);
 		System.out.println("Whitey has arrived");
@@ -17,7 +17,7 @@ public class UCI {
 	            {
 	                System.out.println("id name Whitie");
 	                System.out.println("id author LuckyAC");
-	                System.out.println("version Deep");
+	                System.out.println("version killer");
 	                System.out.println("uciok");
 	            }  else if (inputString.equals("ucinewgame")){
 	            	currGame = new Game();
