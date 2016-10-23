@@ -399,9 +399,11 @@ public class Game {
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
 				if (board[i][j] == 'P'){
+					//Encourage pawn chains
 					if (i>=3 && j>0 && j<7 && (board[i-1][j-1] == 'P' || board[i-1][j+1] == 'P')){
 						whitePawnStructure = whitePawnStructure + 0.05;
 					}
+					//Encourage pawn pushing in endgame
 					if (blackMaterialScore < 15){
 						if (i==4){whitePawnStructure = whitePawnStructure + 0.15;}
 						if (i==5){whitePawnStructure = whitePawnStructure + 0.4;}
@@ -412,6 +414,7 @@ public class Game {
 					whiteCheckLocation[0] = i;
 					whiteCheckLocation[1] = j;
 				}
+				//discourage knight on rim
 				if (board[i][j] == 'N') {
 					if(i==0 || i==7){ whiteKnightActivity = whiteKnightActivity - 0.1;}
 					if(i==1 || i==6){ whiteKnightActivity = whiteKnightActivity - 0.05;}
@@ -443,11 +446,13 @@ public class Game {
 		
 		//blackKingSafety
 		if (whiteMaterialScore > 15){
+			//discourage pawn pushing on kingside before castling
 			if (board[7][1] != 'P' && board[6][1] != 'P'){blackKingSafety = blackKingSafety - 0.1;}
 			if (board[7][1] != 'P' && board[7][1] != 'b'){blackKingSafety = blackKingSafety - 0.05;}
 			if (board[7][2] != 'P'){blackKingSafety = blackKingSafety - 0.05;}
 			if (board[7][0] != 'p' && board[6][0] != 'p'){blackKingSafety = blackKingSafety - 0.05;}
 			if (blackCheckLocation[0] != 7) {blackKingSafety = blackKingSafety - 0.1;} 
+			// encourage kingside castling
 			if ((board[7][1] == 'k' || board[7][0] == 'k') && board[7][0] != 'r'){ 
 				blackKingSafety = blackKingSafety + 0.3;
 				if (board[6][1] != 'p' && board[6][0] != 'p'){
@@ -461,6 +466,7 @@ public class Game {
 				}
 				if (board[7][2] != 'P'){blackKingSafety = blackKingSafety - 0.05;}
 			}
+			// encourage queenside castling
 			else if ((board[7][5] == 'k' || board[7][6] == 'k' || board[7][7] == 'k') && board[7][0] != 'r'){ 
 				blackKingSafety = blackKingSafety + 0.2;
 				if (board[7][5] == 'k') { 
