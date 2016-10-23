@@ -340,7 +340,7 @@ public class Game {
 				if (moveValue < minValue) {
 					minValue = moveValue;
 				}
-				if (moveValue <= alpha) {
+				if (moveValue < alpha) {
 					//System.out.printf("Trim alpha %f depth %d\n", alpha, depth);
 					break;
 				}
@@ -375,7 +375,7 @@ public class Game {
 				if (moveValue > maxValue) {
 					maxValue = moveValue;
 				}
-				if (moveValue >= beta) {
+				if (moveValue > beta) {
 					//System.out.printf("Trim beta %f depth %d\n", beta, depth);
 					break;
 				}
