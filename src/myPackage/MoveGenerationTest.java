@@ -123,7 +123,15 @@ public class MoveGenerationTest {
 //		System.out.print(castleGame);
 		ArrayList<Move> moves = castleGame.generateLegalMoves();
 		assertTrue("Castling move not found", 
-				moves.contains(new Move("e1g1")));		
+				moves.contains(new Move("e1g1")));	
+		
+		Game game2 = new Game("rn1qkbnr/ppp1pppp/2bp4/8/7N/6PB/PPPPPP1P/RNBQK2R b KQkq -");
+		game2 = new Game(game2, new Move("c6h1"));
+		game2 = new Game(game2, new Move("b1c3"));
+		game2 = new Game(game2, new Move("h1c6"));
+		moves = game2.generateLegalMoves();
+		assertTrue("Illegal to castle after rook is taken",
+				!moves.contains(new Move("e1g1")));
 	}
 		
 }

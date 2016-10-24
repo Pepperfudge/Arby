@@ -10,6 +10,14 @@ public class Move {
 	public char promotionPiece;
 	
 	public Move(String UCIFormat){
+		if (!Character.isLetter(UCIFormat.charAt(0))
+				|| !Character.isLetter(UCIFormat.charAt(2))
+				|| !Character.isDigit(UCIFormat.charAt(1))
+				|| !Character.isDigit(UCIFormat.charAt(3))){
+			String errorMessage = String.format(
+					"%s is not a correctly formatted move", UCIFormat);
+			throw new IllegalArgumentException(errorMessage);
+		}
 		currColumn = letterToCol.get(UCIFormat.charAt(0));
 		currRow = Character.getNumericValue(UCIFormat.charAt(1)) - 1;
 		newColumn = letterToCol.get(UCIFormat.charAt(2));

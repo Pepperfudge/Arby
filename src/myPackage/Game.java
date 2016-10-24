@@ -56,6 +56,7 @@ public class Game {
 		
 		board = copyBoard(prevPosition.board);
 		char piece = board[move.currRow][move.currColumn];
+		char pieceTaken = board[move.newRow][move.newColumn];
 		makeMove(move);
 
 		if (piece == 'k' || piece == 'K') {
@@ -91,6 +92,22 @@ public class Game {
 				whiteKCastle = false;
 			} else if (whiteQCastle && move.currColumn == 7 && move.currRow == 0) {
 				whiteQCastle = false;
+			}
+		}
+		
+		if (pieceTaken == 'R' && move.newRow == 0){
+			if (move.newColumn == 0){
+				whiteKCastle = false;
+			} else if (move.newColumn == 7){
+				whiteQCastle = false;
+			}
+		}
+		
+		if (pieceTaken == 'r' && move.newRow == 7){
+			if (move.newColumn == 0){
+				blackKCastle = false;
+			} else if (move.newColumn == 7){
+				blackQCastle = false;
 			}
 		}
 
@@ -179,7 +196,11 @@ public class Game {
 	private void makeMove(Move move) {
 		char piece = board[move.currRow][move.currColumn];
 		if (piece == 'x'){
-			throw new IllegalArgumentException("No piece found to move");
+			String errorMessage = String.format(
+					"bad move %s. No piece found to move. \n %s",
+					move.convertToUCIFormat(),
+					this.toString());
+			throw new IllegalArgumentException(errorMessage);
 		}
 		char promotionPiece;
 
