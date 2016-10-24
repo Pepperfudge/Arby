@@ -283,130 +283,189 @@ public class Game {
 		}
 	}
 
+//	public Move findBestMove(int depth) {
+//		if (sideToMove == 'w') {
+//			return findBestMoveWhite(depth);
+//		} else {
+//			return findBestMoveBlack(depth);
+//		}
+//	}
 	public Move findBestMove(int depth) {
-		if (sideToMove == 'w') {
-			return findBestMoveWhite(depth);
-		} else {
-			return findBestMoveBlack(depth);
-		}
-	}
-
-	public Move findBestMoveWhite(int depth) {
 		ArrayList<Move> moves = generateLegalMoves();
 
 		double maxValue = Double.NEGATIVE_INFINITY;
 		Move bestMove = null;
 		for (int i = 0; i < moves.size(); i++) {
-			// for (int i = 0; i < 2; i++){
+//		for (int i = 0; i < 2; i++){
 			Move move = moves.get(i);
-			// Move move = moves.get(new Random().nextInt(moves.size()));
-			double moveValue = evaluateMoveWhite(move, depth - 1, maxValue, Double.POSITIVE_INFINITY);
-			if (moveValue > maxValue) {
+//			Move move = moves.get(new Random().nextInt(moves.size()));
+			double moveValue = -evaluateMove(move, depth - 1, Double.NEGATIVE_INFINITY,-maxValue);
+//			double moveValue = -evaluateMove(move,depth - 1);
+			if (moveValue >= maxValue) {
 				maxValue = moveValue;
 				bestMove = move;
 			}
 		}
-		// System.out.println(bestMove.convertToUCIFormat());
-		// System.out.printf("W, depth %d: %f\n", depth, maxValue);
-		if (bestMove != null){
-			return bestMove;
-		} else {
-			return moves.get(0);
-		}
+		System.out.println(bestMove.convertToUCIFormat());
+		System.out.printf("W, depth %d: %f\n", depth, maxValue);
+		return bestMove;
 	}
-
-	public Move findBestMoveBlack(int depth) {
-		ArrayList<Move> moves = generateLegalMoves();
-
-		double minValue = Double.POSITIVE_INFINITY;
-		Move bestMove = null;
-		for (int i = 0; i < moves.size(); i++) {
-			// for (int i = 0; i < 2; i++){
-			Move move = moves.get(i);
-			// Move move = moves.get(new Random().nextInt(moves.size()));
-			double moveValue = evaluateMoveBlack(move, depth - 1, Double.NEGATIVE_INFINITY, minValue);
-
-			if (moveValue < minValue) {
-				minValue = moveValue;
-				bestMove = move;
-			}
-		}
-		//System.out.println(bestMove.convertToUCIFormat());
-		//System.out.printf("B, depth %d: %f\n", depth, minValue);
-		if (bestMove != null){
-			return bestMove;
-		} else {
-			return moves.get(0);
-		}
-	}
-
-	private double evaluateMoveWhite(Move whiteMove, int depth, double alpha, double beta) {
-		Game newPosition = new Game(this, whiteMove);
+	
+	private double evaluateMove(Move move, int depth, double alpha, double beta) {
+		
+		Game newPosition = new Game(this, move);
 		if (depth == 0) {
-			//System.out.println(whiteMove.convertToUCIFormat());
-			//System.out.printf("W depth %d: %f\n", depth, newPosition.evaluateBoard());
-			return newPosition.evaluateBoard();
-		} else {
-			// to evaluate whites move we must evaluate black's response
-			// Black should pick the move with the minimum value
-			ArrayList<Move> blackMoves = newPosition.generateLegalMoves();
-			double minValue = Double.POSITIVE_INFINITY;
-			for (int i = 0; i < blackMoves.size(); i++) {
-				// for (int i = 0; i < 2; i++){
-				Move blackMove = blackMoves.get(i);
-				// Move blackMove = blackMoves.get(new
-				// Random().nextInt(blackMoves.size()));
-				double moveValue = newPosition.evaluateMoveBlack(blackMove, depth - 1, alpha, Math.min(minValue, beta));
-
-				if (moveValue < minValue) {
-					minValue = moveValue;
-				}
-				if (moveValue < alpha) {
-					//System.out.printf("Trim alpha %f depth %d\n", alpha, depth);
-					break;
-				}
-
+//			System.out.println(move.convertToUCIFormat());
+//			System.out.println(newPosition);
+			double score = newPosition.evaluateBoard();
+			if (newPosition.sideToMove == 'b'){
+				score = -1*score;
 			}
-			//System.out.println(whiteMove.convertToUCIFormat());
-			//System.out.printf("W, depth %d: %f\n", depth, minValue);
-			return minValue;
-		}
-
-	}
-
-	private double evaluateMoveBlack(Move blackMove, int depth, double alpha, double beta) {
-		Game newPosition = new Game(this, blackMove);
-		if (depth == 0) {
-			// if the max depth has been reached we simply return
-			// the value of the board
-			//System.out.println(blackMove.convertToUCIFormat());
-			//System.out.printf("B, depth %d: %f\n", depth, newPosition.evaluateBoard());
-			return newPosition.evaluateBoard();
+//			System.out.printf("%s depth %d: %f\n", newPosition.sideToMove, depth, score);
+			return score;
 		} else {
-			// to evaluate blacks move we must evaluate whites's response
-			// White should pick the move with the maximum value
-			ArrayList<Move> whiteMoves = newPosition.generateLegalMoves();
+//			System.out.printf("depth %d, alpha %f, beta %f \n", depth, alpha, beta);
+			ArrayList<Move> opponentMoves = newPosition.generateLegalMoves();
 			double maxValue = Double.NEGATIVE_INFINITY;
-			for (int i = 0; i < whiteMoves.size(); i++) {
-				// for (int i = 0; i < 2; i++){
-				Move whiteMove = whiteMoves.get(i);
-				// Move whiteMove = whiteMoves.get(new
-				// Random().nextInt(whiteMoves.size()));
-				double moveValue = newPosition.evaluateMoveWhite(whiteMove, depth - 1, Math.max(alpha, maxValue), beta);
+			for (int i = 0; i < opponentMoves.size(); i++) {
+//			for (int i = 0; i < 2; i++){
+				Move opponentMove = opponentMoves.get(i);
+//				Move opponentMove = opponentMoves.get(
+//						new Random().nextInt(opponentMoves.size()));
+				double moveValue = -newPosition.evaluateMove(
+						opponentMove, depth - 1,-beta, -Math.max(alpha, maxValue));
+				if (moveValue > beta) {
+//					System.out.println(move.convertToUCIFormat());
+//					System.out.printf("Trim beta %f depth %d\n", beta, depth);
+//					System.out.printf("W, depth %d: %f\n", depth, moveValue);
+					return moveValue;
+				}
 				if (moveValue > maxValue) {
 					maxValue = moveValue;
 				}
-				if (moveValue > beta) {
-					//System.out.printf("Trim beta %f depth %d\n", beta, depth);
-					break;
-				}
 			}
-			//System.out.println(blackMove.convertToUCIFormat());
-			//System.out.printf("B, depth %d: %f\n", depth, maxValue);
+//			System.out.println(move.convertToUCIFormat());
+//			System.out.printf("W, depth %d: %f\n", depth, maxValue);
 			return maxValue;
 		}
-
 	}
+
+//	public Move findBestMoveWhite(int depth) {
+//		ArrayList<Move> moves = generateLegalMoves();
+//
+//		double maxValue = Double.NEGATIVE_INFINITY;
+//		Move bestMove = null;
+//		for (int i = 0; i < moves.size(); i++) {
+//			// for (int i = 0; i < 2; i++){
+//			Move move = moves.get(i);
+//			// Move move = moves.get(new Random().nextInt(moves.size()));
+//			double moveValue = evaluateMoveWhite(move, depth - 1, maxValue, Double.POSITIVE_INFINITY);
+//			if (moveValue > maxValue) {
+//				maxValue = moveValue;
+//				bestMove = move;
+//			}
+//		}
+//		 System.out.println(bestMove.convertToUCIFormat());
+//		 System.out.printf("W, depth %d: %f\n", depth, maxValue);
+//		if (bestMove != null){
+//			return bestMove;
+//		} else {
+//			return moves.get(0);
+//		}
+//	}
+//
+//	public Move findBestMoveBlack(int depth) {
+//		ArrayList<Move> moves = generateLegalMoves();
+//
+//		double minValue = Double.POSITIVE_INFINITY;
+//		Move bestMove = null;
+//		for (int i = 0; i < moves.size(); i++) {
+//			// for (int i = 0; i < 2; i++){
+//			Move move = moves.get(i);
+//			// Move move = moves.get(new Random().nextInt(moves.size()));
+//			double moveValue = evaluateMoveBlack(move, depth - 1, Double.NEGATIVE_INFINITY, minValue);
+//
+//			if (moveValue < minValue) {
+//				minValue = moveValue;
+//				bestMove = move;
+//			}
+//		}
+//		System.out.println(bestMove.convertToUCIFormat());
+//		System.out.printf("B, depth %d: %f\n", depth, minValue);
+//		if (bestMove != null){
+//			return bestMove;
+//		} else {
+//			return moves.get(0);
+//		}
+//	}
+//
+//	private double evaluateMoveWhite(Move whiteMove, int depth, double alpha, double beta) {
+//		Game newPosition = new Game(this, whiteMove);
+//		if (depth == 0) {
+//			//System.out.println(whiteMove.convertToUCIFormat());
+//			//System.out.printf("W depth %d: %f\n", depth, newPosition.evaluateBoard());
+//			return newPosition.evaluateBoard();
+//		} else {
+//			// to evaluate whites move we must evaluate black's response
+//			// Black should pick the move with the minimum value
+//			ArrayList<Move> blackMoves = newPosition.generateLegalMoves();
+//			double minValue = Double.POSITIVE_INFINITY;
+//			for (int i = 0; i < blackMoves.size(); i++) {
+//				// for (int i = 0; i < 2; i++){
+//				Move blackMove = blackMoves.get(i);
+//				// Move blackMove = blackMoves.get(new
+//				// Random().nextInt(blackMoves.size()));
+//				double moveValue = newPosition.evaluateMoveBlack(blackMove, depth - 1, alpha, Math.min(minValue, beta));
+//
+//				if (moveValue < minValue) {
+//					minValue = moveValue;
+//				}
+//				if (moveValue < alpha) {
+//					//System.out.printf("Trim alpha %f depth %d\n", alpha, depth);
+//					break;
+//				}
+//
+//			}
+//			//System.out.println(whiteMove.convertToUCIFormat());
+//			//System.out.printf("W, depth %d: %f\n", depth, minValue);
+//			return minValue;
+//		}
+//
+//	}
+//
+//	private double evaluateMoveBlack(Move blackMove, int depth, double alpha, double beta) {
+//		Game newPosition = new Game(this, blackMove);
+//		if (depth == 0) {
+//			// if the max depth has been reached we simply return
+//			// the value of the board
+//			//System.out.println(blackMove.convertToUCIFormat());
+//			//System.out.printf("B, depth %d: %f\n", depth, newPosition.evaluateBoard());
+//			return newPosition.evaluateBoard();
+//		} else {
+//			// to evaluate blacks move we must evaluate whites's response
+//			// White should pick the move with the maximum value
+//			ArrayList<Move> whiteMoves = newPosition.generateLegalMoves();
+//			double maxValue = Double.NEGATIVE_INFINITY;
+//			for (int i = 0; i < whiteMoves.size(); i++) {
+//				// for (int i = 0; i < 2; i++){
+//				Move whiteMove = whiteMoves.get(i);
+//				// Move whiteMove = whiteMoves.get(new
+//				// Random().nextInt(whiteMoves.size()));
+//				double moveValue = newPosition.evaluateMoveWhite(whiteMove, depth - 1, Math.max(alpha, maxValue), beta);
+//				if (moveValue > maxValue) {
+//					maxValue = moveValue;
+//				}
+//				if (moveValue > beta) {
+//					//System.out.printf("Trim beta %f depth %d\n", beta, depth);
+//					break;
+//				}
+//			}
+//			//System.out.println(blackMove.convertToUCIFormat());
+//			//System.out.printf("B, depth %d: %f\n", depth, maxValue);
+//			return maxValue;
+//		}
+//
+//	}
 
 	private double evaluateBoard(){
 		double positionScore=0;
