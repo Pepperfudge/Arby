@@ -5,6 +5,7 @@ public class UCI {
 	static Game currGame = new Game();
 	static int num_moves;
 	static final int DEPTH = 4;
+	static final boolean QUIESCE = false;
 	public static void main(String[] args) {
 		Scanner input = new Scanner(System.in);
 		System.out.println("Whitey has arrived");
@@ -17,7 +18,7 @@ public class UCI {
 	            {
 	                System.out.println("id name Whitie");
 	                System.out.println("id author LuckyAC");
-	                System.out.println("version quiesce");
+	                System.out.println("version quiesce optional");
 	                System.out.println("uciok");
 	            }  else if (inputString.equals("ucinewgame")){
 	            	currGame = new Game();
@@ -56,7 +57,7 @@ public class UCI {
 			Move nextMove =  possibleMoves.get(rnd);
 			return nextMove.convertToUCIFormat();
 		}
-		return currGame.findBestMove(DEPTH).convertToUCIFormat();
+		return currGame.findBestMove(DEPTH, QUIESCE).convertToUCIFormat();
 
 	}
 

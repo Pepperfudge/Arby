@@ -1,8 +1,11 @@
 package myPackage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Utils {
+	public static HashMap<Character, Integer> pieceValues = createPieceValueMap();
+	
 	
 	public static boolean contains(char[] array, char c){
 		for (int i = 0; i<array.length; i++){
@@ -64,5 +67,19 @@ public class Utils {
 			moves.add(new Move(square + destinationArray[i]));
 		}
 		return moves;
+	}
+	private static HashMap<Character, Integer> createPieceValueMap(){
+		HashMap<Character, Integer> hash = new HashMap<Character, Integer> ();
+		hash.put('Q', 9);
+		hash.put('R', 5);
+		hash.put('N', 3);
+		hash.put('B', 3);
+		hash.put('P', 1);
+		hash.put('q', 9);
+		hash.put('r', 5);
+		hash.put('n', 3);
+		hash.put('b', 3);
+		hash.put('p', 1);
+		return hash;
 	}
 }

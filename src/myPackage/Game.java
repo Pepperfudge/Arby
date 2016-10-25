@@ -1,6 +1,7 @@
 package myPackage;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Game {
 	private char[][] board;
@@ -240,6 +241,9 @@ public class Game {
 		boolean foundWhiteKing = false;
 		boolean foundBlackKing = false;
 		// iterate through every rank of the board
+
+		whiteMaterialScore = 0;
+		blackMaterialScore = 0;
 		for (int i = 0; i < 8; i++) {
 			String rank = piecePlacement[i];
 			int rowIndex = 7 - i;
@@ -260,6 +264,12 @@ public class Game {
 						foundBlackKing = true;
 					} else if (piece == 'K') {
 						foundWhiteKing = true;
+					} else if (Utils.contains(whitePieces, piece)) {
+						whiteMaterialScore += Utils.pieceValues.get(piece);
+					} else if (Utils.contains(blackPieces, piece)) {
+						blackMaterialScore += Utils.pieceValues.get(piece);
+					} else {
+						throw new RuntimeException("Bad piece");
 					}
 					board[rowIndex][colIndex] = piece;
 					colIndex--;
@@ -306,7 +316,7 @@ public class Game {
 	// return findBestMoveBlack(depth);
 	// }
 	// }
-	public Move findBestMove(int depth) {
+	public Move findBestMove(int depth, boolean quiesce) {
 		ArrayList<Move> moves = generateLegalMoves();
 
 		double maxValue = Double.NEGATIVE_INFINITY;
@@ -315,7 +325,7 @@ public class Game {
 			// for (int i = 0; i < 2; i++){
 			Move move = moves.get(i);
 			// Move move = moves.get(new Random().nextInt(moves.size()));
-			double moveValue = -evaluateMove(move, depth - 1, Double.NEGATIVE_INFINITY, -maxValue);
+			double moveValue = -evaluateMove(move, depth - 1, Double.NEGATIVE_INFINITY, -maxValue, quiesce);
 			// double moveValue = -evaluateMove(move,depth - 1);
 			if (moveValue >= maxValue) {
 				maxValue = moveValue;
@@ -327,13 +337,22 @@ public class Game {
 		return bestMove;
 	}
 
-	private double evaluateMove(Move move, int depth, double alpha, double beta) {
+	private double evaluateMove(Move move, int depth, double alpha, double beta, boolean quiesce) {
 
 		Game newPosition = new Game(this, move);
 		if (depth == 0) {
 			// System.out.println(move.convertToUCIFormat());
+			// System.out.println("quiesce");
 			// System.out.println(newPosition);
-			double score = newPosition.quiesce(alpha, beta);
+			double score;
+			if (quiesce){
+				score = newPosition.quiesce(alpha, beta);
+			} else {
+				score = newPosition.evaluateBoard();
+				if (newPosition.sideToMove == 'b'){
+					score = -1*score;
+				}
+			}
 			// System.out.printf("%s depth %d: %f\n", newPosition.sideToMove,
 			// depth, score);
 			return score;
@@ -348,7 +367,7 @@ public class Game {
 				// Move opponentMove = opponentMoves.get(
 				// new Random().nextInt(opponentMoves.size()));
 				double moveValue = -newPosition.evaluateMove(opponentMove, depth - 1, -beta,
-						-Math.max(alpha, maxValue));
+						-Math.max(alpha, maxValue), quiesce);
 				if (moveValue > beta) {
 					// System.out.println(move.convertToUCIFormat());
 					// System.out.printf("Trim beta %f depth %d\n", beta,
@@ -361,7 +380,8 @@ public class Game {
 				}
 			}
 			// System.out.println(move.convertToUCIFormat());
-			// System.out.printf("W, depth %d: %f\n", depth, maxValue);
+			// System.out.printf("%s, depth %d: %f\n",
+			// newPosition.sideToMove, depth, maxValue);
 			return maxValue;
 		}
 	}
@@ -381,17 +401,44 @@ public class Game {
 
 		double maxValue = Double.NEGATIVE_INFINITY;
 		for (int i = 0; i < captures.size(); i++) {
+			// for (int i = 0; i < captures.size(); i++){
 			Move capture = captures.get(i);
-			Game newPosition = new Game(this, capture);
-			double moveValue = -newPosition.quiesce(-beta, -Math.max(maxValue, alpha));
-			if (moveValue >= beta) {
-				return moveValue;
+			// Move capture = captures.get(
+			// (new Random()).nextInt(captures.size()));
+			// delta pruning
+			char piece = board[capture.currRow][capture.currColumn];
+			Integer pieceValue;
+			if ((piece == 'P' || piece == 'p') && Math.abs(capture.currColumn - capture.newColumn) == 1
+					&& board[capture.newRow][capture.newColumn] == 'x'
+					&& (capture.newRow == 2 || capture.newRow == 5)) {
+				pieceValue = 1;
+			} else {
+				char pieceCaptured = board[capture.newRow][capture.newColumn];
+				pieceValue = Utils.pieceValues.get(pieceCaptured);
+				if (pieceValue == null) {
+					String errorMessage = String.format(
+							"%s not a valid piece to take. \n move %s" + "\n position \n %s", pieceCaptured,
+							capture.convertToUCIFormat(), this);
+					throw new RuntimeException(errorMessage);
+				}
 			}
-			if (moveValue > maxValue) {
-				maxValue = moveValue;
+			if (((double) pieceValue + stand_pat + 0.2) > alpha) {
+
+				// System.out.println(pieceCaptured);
+				Game newPosition = new Game(this, capture);
+				double moveValue = -newPosition.quiesce(-beta, -alpha);
+				if (moveValue >= beta) {
+					return moveValue;
+				}
+				if (moveValue > maxValue) {
+					maxValue = moveValue;
+				}
+				if (moveValue > alpha) {
+					alpha = moveValue;
+				}
 			}
 		}
-		return maxValue;
+		return Math.max(maxValue, stand_pat);
 
 	}
 
