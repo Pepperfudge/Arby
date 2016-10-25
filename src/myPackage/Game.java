@@ -42,18 +42,18 @@ public class Game {
 	}
 
 	public Game(Game prevPosition, Move move) {
-		
+
 		whiteQCastle = prevPosition.whiteQCastle;
 		whiteKCastle = prevPosition.whiteKCastle;
 		blackQCastle = prevPosition.blackQCastle;
 		blackKCastle = prevPosition.blackKCastle;
-		
+
 		if (prevPosition.sideToMove == 'w') {
 			this.sideToMove = 'b';
 		} else {
 			this.sideToMove = 'w';
 		}
-		
+
 		board = copyBoard(prevPosition.board);
 		char piece = board[move.currRow][move.currColumn];
 		char pieceTaken = board[move.newRow][move.newColumn];
@@ -94,19 +94,19 @@ public class Game {
 				whiteQCastle = false;
 			}
 		}
-		
-		if (pieceTaken == 'R' && move.newRow == 0){
-			if (move.newColumn == 0){
+
+		if (pieceTaken == 'R' && move.newRow == 0) {
+			if (move.newColumn == 0) {
 				whiteKCastle = false;
-			} else if (move.newColumn == 7){
+			} else if (move.newColumn == 7) {
 				whiteQCastle = false;
 			}
 		}
-		
-		if (pieceTaken == 'r' && move.newRow == 7){
-			if (move.newColumn == 0){
+
+		if (pieceTaken == 'r' && move.newRow == 7) {
+			if (move.newColumn == 0) {
 				blackKCastle = false;
-			} else if (move.newColumn == 7){
+			} else if (move.newColumn == 7) {
 				blackQCastle = false;
 			}
 		}
@@ -128,7 +128,6 @@ public class Game {
 				}
 			}
 		}
-
 
 		// System.out.format("Turn to move: %s\n", sideToMove);
 
@@ -195,10 +194,8 @@ public class Game {
 
 	private void makeMove(Move move) {
 		char piece = board[move.currRow][move.currColumn];
-		if (piece == 'x'){
-			String errorMessage = String.format(
-					"bad move %s. No piece found to move. \n %s",
-					move.convertToUCIFormat(),
+		if (piece == 'x') {
+			String errorMessage = String.format("bad move %s. No piece found to move. \n %s", move.convertToUCIFormat(),
 					this.toString());
 			throw new IllegalArgumentException(errorMessage);
 		}
@@ -240,7 +237,6 @@ public class Game {
 
 		String[] piecePlacement = fields[0].split("/");
 
-		
 		boolean foundWhiteKing = false;
 		boolean foundBlackKing = false;
 		// iterate through every rank of the board
@@ -260,9 +256,9 @@ public class Game {
 					}
 				} else {
 					// otherwise add the piece to the matrix
-					if (piece == 'k'){
+					if (piece == 'k') {
 						foundBlackKing = true;
-					} else if(piece == 'K'){
+					} else if (piece == 'K') {
 						foundWhiteKing = true;
 					}
 					board[rowIndex][colIndex] = piece;
@@ -270,19 +266,20 @@ public class Game {
 				}
 			}
 		}
-		if (!foundWhiteKing || !foundBlackKing){
+		if (!foundWhiteKing || !foundBlackKing) {
 			throw new IllegalArgumentException("Illegal Position. Both kings must be on the board");
 		}
 	}
-	
-	private void parseEnPassant(String enPassantStr){
-		if (!enPassantStr.equals("-")){
+
+	private void parseEnPassant(String enPassantStr) {
+		if (!enPassantStr.equals("-")) {
 			enPassant = true;
 			enPassantTarget = (new Square(enPassantStr)).col;
 		} else {
 			enPassant = false;
 		}
 	}
+
 	private void parseCastling(String castling) {
 		whiteKCastle = false;
 		whiteQCastle = false;
@@ -302,415 +299,527 @@ public class Game {
 		}
 	}
 
-//	public Move findBestMove(int depth) {
-//		if (sideToMove == 'w') {
-//			return findBestMoveWhite(depth);
-//		} else {
-//			return findBestMoveBlack(depth);
-//		}
-//	}
+	// public Move findBestMove(int depth) {
+	// if (sideToMove == 'w') {
+	// return findBestMoveWhite(depth);
+	// } else {
+	// return findBestMoveBlack(depth);
+	// }
+	// }
 	public Move findBestMove(int depth) {
 		ArrayList<Move> moves = generateLegalMoves();
 
 		double maxValue = Double.NEGATIVE_INFINITY;
 		Move bestMove = null;
 		for (int i = 0; i < moves.size(); i++) {
-//		for (int i = 0; i < 2; i++){
+			// for (int i = 0; i < 2; i++){
 			Move move = moves.get(i);
-//			Move move = moves.get(new Random().nextInt(moves.size()));
-			double moveValue = -evaluateMove(move, depth - 1, Double.NEGATIVE_INFINITY,-maxValue);
-//			double moveValue = -evaluateMove(move,depth - 1);
+			// Move move = moves.get(new Random().nextInt(moves.size()));
+			double moveValue = -evaluateMove(move, depth - 1, Double.NEGATIVE_INFINITY, -maxValue);
+			// double moveValue = -evaluateMove(move,depth - 1);
 			if (moveValue >= maxValue) {
 				maxValue = moveValue;
 				bestMove = move;
 			}
 		}
-//		System.out.println(bestMove.convertToUCIFormat());
-//		System.out.printf("W, depth %d: %f\n", depth, maxValue);
+		// System.out.println(bestMove.convertToUCIFormat());
+		// System.out.printf("W, depth %d: %f\n", depth, maxValue);
 		return bestMove;
 	}
-	
+
 	private double evaluateMove(Move move, int depth, double alpha, double beta) {
-		
+
 		Game newPosition = new Game(this, move);
 		if (depth == 0) {
-//			System.out.println(move.convertToUCIFormat());
-//			System.out.println(newPosition);
-			if (move.convertToUCIFormat().equals("c3c7")){
-				System.out.println("hi");
-			}
-			double score = newPosition.evaluateBoard();
-			if (newPosition.sideToMove == 'b'){
-				score = -1*score;
-			}
-//			System.out.printf("%s depth %d: %f\n", newPosition.sideToMove, depth, score);
+			// System.out.println(move.convertToUCIFormat());
+			// System.out.println(newPosition);
+			double score = newPosition.quiesce(alpha, beta);
+			// System.out.printf("%s depth %d: %f\n", newPosition.sideToMove,
+			// depth, score);
 			return score;
 		} else {
-//			System.out.printf("depth %d, alpha %f, beta %f \n", depth, alpha, beta);
+			// System.out.printf("depth %d, alpha %f, beta %f \n", depth, alpha,
+			// beta);
 			ArrayList<Move> opponentMoves = newPosition.generateLegalMoves();
 			double maxValue = Double.NEGATIVE_INFINITY;
 			for (int i = 0; i < opponentMoves.size(); i++) {
-//			for (int i = 0; i < 2; i++){
+				// for (int i = 0; i < 2; i++){
 				Move opponentMove = opponentMoves.get(i);
-//				Move opponentMove = opponentMoves.get(
-//						new Random().nextInt(opponentMoves.size()));
-				double moveValue = -newPosition.evaluateMove(
-						opponentMove, depth - 1,-beta, -Math.max(alpha, maxValue));
+				// Move opponentMove = opponentMoves.get(
+				// new Random().nextInt(opponentMoves.size()));
+				double moveValue = -newPosition.evaluateMove(opponentMove, depth - 1, -beta,
+						-Math.max(alpha, maxValue));
 				if (moveValue > beta) {
-//					System.out.println(move.convertToUCIFormat());
-//					System.out.printf("Trim beta %f depth %d\n", beta, depth);
-//					System.out.printf("W, depth %d: %f\n", depth, moveValue);
+					// System.out.println(move.convertToUCIFormat());
+					// System.out.printf("Trim beta %f depth %d\n", beta,
+					// depth);
+					// System.out.printf("W, depth %d: %f\n", depth, moveValue);
 					return moveValue;
 				}
 				if (moveValue > maxValue) {
 					maxValue = moveValue;
 				}
 			}
-//			System.out.println(move.convertToUCIFormat());
-//			System.out.printf("W, depth %d: %f\n", depth, maxValue);
+			// System.out.println(move.convertToUCIFormat());
+			// System.out.printf("W, depth %d: %f\n", depth, maxValue);
 			return maxValue;
 		}
 	}
 
-//	public Move findBestMoveWhite(int depth) {
-//		ArrayList<Move> moves = generateLegalMoves();
-//
-//		double maxValue = Double.NEGATIVE_INFINITY;
-//		Move bestMove = null;
-//		for (int i = 0; i < moves.size(); i++) {
-//			// for (int i = 0; i < 2; i++){
-//			Move move = moves.get(i);
-//			// Move move = moves.get(new Random().nextInt(moves.size()));
-//			double moveValue = evaluateMoveWhite(move, depth - 1, maxValue, Double.POSITIVE_INFINITY);
-//			if (moveValue > maxValue) {
-//				maxValue = moveValue;
-//				bestMove = move;
-//			}
-//		}
-//		 System.out.println(bestMove.convertToUCIFormat());
-//		 System.out.printf("W, depth %d: %f\n", depth, maxValue);
-//		if (bestMove != null){
-//			return bestMove;
-//		} else {
-//			return moves.get(0);
-//		}
-//	}
-//
-//	public Move findBestMoveBlack(int depth) {
-//		ArrayList<Move> moves = generateLegalMoves();
-//
-//		double minValue = Double.POSITIVE_INFINITY;
-//		Move bestMove = null;
-//		for (int i = 0; i < moves.size(); i++) {
-//			// for (int i = 0; i < 2; i++){
-//			Move move = moves.get(i);
-//			// Move move = moves.get(new Random().nextInt(moves.size()));
-//			double moveValue = evaluateMoveBlack(move, depth - 1, Double.NEGATIVE_INFINITY, minValue);
-//
-//			if (moveValue < minValue) {
-//				minValue = moveValue;
-//				bestMove = move;
-//			}
-//		}
-//		System.out.println(bestMove.convertToUCIFormat());
-//		System.out.printf("B, depth %d: %f\n", depth, minValue);
-//		if (bestMove != null){
-//			return bestMove;
-//		} else {
-//			return moves.get(0);
-//		}
-//	}
-//
-//	private double evaluateMoveWhite(Move whiteMove, int depth, double alpha, double beta) {
-//		Game newPosition = new Game(this, whiteMove);
-//		if (depth == 0) {
-//			//System.out.println(whiteMove.convertToUCIFormat());
-//			//System.out.printf("W depth %d: %f\n", depth, newPosition.evaluateBoard());
-//			return newPosition.evaluateBoard();
-//		} else {
-//			// to evaluate whites move we must evaluate black's response
-//			// Black should pick the move with the minimum value
-//			ArrayList<Move> blackMoves = newPosition.generateLegalMoves();
-//			double minValue = Double.POSITIVE_INFINITY;
-//			for (int i = 0; i < blackMoves.size(); i++) {
-//				// for (int i = 0; i < 2; i++){
-//				Move blackMove = blackMoves.get(i);
-//				// Move blackMove = blackMoves.get(new
-//				// Random().nextInt(blackMoves.size()));
-//				double moveValue = newPosition.evaluateMoveBlack(blackMove, depth - 1, alpha, Math.min(minValue, beta));
-//
-//				if (moveValue < minValue) {
-//					minValue = moveValue;
-//				}
-//				if (moveValue < alpha) {
-//					//System.out.printf("Trim alpha %f depth %d\n", alpha, depth);
-//					break;
-//				}
-//
-//			}
-//			//System.out.println(whiteMove.convertToUCIFormat());
-//			//System.out.printf("W, depth %d: %f\n", depth, minValue);
-//			return minValue;
-//		}
-//
-//	}
-//
-//	private double evaluateMoveBlack(Move blackMove, int depth, double alpha, double beta) {
-//		Game newPosition = new Game(this, blackMove);
-//		if (depth == 0) {
-//			// if the max depth has been reached we simply return
-//			// the value of the board
-//			//System.out.println(blackMove.convertToUCIFormat());
-//			//System.out.printf("B, depth %d: %f\n", depth, newPosition.evaluateBoard());
-//			return newPosition.evaluateBoard();
-//		} else {
-//			// to evaluate blacks move we must evaluate whites's response
-//			// White should pick the move with the maximum value
-//			ArrayList<Move> whiteMoves = newPosition.generateLegalMoves();
-//			double maxValue = Double.NEGATIVE_INFINITY;
-//			for (int i = 0; i < whiteMoves.size(); i++) {
-//				// for (int i = 0; i < 2; i++){
-//				Move whiteMove = whiteMoves.get(i);
-//				// Move whiteMove = whiteMoves.get(new
-//				// Random().nextInt(whiteMoves.size()));
-//				double moveValue = newPosition.evaluateMoveWhite(whiteMove, depth - 1, Math.max(alpha, maxValue), beta);
-//				if (moveValue > maxValue) {
-//					maxValue = moveValue;
-//				}
-//				if (moveValue > beta) {
-//					//System.out.printf("Trim beta %f depth %d\n", beta, depth);
-//					break;
-//				}
-//			}
-//			//System.out.println(blackMove.convertToUCIFormat());
-//			//System.out.printf("B, depth %d: %f\n", depth, maxValue);
-//			return maxValue;
-//		}
-//
-//	}
+	private double quiesce(double alpha, double beta) {
+		double stand_pat = evaluateBoard();
+		if (sideToMove == 'b') {
+			stand_pat = -1 * stand_pat;
+		}
+		if (stand_pat >= beta) {
+			return stand_pat;
+		}
+		if (stand_pat > alpha) {
+			alpha = stand_pat;
+		}
+		ArrayList<Move> captures = findCaptures();
 
-	private double evaluateBoard(){
-		double positionScore=0;
-		double blackScore=0;
-		double whiteScore=0;
-		double blackKingSafety=0;
-		double whiteKingSafety=0;
-		double blackDevelopment=0;
-		double whiteDevelopment=0;
-		double blackPawnStructure=0;
-		double whitePawnStructure=0;
+		double maxValue = Double.NEGATIVE_INFINITY;
+		for (int i = 0; i < captures.size(); i++) {
+			Move capture = captures.get(i);
+			Game newPosition = new Game(this, capture);
+			double moveValue = -newPosition.quiesce(-beta, -Math.max(maxValue, alpha));
+			if (moveValue >= beta) {
+				return moveValue;
+			}
+			if (moveValue > maxValue) {
+				maxValue = moveValue;
+			}
+		}
+		return maxValue;
+
+	}
+
+	// public Move findBestMoveWhite(int depth) {
+	// ArrayList<Move> moves = generateLegalMoves();
+	//
+	// double maxValue = Double.NEGATIVE_INFINITY;
+	// Move bestMove = null;
+	// for (int i = 0; i < moves.size(); i++) {
+	// // for (int i = 0; i < 2; i++){
+	// Move move = moves.get(i);
+	// // Move move = moves.get(new Random().nextInt(moves.size()));
+	// double moveValue = evaluateMoveWhite(move, depth - 1, maxValue,
+	// Double.POSITIVE_INFINITY);
+	// if (moveValue > maxValue) {
+	// maxValue = moveValue;
+	// bestMove = move;
+	// }
+	// }
+	// System.out.println(bestMove.convertToUCIFormat());
+	// System.out.printf("W, depth %d: %f\n", depth, maxValue);
+	// if (bestMove != null){
+	// return bestMove;
+	// } else {
+	// return moves.get(0);
+	// }
+	// }
+	//
+	// public Move findBestMoveBlack(int depth) {
+	// ArrayList<Move> moves = generateLegalMoves();
+	//
+	// double minValue = Double.POSITIVE_INFINITY;
+	// Move bestMove = null;
+	// for (int i = 0; i < moves.size(); i++) {
+	// // for (int i = 0; i < 2; i++){
+	// Move move = moves.get(i);
+	// // Move move = moves.get(new Random().nextInt(moves.size()));
+	// double moveValue = evaluateMoveBlack(move, depth - 1,
+	// Double.NEGATIVE_INFINITY, minValue);
+	//
+	// if (moveValue < minValue) {
+	// minValue = moveValue;
+	// bestMove = move;
+	// }
+	// }
+	// System.out.println(bestMove.convertToUCIFormat());
+	// System.out.printf("B, depth %d: %f\n", depth, minValue);
+	// if (bestMove != null){
+	// return bestMove;
+	// } else {
+	// return moves.get(0);
+	// }
+	// }
+	//
+	// private double evaluateMoveWhite(Move whiteMove, int depth, double alpha,
+	// double beta) {
+	// Game newPosition = new Game(this, whiteMove);
+	// if (depth == 0) {
+	// //System.out.println(whiteMove.convertToUCIFormat());
+	// //System.out.printf("W depth %d: %f\n", depth,
+	// newPosition.evaluateBoard());
+	// return newPosition.evaluateBoard();
+	// } else {
+	// // to evaluate whites move we must evaluate black's response
+	// // Black should pick the move with the minimum value
+	// ArrayList<Move> blackMoves = newPosition.generateLegalMoves();
+	// double minValue = Double.POSITIVE_INFINITY;
+	// for (int i = 0; i < blackMoves.size(); i++) {
+	// // for (int i = 0; i < 2; i++){
+	// Move blackMove = blackMoves.get(i);
+	// // Move blackMove = blackMoves.get(new
+	// // Random().nextInt(blackMoves.size()));
+	// double moveValue = newPosition.evaluateMoveBlack(blackMove, depth - 1,
+	// alpha, Math.min(minValue, beta));
+	//
+	// if (moveValue < minValue) {
+	// minValue = moveValue;
+	// }
+	// if (moveValue < alpha) {
+	// //System.out.printf("Trim alpha %f depth %d\n", alpha, depth);
+	// break;
+	// }
+	//
+	// }
+	// //System.out.println(whiteMove.convertToUCIFormat());
+	// //System.out.printf("W, depth %d: %f\n", depth, minValue);
+	// return minValue;
+	// }
+	//
+	// }
+	//
+	// private double evaluateMoveBlack(Move blackMove, int depth, double alpha,
+	// double beta) {
+	// Game newPosition = new Game(this, blackMove);
+	// if (depth == 0) {
+	// // if the max depth has been reached we simply return
+	// // the value of the board
+	// //System.out.println(blackMove.convertToUCIFormat());
+	// //System.out.printf("B, depth %d: %f\n", depth,
+	// newPosition.evaluateBoard());
+	// return newPosition.evaluateBoard();
+	// } else {
+	// // to evaluate blacks move we must evaluate whites's response
+	// // White should pick the move with the maximum value
+	// ArrayList<Move> whiteMoves = newPosition.generateLegalMoves();
+	// double maxValue = Double.NEGATIVE_INFINITY;
+	// for (int i = 0; i < whiteMoves.size(); i++) {
+	// // for (int i = 0; i < 2; i++){
+	// Move whiteMove = whiteMoves.get(i);
+	// // Move whiteMove = whiteMoves.get(new
+	// // Random().nextInt(whiteMoves.size()));
+	// double moveValue = newPosition.evaluateMoveWhite(whiteMove, depth - 1,
+	// Math.max(alpha, maxValue), beta);
+	// if (moveValue > maxValue) {
+	// maxValue = moveValue;
+	// }
+	// if (moveValue > beta) {
+	// //System.out.printf("Trim beta %f depth %d\n", beta, depth);
+	// break;
+	// }
+	// }
+	// //System.out.println(blackMove.convertToUCIFormat());
+	// //System.out.printf("B, depth %d: %f\n", depth, maxValue);
+	// return maxValue;
+	// }
+	//
+	// }
+
+	private double evaluateBoard() {
+		double positionScore = 0;
+		double blackScore = 0;
+		double whiteScore = 0;
+		double blackKingSafety = 0;
+		double whiteKingSafety = 0;
+		double blackDevelopment = 0;
+		double whiteDevelopment = 0;
+		double blackPawnStructure = 0;
+		double whitePawnStructure = 0;
 		double whiteKnightActivity = 0;
 		double blackKnightActivity = 0;
 		double whitePieceActivity = 0;
 		double blackPieceActivity = 0;
 		int[] whiteCheckLocation = new int[2];
 		int[] blackCheckLocation = new int[2];
-		
+
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
-				if (board[i][j] == 'P'){
-					//Encourage pawn chains
-					if (i>=3 && j>0 && j<7 && (board[i-1][j-1] == 'P' || board[i-1][j+1] == 'P')){
+				if (board[i][j] == 'P') {
+					// Encourage pawn chains
+					if (i >= 3 && j > 0 && j < 7 && (board[i - 1][j - 1] == 'P' || board[i - 1][j + 1] == 'P')) {
 						whitePawnStructure = whitePawnStructure + 0.05;
 					}
-					//Encourage pawn pushing in endgame
-					if (blackMaterialScore < 15){
-						if (i==4){whitePawnStructure = whitePawnStructure + 0.15;}
-						if (i==5){whitePawnStructure = whitePawnStructure + 0.4;}
-						if (i==6){whitePawnStructure = whitePawnStructure + 1;}	
+					// Encourage pawn pushing in endgame
+					if (blackMaterialScore < 15) {
+						if (i == 4) {
+							whitePawnStructure = whitePawnStructure + 0.15;
+						}
+						if (i == 5) {
+							whitePawnStructure = whitePawnStructure + 0.4;
+						}
+						if (i == 6) {
+							whitePawnStructure = whitePawnStructure + 1;
+						}
 					}
 				}
 				if (board[i][j] == 'K') {
 					whiteCheckLocation[0] = i;
 					whiteCheckLocation[1] = j;
 				}
-				//discourage knight on rim
+				// discourage knight on rim
 				if (board[i][j] == 'N') {
-					if(i==0 || i==7){ whiteKnightActivity = whiteKnightActivity - 0.1;}
-					if(i==1 || i==6){ whiteKnightActivity = whiteKnightActivity - 0.05;}
-					if(j==0 || j==7){ whiteKnightActivity = whiteKnightActivity - 0.1;}
-					if(j==1 || j==6){ whiteKnightActivity = whiteKnightActivity - 0.05;}
+					if (i == 0 || i == 7) {
+						whiteKnightActivity = whiteKnightActivity - 0.1;
+					}
+					if (i == 1 || i == 6) {
+						whiteKnightActivity = whiteKnightActivity - 0.05;
+					}
+					if (j == 0 || j == 7) {
+						whiteKnightActivity = whiteKnightActivity - 0.1;
+					}
+					if (j == 1 || j == 6) {
+						whiteKnightActivity = whiteKnightActivity - 0.05;
+					}
 				}
 				if (board[i][j] == 'k') {
 					blackCheckLocation[0] = i;
 					blackCheckLocation[1] = j;
 				}
-				if (board[i][j] == 'p'){
-					if (i<=4 && j>0 && j<7 && (board[i+1][j-1] == 'p' || board[i+1][j+1] == 'p')){
+				if (board[i][j] == 'p') {
+					if (i <= 4 && j > 0 && j < 7 && (board[i + 1][j - 1] == 'p' || board[i + 1][j + 1] == 'p')) {
 						blackPawnStructure = blackPawnStructure + 0.05;
 					}
-					if (whiteMaterialScore < 15){
-						if (i==3){blackPawnStructure = blackPawnStructure + 0.15;}
-						if (i==1){blackPawnStructure = blackPawnStructure + 0.4;}
-						if (i==1){blackPawnStructure = blackPawnStructure + 1;}	
+					if (whiteMaterialScore < 15) {
+						if (i == 3) {
+							blackPawnStructure = blackPawnStructure + 0.15;
+						}
+						if (i == 1) {
+							blackPawnStructure = blackPawnStructure + 0.4;
+						}
+						if (i == 1) {
+							blackPawnStructure = blackPawnStructure + 1;
+						}
 					}
 				}
 				if (board[i][j] == 'n') {
-					if(i==0 || i==7){ blackKnightActivity = blackKnightActivity - 0.1;}
-					if(i==1 || i==6){ blackKnightActivity = blackKnightActivity - 0.05;}
-					if(j==0 || j==7){ blackKnightActivity = blackKnightActivity - 0.1;}
-					if(j==1 || j==6){ blackKnightActivity = blackKnightActivity - 0.05;}
+					if (i == 0 || i == 7) {
+						blackKnightActivity = blackKnightActivity - 0.1;
+					}
+					if (i == 1 || i == 6) {
+						blackKnightActivity = blackKnightActivity - 0.05;
+					}
+					if (j == 0 || j == 7) {
+						blackKnightActivity = blackKnightActivity - 0.1;
+					}
+					if (j == 1 || j == 6) {
+						blackKnightActivity = blackKnightActivity - 0.05;
+					}
 				}
-			}	
-		}			
-		
-		//blackKingSafety
-		if (whiteMaterialScore > 15){
-			//discourage pawn pushing on kingside before castling
-			if (board[7][1] != 'P' && board[6][1] != 'P'){blackKingSafety = blackKingSafety - 0.1;}
-			if (board[7][1] != 'P' && board[7][1] != 'b'){blackKingSafety = blackKingSafety - 0.05;}
-			if (board[7][2] != 'P'){blackKingSafety = blackKingSafety - 0.05;}
-			if (board[7][0] != 'p' && board[6][0] != 'p'){blackKingSafety = blackKingSafety - 0.05;}
-			if (blackCheckLocation[0] != 7) {blackKingSafety = blackKingSafety - 0.1;} 
+			}
+		}
+
+		// blackKingSafety
+		if (whiteMaterialScore > 15) {
+			// discourage pawn pushing on kingside before castling
+			if (board[7][1] != 'P' && board[6][1] != 'P') {
+				blackKingSafety = blackKingSafety - 0.1;
+			}
+			if (board[7][1] != 'P' && board[7][1] != 'b') {
+				blackKingSafety = blackKingSafety - 0.05;
+			}
+			if (board[7][2] != 'P') {
+				blackKingSafety = blackKingSafety - 0.05;
+			}
+			if (board[7][0] != 'p' && board[6][0] != 'p') {
+				blackKingSafety = blackKingSafety - 0.05;
+			}
+			if (blackCheckLocation[0] != 7) {
+				blackKingSafety = blackKingSafety - 0.1;
+			}
 			// encourage kingside castling
-			if ((board[7][1] == 'k' || board[7][0] == 'k') && board[7][0] != 'r'){ 
+			if ((board[7][1] == 'k' || board[7][0] == 'k') && board[7][0] != 'r') {
 				blackKingSafety = blackKingSafety + 0.3;
-				if (board[6][1] != 'p' && board[6][0] != 'p'){
-					blackKingSafety = blackKingSafety - 0.1;
-				}	
-				if (board[6][1] !='p' && board[5][1] !='p'){
+				if (board[6][1] != 'p' && board[6][0] != 'p') {
 					blackKingSafety = blackKingSafety - 0.1;
 				}
-				if (board[6][0] !='p' && board[5][0] !='p'){
+				if (board[6][1] != 'p' && board[5][1] != 'p') {
 					blackKingSafety = blackKingSafety - 0.1;
 				}
-				if (board[7][2] != 'P'){blackKingSafety = blackKingSafety - 0.05;}
+				if (board[6][0] != 'p' && board[5][0] != 'p') {
+					blackKingSafety = blackKingSafety - 0.1;
+				}
+				if (board[7][2] != 'P') {
+					blackKingSafety = blackKingSafety - 0.05;
+				}
 			}
 			// encourage queenside castling
-			else if ((board[7][5] == 'k' || board[7][6] == 'k' || board[7][7] == 'k') && board[7][0] != 'r'){ 
+			else if ((board[7][5] == 'k' || board[7][6] == 'k' || board[7][7] == 'k') && board[7][0] != 'r') {
 				blackKingSafety = blackKingSafety + 0.2;
-				if (board[7][5] == 'k') { 
+				if (board[7][5] == 'k') {
 					blackKingSafety = blackKingSafety - 0.05;
-					if (board[6][5] != 'p' && board[5][5] != 'p'){blackKingSafety = blackKingSafety - 0.1;}
-					if (board[6][5] != 'p' && board[6][6] != 'p'){blackKingSafety = blackKingSafety - 0.1;}
+					if (board[6][5] != 'p' && board[5][5] != 'p') {
+						blackKingSafety = blackKingSafety - 0.1;
+					}
+					if (board[6][5] != 'p' && board[6][6] != 'p') {
+						blackKingSafety = blackKingSafety - 0.1;
+					}
 				}
-				if (board[6][5] != 'p' && board[6][6] != 'p'){
+				if (board[6][5] != 'p' && board[6][6] != 'p') {
 					blackKingSafety = blackKingSafety - 0.1;
 				}
-				if (board[6][6] != 'p' && board[5][6] != 'p'){
+				if (board[6][6] != 'p' && board[5][6] != 'p') {
 					blackKingSafety = blackKingSafety - 0.1;
 				}
-				if (board[6][7] != 'p' && board[5][7] != 'p'){
+				if (board[6][7] != 'p' && board[5][7] != 'p') {
 					blackKingSafety = blackKingSafety - 0.1;
 				}
-			}	
-			else if (blackKCastle == false && blackQCastle == false && (blackCheckLocation[1] == 3 || blackCheckLocation[1] == 4)) {
+			} else if (blackKCastle == false && blackQCastle == false
+					&& (blackCheckLocation[1] == 3 || blackCheckLocation[1] == 4)) {
 				blackKingSafety = blackKingSafety - 0.2;
 			}
 		}
-		
-		//whiteKingSafety
-		if (blackMaterialScore > 15){
-			if (board[1][1] != 'P' && board[2][1] != 'P'){whiteKingSafety = whiteKingSafety - 0.1;}
-			if (board[1][1] != 'P' && board[1][1] != 'B'){whiteKingSafety = whiteKingSafety - 0.05;}
-			if (board[1][2] != 'P'){whiteKingSafety = whiteKingSafety - 0.05;}
-			if (board[1][0] != 'P' && board[2][0] != 'P'){whiteKingSafety = whiteKingSafety - 0.05;}
-			if (whiteCheckLocation[0] != 0) {whiteKingSafety = whiteKingSafety - 0.1;}  
-			if ((board[0][1] == 'K' || board[0][0] == 'K') && board[7][0] != 'R'){ 
-				whiteKingSafety = whiteKingSafety + 0.3;	
-				if (board[1][1] != 'P' && board[1][0] != 'P'){
-					whiteKingSafety = whiteKingSafety - 0.1;
-				}	
-				if (board[1][1] != 'P' && board[2][1] != 'P'){
-					whiteKingSafety = whiteKingSafety - 0.1;
-				}
-				if (board[1][0] != 'P' && board[2][0] != 'P'){
-					whiteKingSafety = whiteKingSafety - 0.1;
-				}
-				if (board[1][2] != 'P'){whiteKingSafety = whiteKingSafety - 0.05;}
+
+		// whiteKingSafety
+		if (blackMaterialScore > 15) {
+			if (board[1][1] != 'P' && board[2][1] != 'P') {
+				whiteKingSafety = whiteKingSafety - 0.1;
 			}
-			else if ((board[0][5] == 'K' || board[0][6] == 'K' || board[0][7] == 'K') && board[7][0] != 'R'){ 
-				whiteKingSafety = whiteKingSafety + 0.2;
-				if (board[0][5] == 'K') { 
+			if (board[1][1] != 'P' && board[1][1] != 'B') {
+				whiteKingSafety = whiteKingSafety - 0.05;
+			}
+			if (board[1][2] != 'P') {
+				whiteKingSafety = whiteKingSafety - 0.05;
+			}
+			if (board[1][0] != 'P' && board[2][0] != 'P') {
+				whiteKingSafety = whiteKingSafety - 0.05;
+			}
+			if (whiteCheckLocation[0] != 0) {
+				whiteKingSafety = whiteKingSafety - 0.1;
+			}
+			if ((board[0][1] == 'K' || board[0][0] == 'K') && board[7][0] != 'R') {
+				whiteKingSafety = whiteKingSafety + 0.3;
+				if (board[1][1] != 'P' && board[1][0] != 'P') {
+					whiteKingSafety = whiteKingSafety - 0.1;
+				}
+				if (board[1][1] != 'P' && board[2][1] != 'P') {
+					whiteKingSafety = whiteKingSafety - 0.1;
+				}
+				if (board[1][0] != 'P' && board[2][0] != 'P') {
+					whiteKingSafety = whiteKingSafety - 0.1;
+				}
+				if (board[1][2] != 'P') {
 					whiteKingSafety = whiteKingSafety - 0.05;
-					if (board[1][5] != 'P' && board[2][5] != 'P'){whiteKingSafety = whiteKingSafety - 0.1;}
-					if (board[1][5] != 'P' && board[1][6] != 'P'){whiteKingSafety = whiteKingSafety - 0.1;}
 				}
-				
-				if (board[1][6] != 'P' && board[1][7] != 'P'){
+			} else if ((board[0][5] == 'K' || board[0][6] == 'K' || board[0][7] == 'K') && board[7][0] != 'R') {
+				whiteKingSafety = whiteKingSafety + 0.2;
+				if (board[0][5] == 'K') {
+					whiteKingSafety = whiteKingSafety - 0.05;
+					if (board[1][5] != 'P' && board[2][5] != 'P') {
+						whiteKingSafety = whiteKingSafety - 0.1;
+					}
+					if (board[1][5] != 'P' && board[1][6] != 'P') {
+						whiteKingSafety = whiteKingSafety - 0.1;
+					}
+				}
+
+				if (board[1][6] != 'P' && board[1][7] != 'P') {
 					whiteKingSafety = whiteKingSafety - 0.1;
 				}
-				if (board[1][6] != 'P' && board[2][6] != 'P'){
+				if (board[1][6] != 'P' && board[2][6] != 'P') {
 					whiteKingSafety = whiteKingSafety - 0.1;
 				}
-				if (board[1][7] != 'P' && board[2][7] != 'P'){
+				if (board[1][7] != 'P' && board[2][7] != 'P') {
 					whiteKingSafety = whiteKingSafety - 0.1;
 				}
-			}	
-			else if (whiteKCastle == false && whiteQCastle == false && (whiteCheckLocation[1] == 3 || whiteCheckLocation[1] == 4)) {
+			} else if (whiteKCastle == false && whiteQCastle == false
+					&& (whiteCheckLocation[1] == 3 || whiteCheckLocation[1] == 4)) {
 				whiteKingSafety = whiteKingSafety - 0.2;
-			}	
+			}
 		}
-		
-		//blackDevelopment
-		if (board[7][1] != 'n') { blackDevelopment = blackDevelopment + 0.1; }
-		if (board[7][2] != 'b') { blackDevelopment = blackDevelopment + 0.15; }
-		if (board[7][5] != 'b')	{ blackDevelopment = blackDevelopment + 0.15; }
-		if (board[7][6] != 'n')	{ blackDevelopment = blackDevelopment + 0.1; }
-		if (board[7][1] != 'n' && board[7][2] != 'b' && board[7][5] != 'b' && board[7][6] != 'n'){
-			if (board[7][4] != 'q'){blackDevelopment = blackDevelopment + 0.05; }
+
+		// blackDevelopment
+		if (board[7][1] != 'n') {
+			blackDevelopment = blackDevelopment + 0.1;
 		}
-		
-		//whiteDevelopment
-		if (board[0][1] != 'N') { whiteDevelopment = whiteDevelopment + 0.1; }
-		if (board[0][2] != 'B') { whiteDevelopment = whiteDevelopment + 0.15; }
-		if (board[0][5] != 'B')	{ whiteDevelopment = whiteDevelopment + 0.15; }
-		if (board[0][6] != 'N')	{ whiteDevelopment = whiteDevelopment + 0.1; }
-		if (board[0][1] != 'n' && board[0][2] != 'b' && board[0][5] != 'b' && board[0][6] != 'n'){
-			if (board[0][4] != 'Q'){ whiteDevelopment = whiteDevelopment + 0.05; }
-		}	
-		//blackPawnStructure
-		if (board[5][3]=='p') {
+		if (board[7][2] != 'b') {
+			blackDevelopment = blackDevelopment + 0.15;
+		}
+		if (board[7][5] != 'b') {
+			blackDevelopment = blackDevelopment + 0.15;
+		}
+		if (board[7][6] != 'n') {
+			blackDevelopment = blackDevelopment + 0.1;
+		}
+		if (board[7][1] != 'n' && board[7][2] != 'b' && board[7][5] != 'b' && board[7][6] != 'n') {
+			if (board[7][4] != 'q') {
+				blackDevelopment = blackDevelopment + 0.05;
+			}
+		}
+
+		// whiteDevelopment
+		if (board[0][1] != 'N') {
+			whiteDevelopment = whiteDevelopment + 0.1;
+		}
+		if (board[0][2] != 'B') {
+			whiteDevelopment = whiteDevelopment + 0.15;
+		}
+		if (board[0][5] != 'B') {
+			whiteDevelopment = whiteDevelopment + 0.15;
+		}
+		if (board[0][6] != 'N') {
+			whiteDevelopment = whiteDevelopment + 0.1;
+		}
+		if (board[0][1] != 'n' && board[0][2] != 'b' && board[0][5] != 'b' && board[0][6] != 'n') {
+			if (board[0][4] != 'Q') {
+				whiteDevelopment = whiteDevelopment + 0.05;
+			}
+		}
+		// blackPawnStructure
+		if (board[5][3] == 'p') {
 			blackPawnStructure = blackPawnStructure + 0.05;
 		}
-		if (board[5][4] =='p') {
+		if (board[5][4] == 'p') {
 			blackPawnStructure = blackPawnStructure + 0.05;
 		}
-		if (board[4][3]=='p' || board[3][3] =='p') {
+		if (board[4][3] == 'p' || board[3][3] == 'p') {
 			blackPawnStructure = blackPawnStructure + 0.1;
 		}
-		if (board[4][4] =='p' || board[3][4] == 'p') {
+		if (board[4][4] == 'p' || board[3][4] == 'p') {
 			blackPawnStructure = blackPawnStructure + 0.1;
 		}
-		
-		//whitePawnStructure
-		if (board[2][3]=='P') {
+
+		// whitePawnStructure
+		if (board[2][3] == 'P') {
 			whitePawnStructure = whitePawnStructure + 0.05;
 		}
-		if (board[2][4] =='P') {
+		if (board[2][4] == 'P') {
 			whitePawnStructure = whitePawnStructure + 0.05;
 		}
-		if (board[4][3]=='P' || board[3][3] =='P') {
+		if (board[4][3] == 'P' || board[3][3] == 'P') {
 			whitePawnStructure = whitePawnStructure + 0.1;
 		}
-		if (board[4][4] =='P' || board[3][4] == 'P') {
+		if (board[4][4] == 'P' || board[3][4] == 'P') {
 			whitePawnStructure = whitePawnStructure + 0.1;
 		}
 		whitePieceActivity = whiteKnightActivity;
 		blackPieceActivity = blackKnightActivity;
-		
+
 		blackScore = blackMaterialScore + blackKingSafety + blackDevelopment + blackPawnStructure + blackPieceActivity;
 		whiteScore = whiteMaterialScore + whiteKingSafety + whiteDevelopment + whitePawnStructure + whitePieceActivity;
-		
-		if (sideToMove == 'w'){
-			/*if (isWhiteKingInCheck(whiteCheckLocation[0], whiteCheckLocation[1]) == true){
-				ArrayList<Move> checkmateMoves = generateLegalMoves();
-				if(checkmateMoves.isEmpty()){ 
-					positionScore = -1000;
-				}
-			}*/
+
+		if (sideToMove == 'w') {
+			/*
+			 * if (isWhiteKingInCheck(whiteCheckLocation[0],
+			 * whiteCheckLocation[1]) == true){ ArrayList<Move> checkmateMoves =
+			 * generateLegalMoves(); if(checkmateMoves.isEmpty()){ positionScore
+			 * = -1000; } }
+			 */
+			positionScore = whiteScore - blackScore;
+		} else {
+			/*
+			 * if (isBlackKingInCheck(blackCheckLocation[0],
+			 * blackCheckLocation[1]) == true){ ArrayList<Move> checkmateMoves =
+			 * generateLegalMoves(); if(checkmateMoves.isEmpty()){ positionScore
+			 * = 1000; } }
+			 */
 			positionScore = whiteScore - blackScore;
 		}
-		else{
-			/*if (isBlackKingInCheck(blackCheckLocation[0], blackCheckLocation[1]) == true){
-				ArrayList<Move> checkmateMoves = generateLegalMoves();
-				if(checkmateMoves.isEmpty()){ 
-					positionScore = 1000;
-				}
-			}*/
-			positionScore = whiteScore - blackScore;
-		}	
-		
+
 		return positionScore;
 	}
 
@@ -722,7 +831,7 @@ public class Game {
 	 */
 	public ArrayList<Move> findCaptures() {
 		// System.out.println("generateLegalMoves");
-		//System.out.println("positionScore is" + evaluateBoard());
+		// System.out.println("positionScore is" + evaluateBoard());
 		// System.out.println("whiteKcastle is" + whiteKCastle);
 		ArrayList<Move> captures = new ArrayList<Move>();
 		if (sideToMove == 'w') {
@@ -732,8 +841,8 @@ public class Game {
 		}
 		return captures;
 	}
-	
-	private ArrayList<Move> findWhiteCaptures(){
+
+	private ArrayList<Move> findWhiteCaptures() {
 		ArrayList<Move> moves = new ArrayList<>();
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
@@ -748,20 +857,15 @@ public class Game {
 			for (int j = 0; j < 8; j++) {
 				if (board[i][j] == 'P') {
 					moves.addAll(findWhitePawnCaptures(i, j));
-				}
-				else if (board[i][j] == 'K') {
+				} else if (board[i][j] == 'K') {
 					moves.addAll(findKingCaptures(i, j, blackPieces));
-				}
-				else if (board[i][j] == 'R') {
+				} else if (board[i][j] == 'R') {
 					moves.addAll(findRookCaptures(i, j, blackPieces));
-				}
-				else if (board[i][j] == 'B') {
+				} else if (board[i][j] == 'B') {
 					moves.addAll(findBishopCaptures(i, j, blackPieces));
-				}
-				else if (board[i][j] == 'Q') {
+				} else if (board[i][j] == 'Q') {
 					moves.addAll(findQueenCaptures(i, j, blackPieces));
-				}
-				else if (board[i][j] == 'N') {
+				} else if (board[i][j] == 'N') {
 					moves.addAll(findKnightCaptures(i, j, blackPieces));
 				}
 			}
@@ -769,8 +873,8 @@ public class Game {
 
 		return moves;
 	}
-	
-	private ArrayList<Move> findBlackCaptures(){
+
+	private ArrayList<Move> findBlackCaptures() {
 		ArrayList<Move> moves = new ArrayList<>();
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
@@ -785,20 +889,15 @@ public class Game {
 			for (int j = 0; j < 8; j++) {
 				if (board[i][j] == 'p') {
 					moves.addAll(findBlackPawnCaptures(i, j));
-				}
-				else if (board[i][j] == 'k') {
+				} else if (board[i][j] == 'k') {
 					moves.addAll(findKingCaptures(i, j, whitePieces));
-				}
-				else if (board[i][j] == 'r') {
+				} else if (board[i][j] == 'r') {
 					moves.addAll(findRookCaptures(i, j, whitePieces));
-				}
-				else if (board[i][j] == 'b') {
+				} else if (board[i][j] == 'b') {
 					moves.addAll(findBishopCaptures(i, j, whitePieces));
-				}
-				else if (board[i][j] == 'q') {
+				} else if (board[i][j] == 'q') {
 					moves.addAll(findQueenCaptures(i, j, whitePieces));
-				}
-				else if (board[i][j] == 'n') {
+				} else if (board[i][j] == 'n') {
 					moves.addAll(findKnightCaptures(i, j, whitePieces));
 				}
 			}
@@ -806,10 +905,10 @@ public class Game {
 
 		return moves;
 	}
-	
+
 	public ArrayList<Move> generateLegalMoves() {
 		// System.out.println("generateLegalMoves");
-		//System.out.println("positionScore is" + evaluateBoard());
+		// System.out.println("positionScore is" + evaluateBoard());
 		// System.out.println("whiteKcastle is" + whiteKCastle);
 		ArrayList<Move> moves = new ArrayList<Move>();
 		if (sideToMove == 'w') {
@@ -947,12 +1046,12 @@ public class Game {
 				moves.add(new Move(row, col, row - 1, col));
 			}
 		}
-		
-		moves.addAll(findBlackPawnCaptures(row,col));
+
+		moves.addAll(findBlackPawnCaptures(row, col));
 
 		return moves;
 	}
-	
+
 	private ArrayList<Move> findBlackPawnCaptures(int row, int col) {
 		// System.out.println("generatePawnMoves");
 		ArrayList<Move> moves = new ArrayList<Move>();
@@ -964,7 +1063,7 @@ public class Game {
 				moves.add(new Move(row, col, row - 1, col - 1));
 			}
 		}
-		
+
 		if (col < 7 && contains(whitePieces, board[row - 1][col + 1])) {
 			Move interimMove = new Move(row, col, row - 1, col + 1);
 			Game nextPosition = new Game(this, interimMove);
@@ -972,7 +1071,7 @@ public class Game {
 				moves.add(new Move(row, col, row - 1, col + 1));
 			}
 		}
-		
+
 		if (enPassant == true && row == 3 && (col == enPassantTarget - 1 || col == enPassantTarget + 1)) {
 			Move interimMove = new Move(row, col, 2, enPassantTarget);
 			Game nextPosition = new Game(this, interimMove);
@@ -983,7 +1082,6 @@ public class Game {
 
 		return moves;
 	}
-
 
 	private ArrayList<Move> generateWhitePawnMoves(int row, int col) {
 		// System.out.println("generatePawnMoves");
@@ -1003,12 +1101,12 @@ public class Game {
 				moves.add(new Move(row, col, row + 1, col));
 			}
 		}
-		
-		moves.addAll(findWhitePawnCaptures(row,col));
+
+		moves.addAll(findWhitePawnCaptures(row, col));
 		return moves;
 	}
-	
-	private ArrayList<Move> findWhitePawnCaptures(int row, int col){
+
+	private ArrayList<Move> findWhitePawnCaptures(int row, int col) {
 		ArrayList<Move> moves = new ArrayList<Move>();
 		if (col > 0 && contains(blackPieces, board[row + 1][col - 1])) {
 			Move interimMove = new Move(row, col, row + 1, col - 1);
@@ -1097,7 +1195,7 @@ public class Game {
 		}
 		return moves;
 	}
-	
+
 	private ArrayList<Move> findKingCaptures(int row, int col, char[] opponentPieces) {
 		// System.out.println("generateKingMoves");
 		ArrayList<Move> moves = new ArrayList<Move>();
@@ -1161,7 +1259,6 @@ public class Game {
 		}
 		return moves;
 	}
-
 
 	private ArrayList<Move> generateRookMoves(int row, int col, char[] opponentPieces) {
 		// System.out.println("generateRookMoves");
@@ -1246,7 +1343,7 @@ public class Game {
 
 		return moves;
 	}
-	
+
 	private ArrayList<Move> findRookCaptures(int row, int col, char[] opponentPieces) {
 		// System.out.println("generateRookMoves");
 		ArrayList<Move> moves = new ArrayList<Move>();
@@ -1414,6 +1511,7 @@ public class Game {
 
 		return moves;
 	}
+
 	private ArrayList<Move> findBishopCaptures(int row, int col, char[] opponentPieces) {
 		// System.out.println("generateBishopMoves");
 		ArrayList<Move> moves = new ArrayList<Move>();
@@ -1497,13 +1595,13 @@ public class Game {
 
 		return moves;
 	}
-	
-	private ArrayList<Move> findQueenCaptures(int row, int col, char [] opponentPieces){
+
+	private ArrayList<Move> findQueenCaptures(int row, int col, char[] opponentPieces) {
 		ArrayList<Move> captures = new ArrayList<Move>();
 		captures.addAll(findBishopCaptures(row, col, opponentPieces));
 		captures.addAll(findRookCaptures(row, col, opponentPieces));
 		return captures;
-		
+
 	}
 
 	private ArrayList<Move> generateQueenMoves(int row, int col, char[] opponentPieces) {
@@ -1800,7 +1898,6 @@ public class Game {
 		return moves;
 	}
 
-	
 	private ArrayList<Move> findKnightCaptures(int row, int col, char[] opponentPieces) {
 		// System.out.println("generateKnightMoves");
 		ArrayList<Move> moves = new ArrayList<Move>();
