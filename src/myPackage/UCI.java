@@ -4,7 +4,7 @@ import java.util.*;
 public class UCI {
 	static Game currGame = new Game();
 	static int num_moves;
-	static final int DEPTH = 4;
+	static final int DEPTH = 3;
 	static final boolean QUIESCE = false;
 	public static void main(String[] args) {
 		Scanner input = new Scanner(System.in);
