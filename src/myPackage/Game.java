@@ -434,7 +434,7 @@ public class Game {
 			if ((piece == 'P' || piece == 'p') && Math.abs(capture.currColumn - capture.newColumn) == 1
 					&& board[capture.newRow][capture.newColumn] == 'x'
 					&& (capture.newRow == 2 || capture.newRow == 5)) {
-				pieceValue = 1;
+				pieceValue = 100;
 			} else {
 				char pieceCaptured = board[capture.newRow][capture.newColumn];
 				pieceValue = Utils.pieceValues.get(pieceCaptured);

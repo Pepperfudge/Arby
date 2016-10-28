@@ -5,7 +5,7 @@ public class UCI {
 	static Game currGame = new Game();
 	static int num_moves;
 	static final int DEPTH = 4;
-	static final boolean QUIESCE = false;
+	static final boolean QUIESCE = true;
 	public static void main(String[] args) {
 		Scanner input = new Scanner(System.in);
 		System.out.println("Whitey has arrived");
