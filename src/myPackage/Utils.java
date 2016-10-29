@@ -72,11 +72,15 @@ public class Utils {
 		HashMap<Character, Integer> hash = new HashMap<Character, Integer> ();
 		hash.put('Q', 900);
 		hash.put('R', 500);
+		hash.put('N', 325);
+		hash.put('B', 325);
 		hash.put('N', 300);
 		hash.put('B', 300);
 		hash.put('P', 100);
 		hash.put('q', 900);
 		hash.put('r', 500);
+		hash.put('n', 325);
+		hash.put('b', 325);
 		hash.put('n', 300);
 		hash.put('b', 300);
 		hash.put('p', 100);
