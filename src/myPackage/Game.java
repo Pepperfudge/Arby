@@ -8,8 +8,8 @@ public class Game {
 
 	public char sideToMove;
 
-	private int[] whiteKingLocation = {0, 3};
-	private int[] blackKingLocation = {7, 3};
+	private int[] whiteKingLocation;
+	private int[] blackKingLocation;
 
 	private boolean enPassant;
 	private int enPassantTarget;
@@ -40,16 +40,21 @@ public class Game {
 		whiteKCastle = true;
 		blackQCastle = true;
 		blackKCastle = true;
+		whiteKingLocation = new int[] {0, 3};
+		blackKingLocation = new int[] {7, 3};
 	}
+	
 	public char getPieceAt(int row, int col){
 		return board[row][col];
 	}
+	
 	public Game(Game prevPosition, Move move) {
 
 		whiteQCastle = prevPosition.whiteQCastle;
 		whiteKCastle = prevPosition.whiteKCastle;
 		blackQCastle = prevPosition.blackQCastle;
 		blackKCastle = prevPosition.blackKCastle;
+
 
 		if (prevPosition.sideToMove == 'w') {
 			this.sideToMove = 'b';
@@ -136,21 +141,19 @@ public class Game {
 			for (int i = 0; i < 8; i++) {
 				for (int j = 0; j < 8; j++) {
 					if (board[i][j] == 'K') {
-						whiteKingLocation[0] = i;
-						whiteKingLocation[1] = j;
+						whiteKingLocation = new int[] {i,j};
 					}
 					if (board[i][j] == 'k') {
-						blackKingLocation[0] = i;
-						blackKingLocation[1] = j;
+						blackKingLocation = new int[] {i,j};
 					}
 				}
 			}
 		}	
 		else {
-			whiteKingLocation[0] = prevPosition.whiteKingLocation[0];	
-			whiteKingLocation[1] = prevPosition.whiteKingLocation[1];
-			blackKingLocation[0] = prevPosition.blackKingLocation[0];
-			blackKingLocation[1] = prevPosition.blackKingLocation[1];
+			whiteKingLocation = new int[] {prevPosition.whiteKingLocation[0], 
+										   prevPosition.whiteKingLocation[1]};	
+			blackKingLocation = new int[] {prevPosition.blackKingLocation[0],
+										   prevPosition.blackKingLocation[1]};
 		}
 
 		// System.out.format("Turn to move: %s\n", sideToMove);
@@ -284,8 +287,10 @@ public class Game {
 				} else {
 					// otherwise add the piece to the matrix
 					if (piece == 'k') {
+						blackKingLocation = new int[]{rowIndex,colIndex};
 						foundBlackKing = true;
 					} else if (piece == 'K') {
+						whiteKingLocation = new int[]{rowIndex,colIndex};
 						foundWhiteKing = true;
 					} else if (Utils.contains(whitePieces, piece)) {
 						whiteMaterialScore += Utils.pieceValues.get(piece);
@@ -749,14 +754,6 @@ public class Game {
 
 	private ArrayList<Move> findWhiteCaptures() {
 		ArrayList<Move> moves = new ArrayList<>();
-		for (int i = 0; i < 8; i++) {
-			for (int j = 0; j < 8; j++) {
-				if (board[i][j] == 'K') {
-					whiteKingLocation[0] = i;
-					whiteKingLocation[1] = j;
-				}
-			}
-		}
 
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
@@ -1415,7 +1412,7 @@ public class Game {
 						moves.add(new Move(row, col, i, j));
 					}
 				}
-				if (opponentPieces == whitePieces) {
+				else if (opponentPieces == whitePieces) {
 					if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
 						moves.add(new Move(row, col, i, j));
 					}
