@@ -608,6 +608,8 @@ public class Game {
 		int blackBishopActivity = 0;
 		int whitePieceActivity = 0;
 		int blackPieceActivity = 0;
+		int whiteTradeBonus = 0;
+		int blackTradeBonus = 0;
 		
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
@@ -616,61 +618,65 @@ public class Game {
 					if (i>=3 && j>0 && j<7 && (board[i-1][j-1] == 'P' || board[i-1][j+1] == 'P')){
 						whitePawnStructure = whitePawnStructure +5;
 					}
-					//Encourage pawn pushing in endgame
-					if (blackMaterialScore < 1500){
-						if (i==4){whitePawnStructure = whitePawnStructure + 15;}
-						if (i==5){whitePawnStructure = whitePawnStructure + 40;}
-						if (i==6){whitePawnStructure = whitePawnStructure + 100;}	
-					}
-					//Discourage doubled pawns
-					if (i<5){
-						if (board[i+1][j]=='P' || board[i+2][j]== 'P' || board[i+3][j]== 'P'){
-						whitePawnStructure = whitePawnStructure - 20;
-						}
-					}
-					boolean whiteIsolatedPawn = true;
-					for (int k = 0; k + i <=7; k++){					
-						if (j-1>=0){	
-							if (board [i+k][j-1] == 'P')  {
-								whiteIsolatedPawn = false;
+					//passed pawns
+					boolean whitePassedPawn = true;
+					for (int k = i+1; k <=6; k++){						
+						if (j-1>=0){
+							if (board [k][j-1] == 'p')  {
+								whitePassedPawn = false;
 								break;
-							}	
-						}		
+							}
+						}	
+						if (board [k][j] == 'p')  {
+							whitePassedPawn = false;
+							break;
+						}
 						if (j+1<=7){
-							if	(board [i+k][j+1] == 'P'){
-								whiteIsolatedPawn = false;
+							if	(board [k][j+1] == 'p'){
+								whitePassedPawn = false;
 								break;
-							}	
-						}
-					}	
-					if (whiteIsolatedPawn == true){
-						for (int k = -1; k + i >=0; k--){
-							if (j-1>=0){	
-								if (board [i+k][j-1] == 'P')  {
-									whiteIsolatedPawn = false;
-									break;
-								}	
-							}		
-							if (j+1<=7){
-								if	(board [i+k][j+1] == 'P'){
-									whiteIsolatedPawn = false;
-									break;
-								}	
 							}
 						}	
 					}
+					if (whitePassedPawn == true){whitePawnStructure = whitePawnStructure + 20;}
+					//isolated pawns
+					boolean whiteIsolatedPawn = true;
+					for (int k = 1; k <=6; k++){
+						if (j-1>=0){
+							if (board [k][j-1] == 'P')  {
+								whiteIsolatedPawn = false;
+								break;
+							}
+						}
+						if (j+1<=7){
+							if	(board [k][j+1] == 'P'){
+								whiteIsolatedPawn = false;
+								break;
+							}
+						}	
+					}	
 					if (whiteIsolatedPawn == true){whitePawnStructure = whitePawnStructure - 20;}
-					/*boolean passedPawn = true;
-					for (int k = 1; k + i <=7; k++){
-						if (board [i+k][j-1] == 'p' || board [i+k][j] == 'p' || board [i+k][j+1] == 'p'){
-							passedPawn = false;
-							break;
+					//Encourage pawn pushing in endgame
+					if (blackMaterialScore < 2000){
+						if (i==3){
+							whitePawnStructure = whitePawnStructure + 5;
+							if (whitePassedPawn == true){whitePawnStructure = whitePawnStructure + 5;} 
+						}
+						if (i==4){
+							whitePawnStructure = whitePawnStructure + 10;}
+							if (whitePassedPawn == true){whitePawnStructure = whitePawnStructure + 10;} 
+						if (i==5){
+							whitePawnStructure = whitePawnStructure + 20;
+							if (whitePassedPawn == true){whitePawnStructure = whitePawnStructure + 30;} 
+						}
+						if (i==6){whitePawnStructure = whitePawnStructure + 100;}	
+					}
+					//Discourage doubled pawns
+					for (int k = i+1; k <=7; k++){
+						if (board[k][j]=='P') {
+						whitePawnStructure = whitePawnStructure - 20;
 						}
 					}
-					if (passedPawn == true){
-						whitePawnStructure = whitePawnStructure + 20;
-						if (blackMaterialScore < 1500) { whitePawnStructure = whitePawnStructure + 20;}
-					}*/
 				}
 				if (board[i][j] == 'B') {
 						// Light squared bishop
@@ -689,12 +695,21 @@ public class Game {
 						if (i==1 && j==6 && board[3][4] != 'P'){whiteBishopActivity =	whiteBishopActivity + 15; }
 				}
 				if (board[i][j] == 'R') {
-					if (i<4 && j>0 && j<7){
-						if(board[i+1][j] !='P' && board[i+2][j] !='P' && board[i+3][j] !='P'){
-						whiteRookActivity =	whiteRookActivity + 15;
+					boolean friendlyOpenFile = true;
+					boolean enemyOpenFile = true;
+					for (int k = 1; k <=6; k++){
+						if (board[k][j]=='P' ) {
+							friendlyOpenFile = false;
+						}
+						if (board[k][j]=='p' ) {
+							enemyOpenFile = false;
 						}
 					}
-					if (i==6){whiteRookActivity = whiteRookActivity + 30;}
+					if (friendlyOpenFile == true) {
+						whiteRookActivity = whiteRookActivity + 15;
+						if (enemyOpenFile == true) {whiteRookActivity = whiteRookActivity + 15;}
+					}	
+					if (i==6){whiteRookActivity = whiteRookActivity + 20;}
 				}
 				
 				//discourage knight on rim
@@ -722,61 +737,83 @@ public class Game {
 				}
 				
 				if (board[i][j] == 'r') {
-					if (i>3 && j>0 && j<7){
-						if(board[i-1][j] !='p' && board[i-2][j] !='p' && board[i-3][j] !='p'){
-						blackRookActivity =	blackRookActivity + 15;
+					boolean friendlyOpenFile = true;
+					boolean enemyOpenFile = true;
+					for (int k = 1; k <=6; k++){
+						if (board[k][j]=='p' ) {
+							friendlyOpenFile = false;
+						}
+						if (board[k][j]=='P' ) {
+							enemyOpenFile = false;
 						}
 					}
-					if (i==1){blackRookActivity = blackRookActivity + 30;}
+					if (friendlyOpenFile == true) {
+						blackRookActivity = blackRookActivity + 15;
+						if (enemyOpenFile == true) {blackRookActivity = blackRookActivity + 15;}
+					}	
+					if (i==1){blackRookActivity = blackRookActivity + 20;}
 				}
 				
 				if (board[i][j] == 'p'){
 					if (i<=4 && j>0 && j<7 && (board[i+1][j-1] == 'p' || board[i+1][j+1] == 'p')){
 						blackPawnStructure = blackPawnStructure + 5;
 					}
-					if (whiteMaterialScore < 1500){
-						if (i==3){blackPawnStructure = blackPawnStructure + 15;}
-						if (i==2){blackPawnStructure = blackPawnStructure + 40;}
-						if (i==1){blackPawnStructure = blackPawnStructure + 100;}	
-					}
-					if (i > 2){
-						if (board[i-1][j]== 'p' || board[i-2][j]== 'p' || board[i-3][j]== 'p'){
-						blackPawnStructure = blackPawnStructure - 20;
-						}
-					}
 					boolean blackIsolatedPawn = true;
-					for (int k = 0; k + i <=7; k++){					
-						if (j-1>=0){	
-							if (board [i+k][j-1] == 'p')  {
+					for (int k = 6; k >=1; k--){						
+						if (j-1>=0){
+							if (board [k][j-1] == 'p')  {
 								blackIsolatedPawn = false;
 								break;
-							}	
-						}		
+							}
+						}	
 						if (j+1<=7){
-							if	(board [i+k][j+1] == 'p'){
+							if	(board [k][j+1] == 'p'){
 								blackIsolatedPawn = false;
 								break;
-							}	
-						}
-					}	
-					if (blackIsolatedPawn == true){
-						for (int k = -1; k + i >=0; k--){
-							if (j-1>=0){	
-								if (board [i+k][j-1] == 'p')  {
-									blackIsolatedPawn = false;
-									break;
-								}	
-							}		
-							if (j+1<=7){
-								if	(board [i+k][j+1] == 'p'){
-									blackIsolatedPawn = false;
-									break;
-								}	
 							}
 						}	
 					}	
-					
 					if (blackIsolatedPawn == true){blackPawnStructure = blackPawnStructure - 20;}
+					
+					boolean blackPassedPawn = true;
+					for (int k = i-1; k >=1; k--){
+						if (j-1>=0){
+							if (board [k][j-1] == 'P')  {
+								blackPassedPawn = false;
+								break;
+							}
+						}	
+						if (board [k][j] == 'P')  {
+							blackPassedPawn = false;
+							break;
+						}	
+						if (j+1<=7){
+							if	(board [k][j+1] == 'P'){
+								blackPassedPawn = false;
+								break;
+							}
+						}	
+					}
+					if (blackPassedPawn == true){blackPawnStructure = blackPawnStructure + 20;}
+					
+					if (whiteMaterialScore < 2000){
+						if (i==4){blackPawnStructure = blackPawnStructure + 5;
+							if (blackPassedPawn == true){blackPawnStructure = blackPawnStructure + 5;}
+						}
+						if (i==3){blackPawnStructure = blackPawnStructure + 10;
+							if (blackPassedPawn == true){blackPawnStructure = blackPawnStructure + 10;}
+						}
+						if (i==2){blackPawnStructure = blackPawnStructure + 20;
+							if (blackPassedPawn == true){blackPawnStructure = blackPawnStructure + 30;}
+						}
+						if (i==1){blackPawnStructure = blackPawnStructure + 100;}	
+					}
+					for (int k = i-1; k >= 1; k--){
+						if (board[k][j]=='p') {
+						blackPawnStructure = blackPawnStructure - 20;
+						}
+					}
+					
 			}
 				if (board[i][j] == 'n') {
 					if(i==0 || i==7){ blackKnightActivity = blackKnightActivity - 10;}
@@ -788,12 +825,12 @@ public class Game {
 		}			
 		
 		//blackKingSafety
-		if (whiteMaterialScore > 1500){
+		if (whiteMaterialScore > 1600){
 			//discourage pawn pushing on kingside before castling
-			if (board[6][1] != 'p' && board[5][1] != 'p' && blackKingLocation[1] <5 ){blackKingSafety = blackKingSafety - 10;}
+			if (board[6][1] != 'p' && board[5][1] != 'p' && blackKingLocation[1] <5 ){blackKingSafety = blackKingSafety - 20;}
 			if (board[6][1] != 'p' && board[6][1] != 'b' && blackKingLocation[1] <5){blackKingSafety = blackKingSafety - 5;}
 			if (board[6][2] != 'p' && blackKingLocation[1] <5){blackKingSafety = blackKingSafety - 10;}
-			if (board[6][0] != 'p' && board[5][0] != 'p' && blackKingLocation[1] <5){blackKingSafety = blackKingSafety - 20;}
+			if (board[6][0] != 'p' && board[5][0] != 'p' && blackKingLocation[1] <5){blackKingSafety = blackKingSafety - 10;}
 			if (blackKingLocation[0] != 7) {blackKingSafety = blackKingSafety - 10;} 
 			// encourage kingside castling
 			if ((board[7][1] == 'k' || board[7][0] == 'k') && board[7][0] != 'r'){ 
@@ -832,14 +869,15 @@ public class Game {
 			|| blackKingLocation[1] == 2 || (blackKingLocation[1] == 5 && board[7][7]=='R') ) ) {
 				blackKingSafety = blackKingSafety - 30;
 			}
+			if (whiteMaterialScore < 2400){ blackKingSafety = blackKingSafety/2;}
 		}
 		
 		//whiteKingSafety
-		if (blackMaterialScore > 1500){
-			if (board[1][1] != 'P' && board[2][1] != 'P' && whiteKingLocation[1] <5){whiteKingSafety = whiteKingSafety - 10;}
+		if (blackMaterialScore > 1600){
+			if (board[1][1] != 'P' && board[2][1] != 'P' && whiteKingLocation[1] <5){whiteKingSafety = whiteKingSafety - 20;}
 			if (board[1][1] != 'P' && board[1][1] != 'B' && whiteKingLocation[1] <5){whiteKingSafety = whiteKingSafety - 5;}
 			if (board[1][2] != 'P' && whiteKingLocation[1] <5){whiteKingSafety = whiteKingSafety - 10;}
-			if (board[1][0] != 'P' && board[2][0] != 'P' && whiteKingLocation[1] <5){whiteKingSafety = whiteKingSafety - 20;}
+			if (board[1][0] != 'P' && board[2][0] != 'P' && whiteKingLocation[1] <5){whiteKingSafety = whiteKingSafety - 10;}
 			if (whiteKingLocation[0] != 0) {whiteKingSafety = whiteKingSafety - 10;}  
 			if ((board[0][1] == 'K' || board[0][0] == 'K') && board[7][0] != 'R'){ 
 				whiteKingSafety = whiteKingSafety + 30;	
@@ -875,7 +913,8 @@ public class Game {
 			if (whiteKCastle == false && ((whiteKingLocation[1] == 3 || whiteKingLocation[1] == 4 
 			|| whiteKingLocation[1] == 2) || (whiteKingLocation[1] == 5 && board[0][7]=='R') ) ){
 				whiteKingSafety = whiteKingSafety - 30;
-			}	
+			}
+			if (blackMaterialScore < 2400){ whiteKingSafety = whiteKingSafety/2;}
 		}
 		
 		//blackDevelopment
@@ -925,8 +964,11 @@ public class Game {
 		whitePieceActivity = whiteKnightActivity + whiteRookActivity + whiteBishopActivity;
 		blackPieceActivity = blackKnightActivity + blackRookActivity + blackBishopActivity;
 		
-		blackScore = blackMaterialScore + blackKingSafety + blackDevelopment + blackPawnStructure + blackPieceActivity  ;
-		whiteScore = whiteMaterialScore + whiteKingSafety + whiteDevelopment + whitePawnStructure + whitePieceActivity;
+		if (whiteMaterialScore - blackMaterialScore  >= 300) {whiteTradeBonus = (3900 - blackMaterialScore)/25;}
+		if (blackMaterialScore - whiteMaterialScore  >= 300) {blackTradeBonus = (3900 - whiteMaterialScore)/25;}
+		
+		blackScore = blackMaterialScore + blackKingSafety + blackDevelopment + blackPawnStructure + blackPieceActivity + blackTradeBonus ;
+		whiteScore = whiteMaterialScore + whiteKingSafety + whiteDevelopment + whitePawnStructure + whitePieceActivity + whiteTradeBonus;
 		
 		if (sideToMove == 'w'){
 			/*if (isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == true){
