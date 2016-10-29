@@ -4,7 +4,7 @@ import java.util.*;
 public class UCI {
 	static Game currGame = new Game();
 	static int num_moves;
-	static final int DEPTH = 4;
+	static final int DEPTH = 6;
 	static final boolean QUIESCE = false;
 	public static void main(String[] args) {
 		Scanner input = new Scanner(System.in);
@@ -51,14 +51,13 @@ public class UCI {
 	}
 	
 	public static String findMove(){
-		if (num_moves == 0 || num_moves == 1){
+		/*if (num_moves == 0 || num_moves == 1){
 			ArrayList<Move> possibleMoves = currGame.generateLegalMoves();
 			int rnd = new Random().nextInt(possibleMoves.size());
 			Move nextMove =  possibleMoves.get(rnd);
 			return nextMove.convertToUCIFormat();
-		}
+		}*/
 		return NegaMax.findBestMove(currGame, DEPTH, QUIESCE).convertToUCIFormat();
-
 	}
 
 }

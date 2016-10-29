@@ -12,16 +12,16 @@ public final class NegaMax {
 	public static Move findBestMove(Game position, int depth, boolean quiesce) {
 		ArrayList<Move> moves = position.generateLegalMoves();
 
-		double maxValue = Double.NEGATIVE_INFINITY;
+		int maxValue = -20000;
 		Move bestMove = null;
 		for (int i = 0; i < moves.size(); i++) {
 			// for (int i = 0; i < 2; i++){
 			Move move = moves.get(i);
 			// Move move = moves.get(new Random().nextInt(moves.size()));
 			Game newPosition = new Game(position, move);
-			double moveValue = -evaluatePosition(newPosition, depth - 1, 
-					Double.NEGATIVE_INFINITY, -maxValue, quiesce);
-			// double moveValue = -evaluateMove(move,depth - 1);
+			int moveValue = -evaluatePosition(newPosition, depth - 1, 
+					-20000, -maxValue, quiesce);
+			// int moveValue = -evaluateMove(move,depth - 1);
 			if (moveValue >= maxValue) {
 				maxValue = moveValue;
 				bestMove = move;
@@ -32,14 +32,14 @@ public final class NegaMax {
 		return bestMove;
 	}
 	
-	private static double evaluatePosition(Game position, int depth, 
-			double alpha, double beta, boolean quiesce) {
+	private static int evaluatePosition(Game position, int depth, 
+			int alpha, int beta, boolean quiesce) {
 
 		if (depth == 0) {
 			// System.out.println(move.convertToUCIFormat());
 			// System.out.println("quiesce");
 			// System.out.println(newPosition);
-			double score;
+			int score;
 			if (quiesce){
 				score = quiesce(position, alpha, beta);
 			} else {
@@ -55,14 +55,14 @@ public final class NegaMax {
 			// System.out.printf("depth %d, alpha %f, beta %f \n", depth, alpha,
 			// beta);
 			ArrayList<Move> opponentMoves = position.generateLegalMoves();
-			double maxValue = Double.NEGATIVE_INFINITY;
+			int maxValue = -20000;
 			for (int i = 0; i < opponentMoves.size(); i++) {
 				// for (int i = 0; i < 2; i++){
 				Move opponentMove = opponentMoves.get(i);
 				Game newPosition = new Game(position, opponentMove);
 				// Move opponentMove = opponentMoves.get(
 				// new Random().nextInt(opponentMoves.size()));
-				double moveValue = -evaluatePosition(newPosition, depth - 1, -beta,
+				int moveValue = -evaluatePosition(newPosition, depth - 1, -beta,
 						-Math.max(alpha, maxValue), quiesce);
 				if (moveValue > beta) {
 					// System.out.println(move.convertToUCIFormat());
@@ -82,8 +82,8 @@ public final class NegaMax {
 		}
 	}
 	
-	private static double quiesce(Game position, double alpha, double beta) {
-		double stand_pat = position.evaluateBoard();
+	private static int quiesce(Game position, int alpha, int beta) {
+		int stand_pat = position.evaluateBoard();
 		if (position.sideToMove == 'b') {
 			stand_pat = -1 * stand_pat;
 		}
@@ -95,7 +95,7 @@ public final class NegaMax {
 		}
 		ArrayList<Move> captures = position.findCaptures();
 
-		double maxValue = Double.NEGATIVE_INFINITY;
+		int maxValue = -20000;
 		for (int i = 0; i < captures.size(); i++) {
 			// for (int i = 0; i < captures.size(); i++){
 			Move capture = captures.get(i);
@@ -108,7 +108,7 @@ public final class NegaMax {
 			if ((piece == 'P' || piece == 'p') && Math.abs(capture.currColumn - capture.newColumn) == 1
 					&& pieceCaptured == 'x'
 					&& (capture.newRow == 2 || capture.newRow == 5)) {
-				pieceValue = 1;
+				pieceValue = 100;
 			} else {
 				pieceValue = Utils.pieceValues.get(pieceCaptured);
 				if (pieceValue == null) {
@@ -118,11 +118,11 @@ public final class NegaMax {
 					throw new RuntimeException(errorMessage);
 				}
 			}
-			if (((double) pieceValue + stand_pat + 0.7) > alpha) {
+			if (( pieceValue + stand_pat + 70) > alpha) {
 
 				// System.out.println(pieceCaptured);
 				Game newPosition = new Game(position, capture);
-				double moveValue = -quiesce(newPosition, -beta, -alpha);
+				int moveValue = -quiesce(newPosition, -beta, -alpha);
 				if (moveValue >= beta) {
 					return moveValue;
 				}

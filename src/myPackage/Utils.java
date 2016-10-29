@@ -70,16 +70,16 @@ public class Utils {
 	}
 	private static HashMap<Character, Integer> createPieceValueMap(){
 		HashMap<Character, Integer> hash = new HashMap<Character, Integer> ();
-		hash.put('Q', 9);
-		hash.put('R', 5);
-		hash.put('N', 3);
-		hash.put('B', 3);
-		hash.put('P', 1);
-		hash.put('q', 9);
-		hash.put('r', 5);
-		hash.put('n', 3);
-		hash.put('b', 3);
-		hash.put('p', 1);
+		hash.put('Q', 900);
+		hash.put('R', 500);
+		hash.put('N', 300);
+		hash.put('B', 300);
+		hash.put('P', 100);
+		hash.put('q', 900);
+		hash.put('r', 500);
+		hash.put('n', 300);
+		hash.put('b', 300);
+		hash.put('p', 100);
 		return hash;
 	}
 }
