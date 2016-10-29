@@ -6,7 +6,6 @@ public class UCI {
 	static int num_moves;
 	static final int DEPTH = 6;
 	static final boolean QUIESCE = true;
-	static final boolean QUIESCE = false;
 	public static void main(String[] args) {
 		Scanner input = new Scanner(System.in);
 		System.out.println("Whitey has arrived");

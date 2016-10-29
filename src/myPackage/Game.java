@@ -16,8 +16,6 @@ public class Game {
 
 	private int whiteMaterialScore = 4000;
 	private int blackMaterialScore = 4000;
-	private int whiteMaterialScore = 3900;
-	private int blackMaterialScore = 3900;
 
 	// these variables are true if the castle is still possible
 	private boolean whiteQCastle;
@@ -161,10 +159,8 @@ public class Game {
 			this.whiteMaterialScore = prevPosition.whiteMaterialScore - 500;
 		} else if (prevPosition.board[move.newRow][move.newColumn] == 'B') {
 			this.whiteMaterialScore = prevPosition.whiteMaterialScore - 325;
-			this.whiteMaterialScore = prevPosition.whiteMaterialScore - 300;
 		} else if (prevPosition.board[move.newRow][move.newColumn] == 'N') {
 			this.whiteMaterialScore = prevPosition.whiteMaterialScore - 325;
-			this.whiteMaterialScore = prevPosition.whiteMaterialScore - 300;
 		} else if (prevPosition.board[move.newRow][move.newColumn] == 'P') {
 			this.whiteMaterialScore = prevPosition.whiteMaterialScore - 100;
 		} else {
@@ -177,13 +173,14 @@ public class Game {
 		if (prevPosition.board[move.currRow][move.currColumn] == 'P'
 				&& this.board[move.newRow][move.newColumn] == 'N') {
 			this.whiteMaterialScore = prevPosition.whiteMaterialScore + 225;
-			this.whiteMaterialScore = prevPosition.whiteMaterialScore + 200;
 		}
 		if (prevPosition.board[move.currRow][move.currColumn] == 'P'
 				&& this.board[move.newRow][move.newColumn] == 'R') {
+			this.whiteMaterialScore = prevPosition.whiteMaterialScore + 400;
 		}
 		if (prevPosition.board[move.currRow][move.currColumn] == 'P'
 				&& this.board[move.newRow][move.newColumn] == 'B') {
+			this.whiteMaterialScore = prevPosition.whiteMaterialScore + 225;
 		}
 
 		if (prevPosition.board[move.newRow][move.newColumn] == 'q') {
@@ -192,10 +189,8 @@ public class Game {
 			this.blackMaterialScore = prevPosition.blackMaterialScore - 500;
 		} else if (prevPosition.board[move.newRow][move.newColumn] == 'b') {
 			this.blackMaterialScore = prevPosition.blackMaterialScore - 325;
-			this.blackMaterialScore = prevPosition.blackMaterialScore - 300;
 		} else if (prevPosition.board[move.newRow][move.newColumn] == 'n') {
 			this.blackMaterialScore = prevPosition.blackMaterialScore - 325;
-			this.blackMaterialScore = prevPosition.blackMaterialScore - 300;
 		} else if (prevPosition.board[move.newRow][move.newColumn] == 'p') {
 			this.blackMaterialScore = prevPosition.blackMaterialScore - 100;
 		} else {
@@ -208,7 +203,6 @@ public class Game {
 		if (prevPosition.board[move.currRow][move.currColumn] == 'p'
 				&& this.board[move.newRow][move.newColumn] == 'n') {
 			this.blackMaterialScore = prevPosition.blackMaterialScore + 225;
-			this.blackMaterialScore = prevPosition.blackMaterialScore + 200;
 		}
 		if (prevPosition.board[move.currRow][move.currColumn] == 'p'
 				&& this.board[move.newRow][move.newColumn] == 'r') {
@@ -217,7 +211,6 @@ public class Game {
 		if (prevPosition.board[move.currRow][move.currColumn] == 'p'
 				&& this.board[move.newRow][move.newColumn] == 'b') {
 			this.blackMaterialScore = prevPosition.blackMaterialScore + 225;
-			this.blackMaterialScore = prevPosition.blackMaterialScore + 200;
 		}
 	}
 
@@ -719,7 +712,6 @@ public class Game {
 					if (i==6){whiteRookActivity = whiteRookActivity + 20;}
 				}
 				
-				//discourage knight on rim
 				if (board[i][j] == 'N') {
 					//discourage knight on rim
 					if(i==0 || i==7){ whiteKnightActivity = whiteKnightActivity - 10;}
@@ -954,7 +946,6 @@ public class Game {
 			blackPawnStructure = blackPawnStructure + 10;
 		}
 		if (board[4][4] =='p' || board[3][4] == 'p' || board[2][4] == 'p') {
-		if (board[4][3]=='p' || board[3][3] =='p') {
 			blackPawnStructure = blackPawnStructure + 10;
 		}
 		if (board[3][3] =='p' && board[4][4] == 'p') {
@@ -967,7 +958,6 @@ public class Game {
 			blackPawnStructure = blackPawnStructure + 20;
 		}
 		if (board[2][4] =='p' && (board[3][3] == 'p' ||  board[3][5] == 'p' )) {
-		if (board[4][4] =='p' || board[3][4] == 'p') {
 			blackPawnStructure = blackPawnStructure + 10;
 		}
 		
@@ -982,14 +972,12 @@ public class Game {
 			whitePawnStructure = whitePawnStructure + 10;
 		}
 		if (board[4][4] =='P' || board[3][4] == 'P' || board[5][4] == 'P') {
-		if (board[4][3]=='P' || board[3][3] =='P') {
 			whitePawnStructure = whitePawnStructure + 10;
 		}
 		if (board[4][3] =='P' && board[3][4] == 'P') {
 			whitePawnStructure = whitePawnStructure + 20;
 		}
 		if (board[4][4] =='P' && (board[3][3] == 'P' ||  board[3][5] == 'P' )) {
-		if (board[4][4] =='P' || board[3][4] == 'P') {
 			whitePawnStructure = whitePawnStructure + 10;
 		}
 		if (board[5][3] =='P' && board[4][4] == 'P') {
@@ -998,13 +986,12 @@ public class Game {
 		if (board[5][4] =='P' && (board[4][3] == 'P' ||  board[4][5] == 'P' )) {
 			whitePawnStructure = whitePawnStructure + 20;
 		}
+		
 		whitePieceActivity = whiteKnightActivity + whiteRookActivity + whiteBishopActivity;
 		blackPieceActivity = blackKnightActivity + blackRookActivity + blackBishopActivity;
 		
 		if (whiteMaterialScore - blackMaterialScore  >= 300) {whiteTradeBonus = (4000 - blackMaterialScore)/25;}
 		if (blackMaterialScore - whiteMaterialScore  >= 300) {blackTradeBonus = (4000 - whiteMaterialScore)/25;}
-		if (whiteMaterialScore - blackMaterialScore  >= 300) {whiteTradeBonus = (3900 - blackMaterialScore)/25;}
-		if (blackMaterialScore - whiteMaterialScore  >= 300) {blackTradeBonus = (3900 - whiteMaterialScore)/25;}
 		
 		blackScore = blackMaterialScore + blackKingSafety + blackDevelopment + blackPawnStructure + blackPieceActivity + blackTradeBonus ;
 		whiteScore = whiteMaterialScore + whiteKingSafety + whiteDevelopment + whitePawnStructure + whitePieceActivity + whiteTradeBonus;
