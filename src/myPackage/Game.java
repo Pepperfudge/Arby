@@ -6,10 +6,10 @@ import java.util.Random;
 public class Game {
 	private char[][] board;
 
-	private char sideToMove;
+	public char sideToMove;
 
-	private int[] whiteKingLocation = {0, 3};
-	private int[] blackKingLocation = {7, 3};
+	private int[] whiteKingLocation;
+	private int[] blackKingLocation;
 
 	private boolean enPassant;
 	private int enPassantTarget;
@@ -40,14 +40,21 @@ public class Game {
 		whiteKCastle = true;
 		blackQCastle = true;
 		blackKCastle = true;
+		whiteKingLocation = new int[] {0, 3};
+		blackKingLocation = new int[] {7, 3};
 	}
-
+	
+	public char getPieceAt(int row, int col){
+		return board[row][col];
+	}
+	
 	public Game(Game prevPosition, Move move) {
 
 		whiteQCastle = prevPosition.whiteQCastle;
 		whiteKCastle = prevPosition.whiteKCastle;
 		blackQCastle = prevPosition.blackQCastle;
 		blackKCastle = prevPosition.blackKCastle;
+
 
 		if (prevPosition.sideToMove == 'w') {
 			this.sideToMove = 'b';
@@ -134,21 +141,19 @@ public class Game {
 			for (int i = 0; i < 8; i++) {
 				for (int j = 0; j < 8; j++) {
 					if (board[i][j] == 'K') {
-						whiteKingLocation[0] = i;
-						whiteKingLocation[1] = j;
+						whiteKingLocation = new int[] {i,j};
 					}
 					if (board[i][j] == 'k') {
-						blackKingLocation[0] = i;
-						blackKingLocation[1] = j;
+						blackKingLocation = new int[] {i,j};
 					}
 				}
 			}
 		}	
 		else {
-			whiteKingLocation[0] = prevPosition.whiteKingLocation[0];	
-			whiteKingLocation[1] = prevPosition.whiteKingLocation[1];
-			blackKingLocation[0] = prevPosition.blackKingLocation[0];
-			blackKingLocation[1] = prevPosition.blackKingLocation[1];
+			whiteKingLocation = new int[] {prevPosition.whiteKingLocation[0], 
+										   prevPosition.whiteKingLocation[1]};	
+			blackKingLocation = new int[] {prevPosition.blackKingLocation[0],
+										   prevPosition.blackKingLocation[1]};
 		}
 
 		// System.out.format("Turn to move: %s\n", sideToMove);
@@ -282,8 +287,10 @@ public class Game {
 				} else {
 					// otherwise add the piece to the matrix
 					if (piece == 'k') {
+						blackKingLocation = new int[]{rowIndex,colIndex};
 						foundBlackKing = true;
 					} else if (piece == 'K') {
+						whiteKingLocation = new int[]{rowIndex,colIndex};
 						foundWhiteKing = true;
 					} else if (Utils.contains(whitePieces, piece)) {
 						whiteMaterialScore += Utils.pieceValues.get(piece);
@@ -330,267 +337,7 @@ public class Game {
 		}
 	}
 
-	// public Move findBestMove(int depth) {
-	// if (sideToMove == 'w') {
-	// return findBestMoveWhite(depth);
-	// } else {
-	// return findBestMoveBlack(depth);
-	// }
-	// }
-	public Move findBestMove(int depth, boolean quiesce) {
-		ArrayList<Move> moves = generateLegalMoves();
-
-		int maxValue = -20000;
-		Move bestMove = null;
-		for (int i = 0; i < moves.size(); i++) {
-			// for (int i = 0; i < 2; i++){
-			Move move = moves.get(i);
-			// Move move = moves.get(new Random().nextInt(moves.size()));
-			int moveValue = -evaluateMove(move, depth - 1, -20000, -maxValue, quiesce);
-			// int moveValue = -evaluateMove(move,depth - 1);
-			if (moveValue >= maxValue) {
-				maxValue = moveValue;
-				bestMove = move;
-			}
-		}
-		// System.out.println(bestMove.convertToUCIFormat());
-		// System.out.printf("W, depth %d: %f\n", depth, maxValue);
-		System.out.println(maxValue);
-		System.out.println(evaluateBoard());
-		return bestMove;
-	}
-
-	private int evaluateMove(Move move, int depth, int alpha, int beta, boolean quiesce) {
-
-		Game newPosition = new Game(this, move);
-		if (depth == 0) {
-			// System.out.println(move.convertToUCIFormat());
-			// System.out.println("quiesce");
-			// System.out.println(newPosition);
-			int score;
-			if (quiesce){
-				score = newPosition.quiesce(alpha, beta);
-			} else {
-				score = newPosition.evaluateBoard();
-				if (newPosition.sideToMove == 'b'){
-					score = -1*score;
-				}
-			}
-			// System.out.printf("%s depth %d: %f\n", newPosition.sideToMove,
-			// depth, score);
-			return score;
-		} else {
-			// System.out.printf("depth %d, alpha %f, beta %f \n", depth, alpha,
-			// beta);
-			ArrayList<Move> opponentMoves = newPosition.generateLegalMoves();
-			int maxValue = -20000;
-			for (int i = 0; i < opponentMoves.size(); i++) {
-				// for (int i = 0; i < 2; i++){
-				Move opponentMove = opponentMoves.get(i);
-				// Move opponentMove = opponentMoves.get(
-				// new Random().nextInt(opponentMoves.size()));
-				int moveValue = -newPosition.evaluateMove(opponentMove, depth - 1, -beta,
-						-Math.max(alpha, maxValue), quiesce);
-				if (moveValue > beta) {
-					// System.out.println(move.convertToUCIFormat());
-					// System.out.printf("Trim beta %f depth %d\n", beta,
-					// depth);
-					// System.out.printf("W, depth %d: %f\n", depth, moveValue);
-					return moveValue;
-				}
-				if (moveValue > maxValue) {
-					maxValue = moveValue;
-				}
-			}
-			// System.out.println(move.convertToUCIFormat());
-			// System.out.printf("%s, depth %d: %f\n",
-			// newPosition.sideToMove, depth, maxValue);
-			return maxValue;
-		}
-	}
-
-	private int quiesce(int alpha, int beta) {
-		int stand_pat = evaluateBoard();
-		if (sideToMove == 'b') {
-			stand_pat = -1 * stand_pat;
-		}
-		if (stand_pat >= beta) {
-			return stand_pat;
-		}
-		if (stand_pat > alpha) {
-			alpha = stand_pat;
-		}
-		ArrayList<Move> captures = findCaptures();
-
-		int maxValue = -20000;
-		for (int i = 0; i < captures.size(); i++) {
-			// for (int i = 0; i < captures.size(); i++){
-			Move capture = captures.get(i);
-			// Move capture = captures.get(
-			// (new Random()).nextInt(captures.size()));
-			// delta pruning
-			char piece = board[capture.currRow][capture.currColumn];
-			Integer pieceValue;
-			if ((piece == 'P' || piece == 'p') && Math.abs(capture.currColumn - capture.newColumn) == 1
-					&& board[capture.newRow][capture.newColumn] == 'x'
-					&& (capture.newRow == 2 || capture.newRow == 5)) {
-				pieceValue = 100;
-			} else {
-				char pieceCaptured = board[capture.newRow][capture.newColumn];
-				pieceValue = Utils.pieceValues.get(pieceCaptured);
-				if (pieceValue == null) {
-					String errorMessage = String.format(
-							"%s not a valid piece to take. \n move %s" + "\n position \n %s", pieceCaptured,
-							capture.convertToUCIFormat(), this);
-					throw new RuntimeException(errorMessage);
-				}
-			}
-			if (((int) pieceValue + stand_pat + 20) > alpha) {
-
-				// System.out.println(pieceCaptured);
-				Game newPosition = new Game(this, capture);
-				int moveValue = -newPosition.quiesce(-beta, -alpha);
-				if (moveValue >= beta) {
-					return moveValue;
-				}
-				if (moveValue > maxValue) {
-					maxValue = moveValue;
-				}
-				if (moveValue > alpha) {
-					alpha = moveValue;
-				}
-			}
-		}
-		return Math.max(maxValue, stand_pat);
-
-	}
-
-	// public Move findBestMoveWhite(int depth) {
-	// ArrayList<Move> moves = generateLegalMoves();
-	//
-	// int maxValue = Integer.MIN_VALUE;
-	// Move bestMove = null;
-	// for (int i = 0; i < moves.size(); i++) {
-	// // for (int i = 0; i < 2; i++){
-	// Move move = moves.get(i);
-	// // Move move = moves.get(new Random().nextInt(moves.size()));
-	// int moveValue = evaluateMoveWhite(move, depth - 1, maxValue,
-	//INTEGER.MAX_VALUE);
-	// if (moveValue > maxValue) {
-	// maxValue = moveValue;
-	// bestMove = move;
-	// }
-	// }
-	// System.out.println(bestMove.convertToUCIFormat());
-	// System.out.printf("W, depth %d: %f\n", depth, maxValue);
-	// if (bestMove != null){
-	// return bestMove;
-	// } else {
-	// return moves.get(0);
-	// }
-	// }
-	//
-	// public Move findBestMoveBlack(int depth) {
-	// ArrayList<Move> moves = generateLegalMoves();
-	//
-	// int minValue = Integer.MAX_VALUE;
-	// Move bestMove = null;
-	// for (int i = 0; i < moves.size(); i++) {
-	// // for (int i = 0; i < 2; i++){
-	// Move move = moves.get(i);
-	// // Move move = moves.get(new Random().nextInt(moves.size()));
-	// int moveValue = evaluateMoveBlack(move, depth - 1,
-	// Integer.MIN_VALUE, minValue);
-	//
-	// if (moveValue < minValue) {
-	// minValue = moveValue;
-	// bestMove = move;
-	// }
-	// }
-	// System.out.println(bestMove.convertToUCIFormat());
-	// System.out.printf("B, depth %d: %f\n", depth, minValue);
-	// if (bestMove != null){
-	// return bestMove;
-	// } else {
-	// return moves.get(0);
-	// }
-	// }
-	//
-	// private int evaluateMoveWhite(Move whiteMove, int depth, int alpha,
-	// int beta) {
-	// Game newPosition = new Game(this, whiteMove);
-	// if (depth == 0) {
-	// //System.out.println(whiteMove.convertToUCIFormat());
-	// //System.out.printf("W depth %d: %f\n", depth,
-	// newPosition.evaluateBoard());
-	// return newPosition.evaluateBoard();
-	// } else {
-	// // to evaluate whites move we must evaluate black's response
-	// // Black should pick the move with the minimum value
-	// ArrayList<Move> blackMoves = newPosition.generateLegalMoves();
-	// int minValue = INTEGER.MAX_VALUE;
-	// for (int i = 0; i < blackMoves.size(); i++) {
-	// // for (int i = 0; i < 2; i++){
-	// Move blackMove = blackMoves.get(i);
-	// // Move blackMove = blackMoves.get(new
-	// // Random().nextInt(blackMoves.size()));
-	// int moveValue = newPosition.evaluateMoveBlack(blackMove, depth - 1,
-	// alpha, Math.min(minValue, beta));
-	//
-	// if (moveValue < minValue) {
-	// minValue = moveValue;
-	// }
-	// if (moveValue < alpha) {
-	// //System.out.printf("Trim alpha %f depth %d\n", alpha, depth);
-	// break;
-	// }
-	//
-	// }
-	// //System.out.println(whiteMove.convertToUCIFormat());
-	// //System.out.printf("W, depth %d: %f\n", depth, minValue);
-	// return minValue;
-	// }
-	//
-	// }
-	//
-	// private int evaluateMoveBlack(Move blackMove, int depth, int alpha,
-	// int beta) {
-	// Game newPosition = new Game(this, blackMove);
-	// if (depth == 0) {
-	// // if the max depth has been reached we simply return
-	// // the value of the board
-	// //System.out.println(blackMove.convertToUCIFormat());
-	// //System.out.printf("B, depth %d: %f\n", depth,
-	// newPosition.evaluateBoard());
-	// return newPosition.evaluateBoard();
-	// } else {
-	// // to evaluate blacks move we must evaluate whites's response
-	// // White should pick the move with the maximum value
-	// ArrayList<Move> whiteMoves = newPosition.generateLegalMoves();
-	// int maxValue = INTEGER.MIN_VALUE;
-	// for (int i = 0; i < whiteMoves.size(); i++) {
-	// // for (int i = 0; i < 2; i++){
-	// Move whiteMove = whiteMoves.get(i);
-	// // Move whiteMove = whiteMoves.get(new
-	// // Random().nextInt(whiteMoves.size()));
-	// int moveValue = newPosition.evaluateMoveWhite(whiteMove, depth - 1,
-	// Math.max(alpha, maxValue), beta);
-	// if (moveValue > maxValue) {
-	// maxValue = moveValue;
-	// }
-	// if (moveValue > beta) {
-	// //System.out.printf("Trim beta %f depth %d\n", beta, depth);
-	// break;
-	// }
-	// }
-	// //System.out.println(blackMove.convertToUCIFormat());
-	// //System.out.printf("B, depth %d: %f\n", depth, maxValue);
-	// return maxValue;
-	// }
-	//
-	// }
-
-	private int evaluateBoard(){
+	public int evaluateBoard(){
 		int positionScore=0;
 		int blackScore=0;
 		int whiteScore=0;
@@ -610,7 +357,7 @@ public class Game {
 		int blackPieceActivity = 0;
 		int whiteTradeBonus = 0;
 		int blackTradeBonus = 0;
-		
+
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
 				if (board[i][j] == 'P'){
@@ -1033,14 +780,6 @@ public class Game {
 
 	private ArrayList<Move> findWhiteCaptures() {
 		ArrayList<Move> moves = new ArrayList<>();
-		for (int i = 0; i < 8; i++) {
-			for (int j = 0; j < 8; j++) {
-				if (board[i][j] == 'K') {
-					whiteKingLocation[0] = i;
-					whiteKingLocation[1] = j;
-				}
-			}
-		}
 
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
@@ -1699,7 +1438,7 @@ public class Game {
 						moves.add(new Move(row, col, i, j));
 					}
 				}
-				if (opponentPieces == whitePieces) {
+				else if (opponentPieces == whitePieces) {
 					if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
 						moves.add(new Move(row, col, i, j));
 					}
