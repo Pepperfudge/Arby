@@ -1,4 +1,3 @@
-
 package myPackage;
 
 import java.util.ArrayList;
@@ -42,7 +41,7 @@ public final class NegaMax {
 			// System.out.println(newPosition);
 			double score;
 			if (quiesce){
-				score = position.quiesce(alpha, beta);
+				score = quiesce(position, alpha, beta);
 			} else {
 				score = position.evaluateBoard();
 				if (position.sideToMove == 'b'){
@@ -63,7 +62,7 @@ public final class NegaMax {
 				Game newPosition = new Game(position, opponentMove);
 				// Move opponentMove = opponentMoves.get(
 				// new Random().nextInt(opponentMoves.size()));
-				double moveValue = evaluatePosition(opponentMove, depth - 1, -beta,
+				double moveValue = -evaluatePosition(newPosition, depth - 1, -beta,
 						-Math.max(alpha, maxValue), quiesce);
 				if (moveValue > beta) {
 					// System.out.println(move.convertToUCIFormat());
@@ -83,9 +82,9 @@ public final class NegaMax {
 		}
 	}
 	
-	private double quiesce(double alpha, double beta) {
-		double stand_pat = evaluateBoard();
-		if (sideToMove == 'b') {
+	private static double quiesce(Game position, double alpha, double beta) {
+		double stand_pat = position.evaluateBoard();
+		if (position.sideToMove == 'b') {
 			stand_pat = -1 * stand_pat;
 		}
 		if (stand_pat >= beta) {
@@ -94,7 +93,7 @@ public final class NegaMax {
 		if (stand_pat > alpha) {
 			alpha = stand_pat;
 		}
-		ArrayList<Move> captures = findCaptures();
+		ArrayList<Move> captures = position.findCaptures();
 
 		double maxValue = Double.NEGATIVE_INFINITY;
 		for (int i = 0; i < captures.size(); i++) {
@@ -103,27 +102,27 @@ public final class NegaMax {
 			// Move capture = captures.get(
 			// (new Random()).nextInt(captures.size()));
 			// delta pruning
-			char piece = board[capture.currRow][capture.currColumn];
+			char piece = position.getPieceAt(capture.currRow,capture.currColumn);
+			char pieceCaptured = position.getPieceAt(capture.newRow,capture.newColumn);
 			Integer pieceValue;
 			if ((piece == 'P' || piece == 'p') && Math.abs(capture.currColumn - capture.newColumn) == 1
-					&& board[capture.newRow][capture.newColumn] == 'x'
+					&& pieceCaptured == 'x'
 					&& (capture.newRow == 2 || capture.newRow == 5)) {
 				pieceValue = 1;
 			} else {
-				char pieceCaptured = board[capture.newRow][capture.newColumn];
 				pieceValue = Utils.pieceValues.get(pieceCaptured);
 				if (pieceValue == null) {
 					String errorMessage = String.format(
 							"%s not a valid piece to take. \n move %s" + "\n position \n %s", pieceCaptured,
-							capture.convertToUCIFormat(), this);
+							capture.convertToUCIFormat(), position);
 					throw new RuntimeException(errorMessage);
 				}
 			}
-			if (((double) pieceValue + stand_pat + 0.2) > alpha) {
+			if (((double) pieceValue + stand_pat + 0.7) > alpha) {
 
 				// System.out.println(pieceCaptured);
-				Game newPosition = new Game(this, capture);
-				double moveValue = -newPosition.quiesce(-beta, -alpha);
+				Game newPosition = new Game(position, capture);
+				double moveValue = -quiesce(newPosition, -beta, -alpha);
 				if (moveValue >= beta) {
 					return moveValue;
 				}

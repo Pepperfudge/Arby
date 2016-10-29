@@ -18,7 +18,7 @@ public class UCI {
 	            {
 	                System.out.println("id name Whitie");
 	                System.out.println("id author LuckyAC");
-	                System.out.println("version quiesce optional");
+	                System.out.println("version organized");
 	                System.out.println("uciok");
 	            }  else if (inputString.equals("ucinewgame")){
 	            	currGame = new Game();
@@ -57,7 +57,7 @@ public class UCI {
 			Move nextMove =  possibleMoves.get(rnd);
 			return nextMove.convertToUCIFormat();
 		}
-		return currGame.findBestMove(DEPTH, QUIESCE).convertToUCIFormat();
+		return NegaMax.findBestMove(currGame, DEPTH, QUIESCE).convertToUCIFormat();
 
 	}
 
