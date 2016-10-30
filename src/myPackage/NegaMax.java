@@ -29,6 +29,7 @@ public final class NegaMax {
 		}
 		// System.out.println(bestMove.convertToUCIFormat());
 		// System.out.printf("W, depth %d: %f\n", depth, maxValue);
+		
 		return bestMove;
 	}
 	
