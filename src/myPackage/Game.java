@@ -406,7 +406,7 @@ public class Game {
 							}
 						}	
 					}	
-					if (whiteIsolatedPawn == true){whitePawnStructure = whitePawnStructure - 20;}
+					if (whiteIsolatedPawn == true){whitePawnStructure = whitePawnStructure - 15;}
 					//Encourage pawn pushing in endgame
 					if (blackMaterialScore < 2000){
 						if (i==3){
@@ -425,7 +425,7 @@ public class Game {
 					//Discourage doubled pawns
 					for (int k = i+1; k <=7; k++){
 						if (board[k][j]=='P') {
-						whitePawnStructure = whitePawnStructure - 20;
+						whitePawnStructure = whitePawnStructure - 15;
 						}
 					}
 				}
@@ -524,6 +524,16 @@ public class Game {
 					//Encourage support points
 				}	
 				if (board[i][j] == 'Q') {
+					if (whiteMaterialScore > 2500){ 
+						//Discourage early queen expeditions
+						if (board[0][1] == 'N' || board[0][2] == 'B' || board[0][5] == 'B' || board[0][6] == 'N'){
+							if (i > 1){ whiteDevelopment = whiteDevelopment - 10; }
+						}	
+						//Encourage queen development
+						if (board[0][1] != 'N' && board[0][2] != 'B' && board[0][5] != 'B' && board[0][6] != 'N'){
+							if (i != 0){ whiteDevelopment = whiteDevelopment + 10; }
+						}
+					}	
 					//is queen attacking king?
 					if (j<=2 && i>=2 && blackKingLocation[1] <= 3){whiteAttackingPieces = whiteAttackingPieces + 1;}
 					if (j>=5 && i>=2 && blackKingLocation[1] >=5 ){whiteAttackingPieces = whiteAttackingPieces + 1;} 
@@ -633,7 +643,7 @@ public class Game {
 							}
 						}	
 					}	
-					if (blackIsolatedPawn == true){blackPawnStructure = blackPawnStructure - 20;}
+					if (blackIsolatedPawn == true){blackPawnStructure = blackPawnStructure - 15;}
 					
 					boolean blackPassedPawn = true;
 					for (int k = i-1; k >=1; k--){
@@ -670,7 +680,7 @@ public class Game {
 					}
 					for (int k = i-1; k >= 1; k--){
 						if (board[k][j]=='p') {
-						blackPawnStructure = blackPawnStructure - 20;
+						blackPawnStructure = blackPawnStructure - 15;
 						}
 					}
 					
@@ -688,6 +698,16 @@ public class Game {
 					if (j>=4 && blackKingLocation[1] >= 5){blackDefendingPieces = blackDefendingPieces + 1;}
 				}
 				if (board[i][j] == 'q') {
+					if (blackMaterialScore > 2500){ 
+						//Discourage early queen expeditions
+						if (board[7][1] == 'n' || board[7][2] == 'b' || board[7][5] == 'b' || board[7][6] == 'N'){
+							if (i < 6){ blackDevelopment = blackDevelopment - 10; }
+						}	
+						//Encourage queen development
+						if (board[7][1] != 'n' && board[7][2] != 'b' && board[7][5] != 'b' && board[7][6] != 'n'){
+							if (i != 7){ blackDevelopment = blackDevelopment + 10; }
+						}
+					}	
 					//is queen attacking king?
 					if (j<=2 && i<=5 && whiteKingLocation[1] <= 3){blackAttackingPieces = blackAttackingPieces + 1;}
 					if (j>=5 && i<=5 && whiteKingLocation[1] >= 5){blackAttackingPieces = blackAttackingPieces + 1;} 
@@ -741,8 +761,9 @@ public class Game {
 			}
 			// Discourage losing ability to castle
 			if (blackKCastle == false && (blackKingLocation[1] == 3 || blackKingLocation[1] == 4
-			|| blackKingLocation[1] == 2 || (blackKingLocation[1] == 5 && board[7][7]=='R') ) ) {
+			|| blackKingLocation[1] == 2 || (blackKingLocation[1] == 5 && (board[7][7]=='r' || board[7][6]=='r') ) ) ) {
 				blackKingSafety = blackKingSafety - 30;
+				if (blackQCastle == false) {blackKingSafety = blackKingSafety - 30;}
 			}
 			if (whiteAttackingPieces >=3 && whiteAttackingPieces > blackDefendingPieces){
 				blackKingSafety = blackKingSafety - 20*(whiteAttackingPieces - blackDefendingPieces);
@@ -790,8 +811,9 @@ public class Game {
 				}
 			}	
 			if (whiteKCastle == false && ((whiteKingLocation[1] == 3 || whiteKingLocation[1] == 4 
-			|| whiteKingLocation[1] == 2) || (whiteKingLocation[1] == 5 && board[0][7]=='R') ) ){
+			|| whiteKingLocation[1] == 2) || (whiteKingLocation[1] == 5 && (board[0][7]=='R' || board[0][6] == 'R') ) ) ){
 				whiteKingSafety = whiteKingSafety - 30;
+				if (whiteQCastle == false) {whiteKingSafety = whiteKingSafety - 30;}
 			}
 			if (blackAttackingPieces >=3 && blackAttackingPieces > whiteDefendingPieces){
 				whiteKingSafety = whiteKingSafety - 20*(blackAttackingPieces - whiteDefendingPieces);
@@ -800,22 +822,22 @@ public class Game {
 		}
 		
 		//blackDevelopment
-		if (board[7][1] != 'n') { blackDevelopment = blackDevelopment + 10; }
-		if (board[7][2] != 'b') { blackDevelopment = blackDevelopment + 15; }
-		if (board[7][5] != 'b')	{ blackDevelopment = blackDevelopment + 15; }
-		if (board[7][6] != 'n')	{ blackDevelopment = blackDevelopment + 10; }
-		if (board[7][1] != 'n' && board[7][2] != 'b' && board[7][5] != 'b' && board[7][6] != 'n'){
-			if (board[7][4] != 'q'){blackDevelopment = blackDevelopment + 5; }
+		if (blackMaterialScore > 2500){
+			if (board[7][1] != 'n') { blackDevelopment = blackDevelopment + 10; }
+			if (board[7][2] != 'b') { blackDevelopment = blackDevelopment + 15; }
+			if (board[7][5] != 'b')	{ blackDevelopment = blackDevelopment + 15; }
+			if (board[7][6] != 'n')	{ blackDevelopment = blackDevelopment + 10; }
+			if (board[6][4] == 'p' && board[5][4] == 'b') { blackDevelopment = blackDevelopment - 15; }   
 		}
-		
 		//whiteDevelopment
-		if (board[0][1] != 'N') { whiteDevelopment = whiteDevelopment + 10; }
-		if (board[0][2] != 'B') { whiteDevelopment = whiteDevelopment + 15; }
-		if (board[0][5] != 'B')	{ whiteDevelopment = whiteDevelopment + 15; }
-		if (board[0][6] != 'N')	{ whiteDevelopment = whiteDevelopment + 10; }
-		if (board[0][1] != 'N' && board[0][2] != 'N' && board[0][5] != 'B' && board[0][6] != 'N'){
-			if (board[0][4] != 'Q'){ whiteDevelopment = whiteDevelopment + 5; }
-		}	
+		if (whiteMaterialScore > 2500){
+			if (board[0][1] != 'N') { whiteDevelopment = whiteDevelopment + 10; }
+			if (board[0][2] != 'B') { whiteDevelopment = whiteDevelopment + 15; }
+			if (board[0][5] != 'B')	{ whiteDevelopment = whiteDevelopment + 15; }
+			if (board[0][6] != 'N')	{ whiteDevelopment = whiteDevelopment + 10; }
+			if (board[1][4] == 'P' && board[2][4] == 'B'){ whiteDevelopment = whiteDevelopment - 15; }
+		}
+			
 		//blackPawnStructure
 		if (board[5][3]=='p') {
 			blackPawnStructure = blackPawnStructure + 5;
@@ -901,7 +923,7 @@ public class Game {
 
 	public ArrayList<Move> findCaptures() {
 		// System.out.println("generateLegalMoves");
-		// System.out.println("positionScore is" + evaluateBoard());
+		//System.out.println("positionScore is " + evaluateBoard());
 		// System.out.println("whiteKcastle is" + whiteKCastle);
 		ArrayList<Move> captures = new ArrayList<Move>();
 		if (sideToMove == 'w') {
@@ -962,7 +984,7 @@ public class Game {
 
 	public ArrayList<Move> generateLegalMoves() {
 		// System.out.println("generateLegalMoves");
-		//System.out.println("positionScore is" + evaluateBoard());
+		//System.out.println("positionScore is " + evaluateBoard());
 		// System.out.println("whiteKcastle is" + whiteKCastle);
 		ArrayList<Move> moves = new ArrayList<Move>();
 		if (sideToMove == 'w') {
