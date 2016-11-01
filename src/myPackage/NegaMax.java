@@ -8,11 +8,12 @@ public final class NegaMax {
 	private NegaMax(){
 		
 	}
+	private static final int CHECKMATE_VALUE = -20000; 
 	
 	public static Move findBestMove(Game position, int depth, boolean quiesce) {
 		ArrayList<Move> moves = position.generateLegalMoves();
 
-		int maxValue = -20000;
+		int maxValue = CHECKMATE_VALUE;
 		Move bestMove = null;
 		for (int i = 0; i < moves.size(); i++) {
 			// for (int i = 0; i < 2; i++){
@@ -20,7 +21,7 @@ public final class NegaMax {
 			// Move move = moves.get(new Random().nextInt(moves.size()));
 			Game newPosition = new Game(position, move);
 			int moveValue = -evaluatePosition(newPosition, depth - 1, 
-					-20000, -maxValue, quiesce);
+					CHECKMATE_VALUE, -maxValue, quiesce);
 			// int moveValue = -evaluateMove(move,depth - 1);
 			if (moveValue >= maxValue) {
 				maxValue = moveValue;
@@ -56,7 +57,14 @@ public final class NegaMax {
 			// System.out.printf("depth %d, alpha %f, beta %f \n", depth, alpha,
 			// beta);
 			ArrayList<Move> opponentMoves = position.generateLegalMoves();
-			int maxValue = -20000;
+			if (opponentMoves.isEmpty()){
+				if (position.isKingInCheck()){
+					return CHECKMATE_VALUE;
+				} else {
+					return 0; //stalemate 
+				}
+			}
+			int maxValue = CHECKMATE_VALUE;
 			for (int i = 0; i < opponentMoves.size(); i++) {
 				// for (int i = 0; i < 2; i++){
 				Move opponentMove = opponentMoves.get(i);
@@ -96,7 +104,7 @@ public final class NegaMax {
 		}
 		ArrayList<Move> captures = position.findCaptures();
 
-		int maxValue = -20000;
+		int maxValue = CHECKMATE_VALUE;
 		for (int i = 0; i < captures.size(); i++) {
 			// for (int i = 0; i < captures.size(); i++){
 			Move capture = captures.get(i);

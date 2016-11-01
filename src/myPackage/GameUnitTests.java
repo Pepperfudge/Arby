@@ -45,5 +45,34 @@ public class GameUnitTests {
 
 		
 	}
+	
+	@Test
+	public void isKingInCheckTest(){
+		Game game = new Game("k7/8/2K5/8/8/8/R7/8 b - -");
+		String errorMessage = String.format(
+				"Engine does not realize black is in check in position %s",
+				game);
+		assertTrue(errorMessage,game.isKingInCheck());
+		
+		game = new Game("k7/8/2K5/8/8/5B2/8/8 b - -");
+		errorMessage = String.format(
+				"Engine incorrectly thinks black is in check %s",
+				game);
+		assertFalse(errorMessage,
+				game.isKingInCheck());
+		
+		game = new Game("k1r5/8/2K5/8/8/8/8/8 w - -");
+		errorMessage = String.format(
+				"Engine does not realize white is in check %s",
+				game);
+		assertTrue(errorMessage,
+				game.isKingInCheck());
+		
+		game = new Game("k7/8/2K5/8/8/8/8/8 w - -");
+		errorMessage = String.format(
+				"Engine incorrectly thinks white is in check %s",
+				game);
+		assertFalse(errorMessage, game.isKingInCheck());
+	}
 
 }

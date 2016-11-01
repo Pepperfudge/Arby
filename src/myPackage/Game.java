@@ -1991,6 +1991,14 @@ public class Game {
 		return moves;
 	}
 
+	public boolean isKingInCheck(){
+		if (sideToMove == 'w'){
+			return isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]);
+		} else {
+			return isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]);
+		}
+	}
+	
 	private boolean isKingInCheck(int row, int col, char color) {
 		if (color == 'w') {
 			return isWhiteKingInCheck(row, col);

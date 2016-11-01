@@ -22,5 +22,24 @@ public class EngineTest {
 		assertFalse("Engine doesn't see past horizon",
 				(NegaMax.findBestMove(game,1,true).convertToUCIFormat().equals("c3c7")));
 	}
+	
+	@Test 
+	public void checkMateTest(){
+		Game game = new Game("4k3/8/4K3/6R1/8/8/8/8 w - -");
+		String move = NegaMax.findBestMove(game, 2, true).convertToUCIFormat(); 
+		String errorMessage = String.format(
+				"Engine cannot find mate.  \n Chose move %s in position \n %s", 
+				move, game);
+		assertTrue(errorMessage,
+					move.equals("g5g8"));
+		
+	}
+	
+	@Test
+	public void staleMateTest(){
+		Game game = new Game("k7/8/2K3P1/8/8/6B1/8/8 w - -");
+		assertFalse("Engine should not value stalemate as a win",
+				NegaMax.findBestMove(game, 2, true).convertToUCIFormat().equals("c6b6"));
+	}
 
 }
