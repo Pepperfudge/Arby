@@ -2,10 +2,12 @@ package myPackage;
 
 import java.util.*;
 public class UCI {
+
 	private static Game currGame = new Game();
 	private static int num_moves;
-	private static final int DEPTH = 6;
-	private static final boolean QUIESCE = false;
+	private static final int DEPTH = 5;
+	private static final boolean QUIESCE = true;
+
 	public static void main(String[] args) {
 		Scanner input = new Scanner(System.in);
 		System.out.println("Whitey has arrived");
