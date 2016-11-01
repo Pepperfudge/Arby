@@ -896,8 +896,34 @@ public class Game {
 		if (whiteMaterialScore - blackMaterialScore  >= 300) {whiteTradeBonus = (4000 - blackMaterialScore)/25;}
 		if (blackMaterialScore - whiteMaterialScore  >= 300) {blackTradeBonus = (4000 - whiteMaterialScore)/25;}
 		
+		
+		
 		blackScore = blackMaterialScore + blackKingSafety + blackDevelopment + blackPawnStructure + blackPieceActivity + blackTradeBonus ;
 		whiteScore = whiteMaterialScore + whiteKingSafety + whiteDevelopment + whitePawnStructure + whitePieceActivity + whiteTradeBonus;
+		
+		//bareKingMating
+		if (blackMaterialScore == 0){
+			if (blackKingLocation[0] <= 2 || blackKingLocation[0] >= 5 || blackKingLocation[1] <= 2 || blackKingLocation[1] >= 5){
+				whiteScore = whiteScore + 20;
+			}
+			if (blackKingLocation[0] <= 1 || blackKingLocation[0] >= 6 || blackKingLocation[1] <= 1 || blackKingLocation[1] >= 6){
+				whiteScore = whiteScore + 20;
+			}
+			if (blackKingLocation[0] == 0 || blackKingLocation[0] == 7 || blackKingLocation[1] == 0 || blackKingLocation[1] == 7){
+				whiteScore = whiteScore + 20;
+			}
+		}
+		if (whiteMaterialScore == 0){
+			if (whiteKingLocation[0] <= 2 || whiteKingLocation[0] >= 5 || whiteKingLocation[1] <= 2 || whiteKingLocation[1] >= 5){
+				blackScore = blackScore + 20;
+			}
+			if (whiteKingLocation[0] <= 1 || whiteKingLocation[0] >= 6 || whiteKingLocation[1] <= 1 || whiteKingLocation[1] >= 6){
+				blackScore = blackScore + 20;
+			}
+			if (whiteKingLocation[0] == 0 || whiteKingLocation[0] == 7 || whiteKingLocation[1] == 0 || whiteKingLocation[1] == 7){
+				blackScore = blackScore + 20;
+			}
+		}
 		
 		if (sideToMove == 'w'){
 			/*if (isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == true){

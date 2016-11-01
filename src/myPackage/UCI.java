@@ -4,8 +4,8 @@ import java.util.*;
 public class UCI {
 	static Game currGame = new Game();
 	static int num_moves;
-	static final int DEPTH = 6;
-	static final boolean QUIESCE = false;
+	static final int DEPTH = 5;
+	static final boolean QUIESCE = true;
 	public static void main(String[] args) {
 		Scanner input = new Scanner(System.in);
 		System.out.println("Whitey has arrived");
