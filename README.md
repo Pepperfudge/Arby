@@ -16,7 +16,7 @@ To use this chess engine
 
 
 
-The Team
+
 
 Arby was made by Chloe and Adam Lischinsky  (a sister and brother team).
 
