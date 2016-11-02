@@ -2307,13 +2307,20 @@ public class Game {
 		return false;
 	}
 
-	public String toString() {
+	public String toString() { 
 		String str = "";
-		for (int i = 0; i < board.length; i++) {
-			for (int j = 0; j < board[0].length; j++) {
+		char[] files = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
+		char[] ranks =  {'1', '2', '3', '4', '5', '6', '7', '8'};
+		for (int i = 7; i >= 0; i--) {
+			str = str + String.format("%5s", ranks[i]);
+			for (int j = 7; j >= 0; j--) {
 				str = str + String.format("%5s", board[i][j]);
 			}
 			str = str + "\n";
+		}
+		str = str + "     ";
+		for (int i = 0; i <= 7; i++){
+			str = str + String.format("%5s", files[i]);
 		}
 		return str;
 

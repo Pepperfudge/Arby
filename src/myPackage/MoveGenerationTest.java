@@ -35,7 +35,7 @@ public class MoveGenerationTest {
 	
 	@Test
 	public void queenTest(){
-		Game game =new Game("4k3/8/8/3q4/8/8/8/4K3 b - - 0 1");
+		Game game = new Game("4k3/8/8/3q4/8/8/8/4K3 b - - 0 1");
 		assertTrue("Queen does not move correctly",
 				Utils.checkLegalMoves(game,game.generateLegalMoves(),
 				"d5", "c5 b5 a5 e5 f5 g5 h5 d6 d7 d8 d4 d3 d2 d1 "

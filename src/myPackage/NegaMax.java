@@ -110,6 +110,7 @@ public final class NegaMax {
 			Move capture = captures.get(i);
 			// Move capture = captures.get(
 			// (new Random()).nextInt(captures.size()));
+			
 			// delta pruning
 			char piece = position.getPieceAt(capture.currRow,capture.currColumn);
 			char pieceCaptured = position.getPieceAt(capture.newRow,capture.newColumn);
@@ -128,7 +129,9 @@ public final class NegaMax {
 				}
 			}
 			if (( pieceValue + stand_pat + 70) > alpha) {
-
+				System.out.println(capture.convertToUCIFormat());
+				System.out.println(position);
+				System.out.println();
 				// System.out.println(pieceCaptured);
 				Game newPosition = new Game(position, capture);
 				int moveValue = -quiesce(newPosition, -beta, -alpha);
