@@ -16,6 +16,8 @@ To use this chess engine
 
 
 
+The Team
+
 Arby was made by Chloe and Adam Lischinsky  (a sister and brother team).
 
 Chloe is the CTO of this venture, equipped with a degree in computer science.
