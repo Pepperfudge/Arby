@@ -5,6 +5,7 @@ import java.util.ArrayList;
 public final class NegaMax {
 
 	//static class so constructor is private
+//	private static HashMap<Game, String[]>  
 	private NegaMax(){
 		
 	}
