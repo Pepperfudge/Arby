@@ -361,6 +361,8 @@ public class Game {
 		int blackDefendingPieces = 0;
 		int whiteTradeBonus = 0;
 		int blackTradeBonus = 0;
+		int whiteBishopCount = 0;
+		int blackBishopCount = 0;
 				
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
@@ -433,6 +435,11 @@ public class Game {
 						int bishopMoves = 0;
 						int bishopCenterSquares = 0;
 						int bishopAttackSquares = 0;
+						
+						//two bishops
+						whiteBishopCount = whiteBishopCount + 1;
+						if (whiteBishopCount == 2) {whiteBishopActivity = whiteBishopActivity + 20;}
+						
 						for (int k = i + 1, l = j + 1; k <= 7 && l <= 7; k++, l++) {
 							if (board[k][l] == 'x')  {
 								bishopMoves = bishopMoves+1;
@@ -478,16 +485,20 @@ public class Game {
 						if (bishopAttackSquares >= 1){whiteAttackingPieces = whiteAttackingPieces + 1;} 
 						if (j<=3 && whiteKingLocation[1] <= 3){whiteDefendingPieces = whiteDefendingPieces + 1;}
 						if (j>=4 && whiteKingLocation[1] >= 5){whiteDefendingPieces = whiteDefendingPieces + 1;}  
-						/* //Light squared bishop
-						if (i==2 && j==4 && board[3][3] != 'P' && board[1][4] != 'P'){whiteBishopActivity =	whiteBishopActivity + 15; }
-						if (i==3 && j==5 && board[5][3] != 'p'){whiteBishopActivity =	whiteBishopActivity + 15; }
-						if (i==2 && j==6 && board[5][3] != 'p'){whiteBishopActivity =	whiteBishopActivity + 15; }
-						if (i==1 && j==1 && board[3][3] != 'P'){whiteBishopActivity =	whiteBishopActivity + 15; }
-						// Dark squared bishop
-						if (i==2 && j==3 && board[3][4] != 'P' && board[1][3] != 'P'){whiteBishopActivity =	whiteBishopActivity + 15; }
-						if (i==3 && j==2 && board[5][4] != 'p'){whiteBishopActivity =	whiteBishopActivity + 15; }
-						if (i==2 && j==1 && board[5][4] != 'p'){whiteBishopActivity =	whiteBishopActivity + 15; }
-						if (i==1 && j==6 && board[3][4] != 'P'){whiteBishopActivity =	whiteBishopActivity + 15; }*/
+						 
+						//Avoid trapped bishop
+						if (i == 6 && j == 7 && board[5][6] == 'p' && board[6][5] == 'p') {
+							whiteBishopActivity = whiteBishopActivity - 100;
+						}
+						//penalize bad bishop
+						if ((i + j)%2 == 1 && board[3][4] == 'P' && board[2][3] == 'P' && board[4][4] == 'p'){
+							whiteBishopActivity = whiteBishopActivity - 10;
+							if (j > 2){whiteBishopActivity = whiteBishopActivity - 10;}
+						}
+						if ((i + j)%2 == 0 && board[2][4] == 'P' && board[3][3] == 'P' && board[4][3] == 'p' ){
+							whiteBishopActivity = whiteBishopActivity - 10;
+							if (j < 5){whiteBishopActivity = whiteBishopActivity - 10;}	
+						}
 				}
 				if (board[i][j] == 'R') {
 					boolean friendlyOpenFile = true;
@@ -503,8 +514,14 @@ public class Game {
 					if (friendlyOpenFile == true) {
 						whiteRookActivity = whiteRookActivity + 15;
 						if (enemyOpenFile == true) {whiteRookActivity = whiteRookActivity + 15;}
-						if (j<=2 && blackKingLocation[1] <= 3){whiteAttackingPieces = whiteAttackingPieces + 1;}
-						if (j>=5 && blackKingLocation[1] >= 5){whiteAttackingPieces = whiteAttackingPieces + 1;}
+						if (j<=2 && blackKingLocation[1] <= 3){
+							whiteAttackingPieces = whiteAttackingPieces + 1;
+							blackKingSafety = blackKingSafety - 20;
+							}
+						if (j>=5 && blackKingLocation[1] >= 5){
+							whiteAttackingPieces = whiteAttackingPieces + 1;
+							blackKingSafety = blackKingSafety - 20;
+							}
 					}	
 					if (i==6){whiteRookActivity = whiteRookActivity + 20;}
 				}
@@ -545,6 +562,10 @@ public class Game {
 					int bishopMoves = 0;
 					int bishopCenterSquares = 0;
 					int bishopAttackSquares = 0;
+					
+					blackBishopCount = blackBishopCount + 1;
+					if (blackBishopCount == 2) {blackBishopActivity = blackBishopActivity + 20;}
+					
 					for (int k = i - 1, l = j + 1; k >= 0 && l <= 7; k--, l++) {
 						if (board[k][l] == 'x')  {
 							bishopMoves = bishopMoves+1;
@@ -590,18 +611,19 @@ public class Game {
 					if (j<=3 && blackKingLocation[1] <= 3){blackDefendingPieces = blackDefendingPieces + 1;}
 					if (j>=4 && blackKingLocation[1] >= 5){blackDefendingPieces = blackDefendingPieces + 1;}
 						
-						/* dark squared bishop
-						if (i==5 && j==4 && board[4][3] != 'p' && board[6][4] != 'p'){blackBishopActivity =	blackBishopActivity + 15; }
-						if (i==4 && j==5 && board[2][3] != 'P'){blackBishopActivity =	blackBishopActivity + 15; }
-						if (i==5 && j==6 && board[2][3] != 'P'){blackBishopActivity =	blackBishopActivity + 15; }
-						
-						if (i==6 && j==1 && board[4][3] != 'p'){blackBishopActivity =	blackBishopActivity + 15; }
-						// light squared bishop
-						if (i==5 && j==3 && board[4][4] != 'p' && board[6][3] != 'p'){blackBishopActivity =	blackBishopActivity + 15; }
-						if (i==4 && j==2 && board[2][4] != 'P'){blackBishopActivity =	blackBishopActivity + 15; }
-						if (i==5 && j==1 && board[2][4] != 'P'){blackBishopActivity =	blackBishopActivity + 15; }
-						
-						if (i==6 && j==6 && board[4][4] != 'p'){blackBishopActivity =	blackBishopActivity + 15; }*/
+					//avoid trapped bishop
+					if (i == 1 && j == 7 && board[2][6] == 'P' && board[1][5] == 'P') {
+						blackBishopActivity = blackBishopActivity - 100;
+					}
+					//Penalize bad bishop
+						if ((i + j)%2 == 1 && board[4][3] == 'p' && board[5][4] == 'p' && board[3][3] == 'P'){
+							blackBishopActivity = blackBishopActivity - 10;
+							if (j < 5){blackBishopActivity = blackBishopActivity - 10;}
+						}
+						if ((i + j)%2 == 0 && board[5][3] == 'p' && board[4][4] == 'p' && board[3][4] == 'P' ){
+							blackBishopActivity = blackBishopActivity - 10;
+							if (j > 2){blackBishopActivity = blackBishopActivity - 10;}	
+						}			
 				}
 				
 				if (board[i][j] == 'r') {
@@ -618,8 +640,14 @@ public class Game {
 					if (friendlyOpenFile == true) {
 						blackRookActivity = blackRookActivity + 15;
 						if (enemyOpenFile == true) {blackRookActivity = blackRookActivity + 15;}
-						if (j<=2 && whiteKingLocation[1] <= 3){blackAttackingPieces = blackAttackingPieces + 1;}
-						if (j>=5 && whiteKingLocation[1] >= 5){blackAttackingPieces = blackAttackingPieces + 1;}
+						if (j<=2 && whiteKingLocation[1] <= 3){
+							blackAttackingPieces = blackAttackingPieces + 1;
+							whiteKingSafety = whiteKingSafety - 20;
+						}
+						if (j>=5 && whiteKingLocation[1] >= 5){
+							blackAttackingPieces = blackAttackingPieces + 1;
+							whiteKingSafety = whiteKingSafety - 20;
+						}
 					}	
 					if (i==1){blackRookActivity = blackRookActivity + 20;}
 				}
@@ -1010,7 +1038,7 @@ public class Game {
 
 	public ArrayList<Move> generateLegalMoves() {
 		// System.out.println("generateLegalMoves");
-		//System.out.println("positionScore is " + evaluateBoard());
+		// System.out.println("positionScore is " + evaluateBoard());
 		// System.out.println("whiteKcastle is" + whiteKCastle);
 		ArrayList<Move> moves = new ArrayList<Move>();
 		if (sideToMove == 'w') {
