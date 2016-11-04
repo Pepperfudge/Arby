@@ -596,11 +596,14 @@ public class Game {
 					if(j==0 || j==7){ whiteKnightActivity = whiteKnightActivity - 10;}
 					else if(j==1 || j==6){ whiteKnightActivity = whiteKnightActivity - 5;}
 					
-					if (j <= 3 && i >= 3 && blackKingLocation[1] <= 3){whiteAttackingPieces = whiteAttackingPieces + 1;} 
-					else if (j >= 4 && i >= 3 && blackKingLocation[1] >= 5){whiteAttackingPieces = whiteAttackingPieces + 1;}
+					if (Math.abs(i - blackKingLocation[0]) <= 3 && Math.abs(j - blackKingLocation[1]) <= 2){
+						whiteAttackingPieces = whiteAttackingPieces + 1;
+					} 
 					
-					if (j<=3 && whiteKingLocation[1] <= 3){whiteDefendingPieces = whiteDefendingPieces + 1;}
-					else if (j>=4 && whiteKingLocation[1] >= 5){whiteDefendingPieces = whiteDefendingPieces + 1;}
+					if (Math.abs(i - whiteKingLocation[0]) <= 4 && Math.abs(j - whiteKingLocation[1]) <= 2){
+					whiteDefendingPieces = whiteDefendingPieces + 1;
+					}
+					
 					//Encourage support points
 				}	
 				else if (board[i][j] == 'Q') {
@@ -722,12 +725,15 @@ public class Game {
 					else if(i==1 || i==6){ blackKnightActivity = blackKnightActivity - 5;}
 					if(j==0 || j==7){ blackKnightActivity = blackKnightActivity - 10;}
 					else if(j==1 || j==6){ blackKnightActivity = blackKnightActivity - 5;}
+					
 					//is knight attacking king?
-					if (j<=3 && i<=4 && whiteKingLocation[1] <= 3){blackAttackingPieces = blackAttackingPieces + 1;}
-					else if (j>=4 && i<=4 && whiteKingLocation[1] >= 5){blackAttackingPieces = blackAttackingPieces + 1;} 
-					// is knight defending king?
-					if (j<=3 && blackKingLocation[1] <= 3){blackDefendingPieces = blackDefendingPieces + 1;}
-					else if (j>=4 && blackKingLocation[1] >= 5){blackDefendingPieces = blackDefendingPieces + 1;}
+					if (Math.abs(i - whiteKingLocation[0]) <= 3 && Math.abs(j - whiteKingLocation[1]) <= 2){
+						blackAttackingPieces = blackAttackingPieces + 1;
+					} 
+					//is knight defending king?
+					if (Math.abs(i - blackKingLocation[0]) <= 4 && Math.abs(j - blackKingLocation[1]) <= 2){
+						blackDefendingPieces = blackDefendingPieces + 1;
+					}
 				}
 				else if (board[i][j] == 'q') {
 					if (blackMaterialScore > 2500){ 
@@ -753,14 +759,16 @@ public class Game {
 		//blackKingSafety
 		if (whiteMaterialScore > 1600){
 			//discourage pawn pushing on kingside before castling
-			if (board[6][1] != 'p' && board[5][1] != 'p' && blackKingLocation[1] <5 ){blackKingSafety = blackKingSafety - 20;}
-			if (board[6][1] != 'p' && board[6][1] != 'b' && blackKingLocation[1] <5){blackKingSafety = blackKingSafety - 5;}
-			if (board[6][2] != 'p' && blackKingLocation[1] <5){blackKingSafety = blackKingSafety - 10;}
-			if (board[6][0] != 'p' && board[5][0] != 'p' && blackKingLocation[1] <5){blackKingSafety = blackKingSafety - 10;}
+			if (blackKingLocation[1] <4){
+				if (board[6][1] != 'p' && board[5][1] != 'p'){blackKingSafety = blackKingSafety - 20;}
+				if (board[6][1] != 'p' && board[6][1] != 'b'){blackKingSafety = blackKingSafety - 5;}
+				if (board[6][2] != 'p'){blackKingSafety = blackKingSafety - 10;}
+				if (board[6][0] != 'p' && board[5][0] != 'p'){blackKingSafety = blackKingSafety - 10;}
+			}
 			if (blackKingLocation[0] == 6) {blackKingSafety = blackKingSafety - 10;} 
 			if (blackKingLocation[0] < 6) {blackKingSafety = blackKingSafety - 40;} 
 			// encourage kingside castling
-			if ((board[7][1] == 'k' || board[7][0] == 'k') && board[7][0] != 'r'){ 
+			if (blackKingLocation[1] < 2 && board[7][0] != 'r'){ 
 				blackKingSafety = blackKingSafety + 30;
 				if (board[6][1] != 'p' && board[6][0] != 'p'){
 					blackKingSafety = blackKingSafety - 10;
@@ -774,11 +782,11 @@ public class Game {
 				if (board[6][2] != 'p'){blackKingSafety = blackKingSafety - 5;}
 			}
 			// encourage queenside castling
-			else if ((board[7][5] == 'k' || board[7][6] == 'k' || board[7][7] == 'k') && board[7][0] != 'r'){ 
+			else if (blackKingLocation[1] > 4 && board[7][6] != 'r' && board[7][7] != 'r'){ 
 				blackKingSafety = blackKingSafety + 30;
-				if (board[7][5] == 'k') { 
+				if (blackKingLocation[1]==5) { 
 					blackKingSafety = blackKingSafety - 5;
-					if (board[6][5] != 'p' && board[5][5] != 'p'){blackKingSafety = blackKingSafety - 10;}
+					if (board[6][5] != 'p' && board[5][5] != 'p'){blackKingSafety = blackKingSafety - 20;}
 					if (board[6][5] != 'p' && board[6][6] != 'p'){blackKingSafety = blackKingSafety - 10;}
 				}
 				if (board[6][5] != 'p' && board[6][6] != 'p'){
@@ -805,13 +813,15 @@ public class Game {
 		
 		//whiteKingSafety
 		if (blackMaterialScore > 1600){
-			if (board[1][1] != 'P' && board[2][1] != 'P' && whiteKingLocation[1] <5){whiteKingSafety = whiteKingSafety - 20;}
-			if (board[1][1] != 'P' && board[1][1] != 'B' && whiteKingLocation[1] <5){whiteKingSafety = whiteKingSafety - 5;}
-			if (board[1][2] != 'P' && whiteKingLocation[1] <5){whiteKingSafety = whiteKingSafety - 10;}
-			if (board[1][0] != 'P' && board[2][0] != 'P' && whiteKingLocation[1] <5){whiteKingSafety = whiteKingSafety - 10;}
+			if (whiteKingLocation[1] <4){
+				if (board[1][1] != 'P' && board[2][1] != 'P'){whiteKingSafety = whiteKingSafety - 20;}
+				if (board[1][1] != 'P' && board[1][1] != 'B'){whiteKingSafety = whiteKingSafety - 5;}
+				if (board[1][2] != 'P' ){whiteKingSafety = whiteKingSafety - 10;}
+				if (board[1][0] != 'P' && board[2][0] != 'P'){whiteKingSafety = whiteKingSafety - 10;}
+			}	
 			if (whiteKingLocation[0] == 1) {whiteKingSafety = whiteKingSafety - 10;}  
 			if (whiteKingLocation[0] > 1) {whiteKingSafety = whiteKingSafety - 40;}  
-			if ((board[0][1] == 'K' || board[0][0] == 'K') && board[7][0] != 'R'){ 
+			if (whiteKingLocation[1] < 2 && board[0][0] != 'R'){ 
 				whiteKingSafety = whiteKingSafety + 30;	
 				if (board[1][1] != 'P' && board[1][0] != 'P'){
 					whiteKingSafety = whiteKingSafety - 10;
@@ -824,11 +834,11 @@ public class Game {
 				}
 				if (board[1][2] != 'P'){whiteKingSafety = whiteKingSafety - 5;}
 			}
-			else if ((board[0][5] == 'K' || board[0][6] == 'K' || board[0][7] == 'K') && board[7][0] != 'R'){ 
+			else if (whiteKingLocation[1] > 4 && board[0][6] != 'R' && board[0][7] != 'R'){ 
 				whiteKingSafety = whiteKingSafety + 30;
-				if (board[0][5] == 'K') { 
+				if (whiteKingLocation[1] == 5) { 
 					whiteKingSafety = whiteKingSafety - 5;
-					if (board[1][5] != 'P' && board[2][5] != 'P'){whiteKingSafety = whiteKingSafety - 10;}
+					if (board[1][5] != 'P' && board[2][5] != 'P'){whiteKingSafety = whiteKingSafety - 20;}
 					if (board[1][5] != 'P' && board[1][6] != 'P'){whiteKingSafety = whiteKingSafety - 10;}
 				}
 				
@@ -877,6 +887,9 @@ public class Game {
 		if (board[5][4] =='p') {
 			blackPawnStructure = blackPawnStructure + 5;
 		}
+		if (board[4][5] =='p') {
+			blackPawnStructure = blackPawnStructure + 5;
+		}
 		if (board[4][3]=='p' || board[3][3] =='p' || board[2][3] =='p') {
 			blackPawnStructure = blackPawnStructure + 10;
 		}
@@ -901,6 +914,9 @@ public class Game {
 			whitePawnStructure = whitePawnStructure + 5;
 		}
 		if (board[2][4] =='P') {
+			whitePawnStructure = whitePawnStructure + 5;
+		}
+		if (board[3][5] =='P') {
 			whitePawnStructure = whitePawnStructure + 5;
 		}
 		if (board[4][3]=='P' || board[3][3] =='P' || board[5][3] =='P') {
@@ -2423,7 +2439,11 @@ public class Game {
 				Move interimMove = new Move(row, col, row + 2, col + 1);
 				Game nextPosition = new Game(this, interimMove);
 				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-						quietMoves.add(interimMove);
+					if ((Math.abs((row + 2) - kingRow) == 2 && Math.abs((col+1) - kingColumn) == 1) 
+					|| (Math.abs((row + 2) - kingRow) == 1 && Math.abs((col+1) - kingColumn) == 2)){	
+						quietMoves.add(0, interimMove);
+					}	
+					else {quietMoves.add(interimMove);}
 				}
 			}
 			else if (contains(opponentPieces, board[row + 2][col + 1])) {
@@ -2444,8 +2464,12 @@ public class Game {
 				Move interimMove = new Move(row, col, row + 2, col - 1);
 				Game nextPosition = new Game(this, interimMove);
 				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-						quietMoves.add(interimMove);
-				}
+					if ((Math.abs((row + 2) - kingRow) == 2 && Math.abs((col-1) - kingColumn) == 1) 
+					|| (Math.abs((row + 2) - kingRow) == 1 && Math.abs((col-1) - kingColumn) == 2)){	
+						quietMoves.add(0, interimMove);
+					}	
+					else {quietMoves.add(interimMove);}
+					}
 			}
 			else if (contains(opponentPieces, board[row + 2][col - 1])) {
 				Move interimMove = new Move(row, col, row + 2, col - 1);
@@ -2465,8 +2489,12 @@ public class Game {
 				Move interimMove = new Move(row, col, row + 1, col + 2);
 				Game nextPosition = new Game(this, interimMove);
 				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-						quietMoves.add(interimMove);
-				}
+					if ((Math.abs((row + 1) - kingRow) == 2 && Math.abs((col+2) - kingColumn) == 1) 
+					|| (Math.abs((row + 1) - kingRow) == 1 && Math.abs((col+2) - kingColumn) == 2)){	
+						quietMoves.add(0, interimMove);
+					}	
+					else {quietMoves.add(interimMove);}
+					}
 			}
 			else if (contains(opponentPieces, board[row + 1][col + 2])) {
 				Move interimMove = new Move(row, col, row + 1, col + 2);
@@ -2486,8 +2514,12 @@ public class Game {
 				Move interimMove = new Move(row, col, row + 1, col - 2);
 				Game nextPosition = new Game(this, interimMove);
 				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-						quietMoves.add(interimMove);
-				}
+					if ((Math.abs((row + 1) - kingRow) == 2 && Math.abs((col-2) - kingColumn) == 1) 
+					|| (Math.abs((row + 1) - kingRow) == 1 && Math.abs((col-2) - kingColumn) == 2)){	
+						quietMoves.add(0, interimMove);
+					}	
+					else {quietMoves.add(interimMove);}
+					}
 			}
 			else if (contains(opponentPieces, board[row + 1][col - 2])) {
 				Move interimMove = new Move(row, col, row + 1, col - 2);
@@ -2507,8 +2539,12 @@ public class Game {
 				Move interimMove = new Move(row, col, row - 1, col + 2);
 				Game nextPosition = new Game(this, interimMove);
 				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-						quietMoves.add(interimMove);
-				}
+					if ((Math.abs((row - 1) - kingRow) == 2 && Math.abs((col+2) - kingColumn) == 1) 
+					|| (Math.abs((row - 1) - kingRow) == 1 && Math.abs((col+2) - kingColumn) == 2)){	
+						quietMoves.add(0, interimMove);
+					}	
+					else {quietMoves.add(interimMove);}
+					}
 			}
 			else if (contains(opponentPieces, board[row - 1][col + 2])) {
 				Move interimMove = new Move(row, col, row - 1, col + 2);
@@ -2529,8 +2565,12 @@ public class Game {
 				Move interimMove = new Move(row, col, row -1, col - 2);
 				Game nextPosition = new Game(this, interimMove);
 				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-						quietMoves.add(interimMove);
-				}
+					if ((Math.abs((row - 1) - kingRow) == 2 && Math.abs((col-2) - kingColumn) == 1) 
+					|| (Math.abs((row - 1) - kingRow) == 1 && Math.abs((col-2) - kingColumn) == 2)){	
+						quietMoves.add(0, interimMove);
+					}	
+					else {quietMoves.add(interimMove);}
+					}
 			}
 			else if (contains(opponentPieces, board[row - 1][col - 2])) {
 				Move interimMove = new Move(row, col, row - 1, col - 2);
@@ -2550,8 +2590,12 @@ public class Game {
 				Move interimMove = new Move(row, col, row - 2, col + 1);
 				Game nextPosition = new Game(this, interimMove);
 				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-						moves.add(interimMove);
-				}
+					if ((Math.abs((row - 2) - kingRow) == 2 && Math.abs((col+1) - kingColumn) == 1) 
+					|| (Math.abs((row - 2) - kingRow) == 1 && Math.abs((col+1) - kingColumn) == 2)){	
+						quietMoves.add(0, interimMove);
+					}	
+					else {quietMoves.add(interimMove);}
+					}
 			}
 			else if (contains(opponentPieces, board[row - 2][col + 1])) {
 				Move interimMove = new Move(row, col, row - 2, col + 1);
@@ -2571,8 +2615,12 @@ public class Game {
 				Move interimMove = new Move(row, col, row - 2, col - 1);
 				Game nextPosition = new Game(this, interimMove);
 				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-						moves.add(interimMove);
-				}
+					if ((Math.abs((row - 2) - kingRow) == 2 && Math.abs((col-1) - kingColumn) == 1) 
+					|| (Math.abs((row - 2) - kingRow) == 1 && Math.abs((col-1) - kingColumn) == 2)){	
+						quietMoves.add(0, interimMove);
+					}	
+					else {quietMoves.add(interimMove);}
+					}
 			}
 			else if (contains(opponentPieces, board[row - 2][col - 1])) {
 				Move interimMove = new Move(row, col, row - 2, col - 1);
