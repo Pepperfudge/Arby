@@ -6,7 +6,7 @@ public class UCI {
 	private static Game currGame = new Game();
 	private static int num_moves;
 	private static final int DEPTH = 6;
-	private static final boolean QUIESCE = true;
+	private static final boolean QUIESCE = false;
 
 	public static void main(String[] args) {
 		Scanner input = new Scanner(System.in);
