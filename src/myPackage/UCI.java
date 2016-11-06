@@ -6,7 +6,7 @@ public class UCI {
 	private static Game currGame = new Game();
 	private static int num_moves;
 	private static final int DEPTH = 6;
-	private static final boolean QUIESCE = false;
+	private static final boolean QUIESCE = true;
 
 	public static void main(String[] args) {
 		Scanner input = new Scanner(System.in);
@@ -59,7 +59,12 @@ public class UCI {
 			Move nextMove =  possibleMoves.get(rnd);
 			return nextMove.convertToUCIFormat();
 		}*/
-		return NegaMax.findBestMove(currGame, DEPTH, QUIESCE).convertToUCIFormat();
+		if (num_moves <=49){
+			return NegaMax.findBestMove(currGame, DEPTH, QUIESCE).convertToUCIFormat();
+			}
+		else if (num_moves <=79){return NegaMax.findBestMove(currGame, DEPTH+1, QUIESCE).convertToUCIFormat();}
+		else if (num_moves <=109){return NegaMax.findBestMove(currGame, DEPTH+2, QUIESCE).convertToUCIFormat();}
+		else {return NegaMax.findBestMove(currGame, DEPTH+3, QUIESCE).convertToUCIFormat();}
 	}
 
 }
