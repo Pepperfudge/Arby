@@ -59,7 +59,7 @@ public final class NegaMax {
 			ArrayList<Move> opponentMoves = position.generateLegalMoves();
 			if (opponentMoves.isEmpty()){
 				if (position.isKingInCheck()){
-					return CHECKMATE_VALUE;
+					return CHECKMATE_VALUE - depth;
 				} else {
 					return 0; //stalemate 
 				}

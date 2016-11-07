@@ -9,7 +9,7 @@ public class EngineTest {
 	@Test
 	public void test() {
 		Game game = new Game();
-		NegaMax.findBestMove(game, 6,true);
+		NegaMax.findBestMove(game, 4,true);
 	}
 	
 	@Test
