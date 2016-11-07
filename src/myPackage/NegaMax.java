@@ -1,14 +1,17 @@
 package myPackage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public final class NegaMax {
 
 	//static class so constructor is private
-//	private static HashMap<Game, String[]>  
+	private static HashMap<Game, int[]> visited = new HashMap<Game, int[]>(); 
+
 	private NegaMax(){
 		
 	}
+	
 	private static final int CHECKMATE_VALUE = -20000; 
 	
 	public static Move findBestMove(Game position, int depth, boolean quiesce) {
@@ -37,7 +40,14 @@ public final class NegaMax {
 	
 	private static int evaluatePosition(Game position, int depth, 
 			int alpha, int beta, boolean quiesce) {
-
+//		int[] oldValues = visited.get(position);
+//		if (oldValues != null) {
+////			System.out.println("found position");
+//			if (oldValues[0] >= depth){
+////				System.out.println("sufficient depth");
+//				return oldValues[1];
+//			}
+//		}
 		if (depth == 0) {
 			// System.out.println(move.convertToUCIFormat());
 			// System.out.println("quiesce");
@@ -51,6 +61,7 @@ public final class NegaMax {
 					score = -1*score;
 				}
 			}
+//			visited.put(position, new int[] {depth, score});
 			// System.out.printf("%s depth %d: %f\n", newPosition.sideToMove,
 			// depth, score);
 			return score;
@@ -85,6 +96,7 @@ public final class NegaMax {
 					maxValue = moveValue;
 				}
 			}
+//			visited.put(position, new int[] {depth, maxValue});
 			// System.out.println(move.convertToUCIFormat());
 			// System.out.printf("%s, depth %d: %f\n",
 			// newPosition.sideToMove, depth, maxValue);
@@ -130,9 +142,9 @@ public final class NegaMax {
 				}
 			}
 			if (( pieceValue + stand_pat + 70) > alpha) {
-				System.out.println(capture.convertToUCIFormat());
-				System.out.println(position);
-				System.out.println();
+//				System.out.println(capture.convertToUCIFormat());
+//				System.out.println(position);
+//				System.out.println();
 				// System.out.println(pieceCaptured);
 				Game newPosition = new Game(position, capture);
 				int moveValue = -quiesce(newPosition, -beta, -alpha);

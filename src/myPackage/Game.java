@@ -1,6 +1,7 @@
 package myPackage;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 public class Game {
@@ -2324,6 +2325,30 @@ public class Game {
 		}
 		return str;
 
+	}
+	
+	@Override 
+	public boolean equals(Object obj){
+		if (obj == null) {
+	        return false;
+	    }
+	    if (!Game.class.isAssignableFrom(obj.getClass())) {
+	        return false;
+	    }
+	    final Game other = (Game) obj;
+	    return Arrays.deepEquals(this.board, other.board) 
+	    		&& this.blackKCastle == other.blackKCastle 
+	    		&& this.blackQCastle == other.blackQCastle
+	    		&& this.whiteKCastle == other.whiteKCastle
+	    		&& this.whiteQCastle == other.whiteQCastle
+	    		&& this.enPassant == other.enPassant
+	    		&& this.enPassantTarget == other.enPassantTarget
+	    		&& this.sideToMove == other.sideToMove;
+	}
+	
+	@Override
+	public int hashCode(){
+		return Arrays.deepHashCode(board);
 	}
 
 	private static char[][] copyBoard(char[][] board) {

@@ -5,8 +5,9 @@ public class UCI {
 
 	private static Game currGame = new Game();
 	private static int num_moves;
-	private static final int DEPTH = 5;
+	private static final int DEPTH = 4;
 	private static final boolean QUIESCE = true;
+	public static int hashSize = 0;
 
 	public static void main(String[] args) {
 		Scanner input = new Scanner(System.in);
@@ -21,6 +22,7 @@ public class UCI {
 	                System.out.println("id name Whitie");
 	                System.out.println("id author LuckyAC");
 	                System.out.println("version organized");
+	                System.out.println("option name Hash type spin default 1 min 1 max 128");
 	                System.out.println("uciok");
 	            }  else if (inputString.equals("ucinewgame")){
 	            	currGame = new Game();
@@ -38,9 +40,10 @@ public class UCI {
 	            			num_moves++;
 	            		}
 	            	}
-	            }  else if (inputString.startsWith("go")){
-	            	System.out.format("bestmove %s \n", findMove());
-	            	
+	            }  else if (inputString.startsWith("setoption name Hash value")){
+	            	hashSize = Integer.parseInt(inputString.split(" ")[4]);
+	            }else if (inputString.startsWith("go")){
+	            	System.out.format("bestmove %s \n", findMove());	
 	            } else if (inputString.equals("quit")){
 	            	System.out.println("engine quitting");
 	            	break;
