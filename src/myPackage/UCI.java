@@ -21,7 +21,7 @@ public class UCI {
 	            {
 	                System.out.println("id name Whitie");
 	                System.out.println("id author LuckyAC");
-	                System.out.println("version organized");
+	                System.out.println("version hash");
 	                System.out.println("option name Hash type spin default 1 min 1 max 128");
 	                System.out.println("uciok");
 	            }  else if (inputString.equals("ucinewgame")){

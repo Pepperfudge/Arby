@@ -1,12 +1,12 @@
 package myPackage;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Hashtable;
 
 public final class NegaMax {
 
 	//static class so constructor is private
-	private static HashMap<Game, int[]> visited = new HashMap<Game, int[]>(); 
+	private static Hashtable<Game, Move> pastSearches = new Hashtable<Game, Move>(); 
 
 	private NegaMax(){
 		
@@ -40,14 +40,6 @@ public final class NegaMax {
 	
 	private static int evaluatePosition(Game position, int depth, 
 			int alpha, int beta, boolean quiesce) {
-//		int[] oldValues = visited.get(position);
-//		if (oldValues != null) {
-////			System.out.println("found position");
-//			if (oldValues[0] >= depth){
-////				System.out.println("sufficient depth");
-//				return oldValues[1];
-//			}
-//		}
 		if (depth == 0) {
 			// System.out.println(move.convertToUCIFormat());
 			// System.out.println("quiesce");
@@ -61,7 +53,6 @@ public final class NegaMax {
 					score = -1*score;
 				}
 			}
-//			visited.put(position, new int[] {depth, score});
 			// System.out.printf("%s depth %d: %f\n", newPosition.sideToMove,
 			// depth, score);
 			return score;
@@ -76,10 +67,25 @@ public final class NegaMax {
 					return 0; //stalemate 
 				}
 			}
+			Move lastBestMove = pastSearches.get(position);
 			int maxValue = CHECKMATE_VALUE;
+			if (lastBestMove != null){
+				Game newPosition = new Game(position, lastBestMove);
+				maxValue = -evaluatePosition(newPosition, depth - 1, -beta,
+						-alpha, quiesce);
+				if (maxValue > beta) {
+					return maxValue;
+				}
+			}
+			Move bestMove = lastBestMove;
 			for (int i = 0; i < opponentMoves.size(); i++) {
 				// for (int i = 0; i < 2; i++){
 				Move opponentMove = opponentMoves.get(i);
+				if (opponentMove.equals(lastBestMove)){
+					//lastBestMove is the first move we searched before the for loop
+					//so it would be redundant to do it again
+					continue;
+				}
 				Game newPosition = new Game(position, opponentMove);
 				// Move opponentMove = opponentMoves.get(
 				// new Random().nextInt(opponentMoves.size()));
@@ -90,13 +96,15 @@ public final class NegaMax {
 					// System.out.printf("Trim beta %f depth %d\n", beta,
 					// depth);
 					// System.out.printf("W, depth %d: %f\n", depth, moveValue);
+					pastSearches.put(position, opponentMove);
 					return moveValue;
 				}
 				if (moveValue > maxValue) {
 					maxValue = moveValue;
+					bestMove = opponentMove;
 				}
 			}
-//			visited.put(position, new int[] {depth, maxValue});
+			pastSearches.put(position, bestMove);
 			// System.out.println(move.convertToUCIFormat());
 			// System.out.printf("%s, depth %d: %f\n",
 			// newPosition.sideToMove, depth, maxValue);
@@ -118,6 +126,7 @@ public final class NegaMax {
 		ArrayList<Move> captures = position.findCaptures();
 
 		int maxValue = CHECKMATE_VALUE;
+		Move bestCapture = null;
 		for (int i = 0; i < captures.size(); i++) {
 			// for (int i = 0; i < captures.size(); i++){
 			Move capture = captures.get(i);
@@ -149,15 +158,20 @@ public final class NegaMax {
 				Game newPosition = new Game(position, capture);
 				int moveValue = -quiesce(newPosition, -beta, -alpha);
 				if (moveValue >= beta) {
+					pastSearches.put(position, capture);
 					return moveValue;
 				}
 				if (moveValue > maxValue) {
 					maxValue = moveValue;
+					bestCapture= capture;
 				}
-				if (moveValue > alpha) {
+				if (moveValue > alpha){
 					alpha = moveValue;
 				}
 			}
+		}
+		if (bestCapture != null){
+			pastSearches.put(position, bestCapture);
 		}
 		return Math.max(maxValue, stand_pat);
 
