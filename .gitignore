@@ -1,5 +1,11 @@
 *.class
 
+heap dumps
+*.hprof
+*.threads
+*.index
+*.zip
+
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 

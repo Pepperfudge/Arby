@@ -1,9 +1,12 @@
-package myPackage;
+package myPackage.Tests;
 
 import static org.junit.Assert.*;
 
 
 import org.junit.Test;
+
+import myPackage.Game;
+import myPackage.Utils;
 
 public class GameUnitTests {
 

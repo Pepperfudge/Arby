@@ -7,11 +7,10 @@ public class UCI {
 	private static int num_moves;
 	private static final int DEPTH = 6;
 	private static final boolean QUIESCE = true;
-	public static int hashSize = 0;
+	private static NegaMax negaMax;
 
 	public static void main(String[] args) {
 		Scanner input = new Scanner(System.in);
-		System.out.println("Whitey has arrived");
 		
 		while (true)
 	        {
@@ -19,9 +18,9 @@ public class UCI {
 	            String inputString=input.nextLine();
 	            if (inputString.equals("uci"))
 	            {
-	                System.out.println("id name Whitie");
+	                System.out.println("id name Arby");
 	                System.out.println("id author LuckyAC");
-	                System.out.println("version hash");
+	                System.out.println("version hash size good");
 	                System.out.println("option name Hash type spin default 1 min 1 max 128");
 	                System.out.println("uciok");
 	            }  else if (inputString.equals("ucinewgame")){
@@ -41,7 +40,8 @@ public class UCI {
 	            		}
 	            	}
 	            }  else if (inputString.startsWith("setoption name Hash value")){
-	            	hashSize = Integer.parseInt(inputString.split(" ")[4]);
+	            	int hashSize = Integer.parseInt(inputString.split(" ")[4]);
+	            	negaMax = new NegaMax(hashSize, QUIESCE);
 	            }else if (inputString.startsWith("go")){
 	            	System.out.format("bestmove %s \n", findMove());	
 	            } else if (inputString.equals("quit")){
@@ -63,11 +63,11 @@ public class UCI {
 			return nextMove.convertToUCIFormat();
 		}*/
 		if (num_moves <=49){
-			return NegaMax.findBestMove(currGame, DEPTH, QUIESCE).convertToUCIFormat();
+			return negaMax.findBestMove(currGame, DEPTH).convertToUCIFormat();
 			}
-		else if (num_moves <=79){return NegaMax.findBestMove(currGame, DEPTH+1, QUIESCE).convertToUCIFormat();}
-		else if (num_moves <=109){return NegaMax.findBestMove(currGame, DEPTH+2, QUIESCE).convertToUCIFormat();}
-		else {return NegaMax.findBestMove(currGame, DEPTH+3, QUIESCE).convertToUCIFormat();}
+		else if (num_moves <=79){return negaMax.findBestMove(currGame, DEPTH+1).convertToUCIFormat();}
+		else if (num_moves <=109){return negaMax.findBestMove(currGame, DEPTH+2).convertToUCIFormat();}
+		else {return negaMax.findBestMove(currGame, DEPTH+3).convertToUCIFormat();}
 	}
 
 }
