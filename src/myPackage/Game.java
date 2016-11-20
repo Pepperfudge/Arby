@@ -2528,8 +2528,8 @@ public class Game {
 				Move interimMove = new Move(row, col, row + 2, col + 1);
 				Game nextPosition = new Game(this, interimMove);
 				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if ((Math.abs((row + 2) - kingRow) == 2 && Math.abs((col+1) - kingColumn) == 1) 
-					|| (Math.abs((row + 2) - kingRow) == 1 && Math.abs((col+1) - kingColumn) == 2)){	
+					if ((Math.abs((row + 2) - targetKingRow) == 2 && Math.abs((col+1) - targetKingColumn) == 1) 
+					|| (Math.abs((row + 2) - targetKingRow) == 1 && Math.abs((col+1) - targetKingColumn) == 2)){	
 						quietMoves.add(0, interimMove);
 					}	
 					else {quietMoves.add(interimMove);}
@@ -2553,8 +2553,8 @@ public class Game {
 				Move interimMove = new Move(row, col, row + 2, col - 1);
 				Game nextPosition = new Game(this, interimMove);
 				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if ((Math.abs((row + 2) - kingRow) == 2 && Math.abs((col-1) - kingColumn) == 1) 
-					|| (Math.abs((row + 2) - kingRow) == 1 && Math.abs((col-1) - kingColumn) == 2)){	
+					if ((Math.abs((row + 2) - targetKingRow) == 2 && Math.abs((col-1) - targetKingColumn) == 1) 
+					|| (Math.abs((row + 2) - targetKingRow) == 1 && Math.abs((col-1) - targetKingColumn) == 2)){	
 						quietMoves.add(0, interimMove);
 					}	
 					else {quietMoves.add(interimMove);}
@@ -2578,8 +2578,8 @@ public class Game {
 				Move interimMove = new Move(row, col, row + 1, col + 2);
 				Game nextPosition = new Game(this, interimMove);
 				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if ((Math.abs((row + 1) - kingRow) == 2 && Math.abs((col+2) - kingColumn) == 1) 
-					|| (Math.abs((row + 1) - kingRow) == 1 && Math.abs((col+2) - kingColumn) == 2)){	
+					if ((Math.abs((row + 1) - targetKingRow) == 2 && Math.abs((col+2) - targetKingColumn) == 1) 
+					|| (Math.abs((row + 1) - targetKingRow) == 1 && Math.abs((col+2) - targetKingColumn) == 2)){	
 						quietMoves.add(0, interimMove);
 					}	
 					else {quietMoves.add(interimMove);}
@@ -2603,8 +2603,8 @@ public class Game {
 				Move interimMove = new Move(row, col, row + 1, col - 2);
 				Game nextPosition = new Game(this, interimMove);
 				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if ((Math.abs((row + 1) - kingRow) == 2 && Math.abs((col-2) - kingColumn) == 1) 
-					|| (Math.abs((row + 1) - kingRow) == 1 && Math.abs((col-2) - kingColumn) == 2)){	
+					if ((Math.abs((row + 1) - targetKingRow) == 2 && Math.abs((col-2) - targetKingColumn) == 1) 
+					|| (Math.abs((row + 1) - targetKingRow) == 1 && Math.abs((col-2) - targetKingColumn) == 2)){	
 						quietMoves.add(0, interimMove);
 					}	
 					else {quietMoves.add(interimMove);}
@@ -2628,8 +2628,8 @@ public class Game {
 				Move interimMove = new Move(row, col, row - 1, col + 2);
 				Game nextPosition = new Game(this, interimMove);
 				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if ((Math.abs((row - 1) - kingRow) == 2 && Math.abs((col+2) - kingColumn) == 1) 
-					|| (Math.abs((row - 1) - kingRow) == 1 && Math.abs((col+2) - kingColumn) == 2)){	
+					if ((Math.abs((row - 1) - targetKingRow) == 2 && Math.abs((col+2) - targetKingColumn) == 1) 
+					|| (Math.abs((row - 1) - targetKingRow) == 1 && Math.abs((col+2) - targetKingColumn) == 2)){	
 						quietMoves.add(0, interimMove);
 					}	
 					else {quietMoves.add(interimMove);}
@@ -2643,7 +2643,7 @@ public class Game {
 						moves.add(0, interimMove);
 					}
 					else {
-						quietMoves.add(interimMove);
+						moves.add(interimMove);
 					}
 				}
 			}
@@ -2654,8 +2654,8 @@ public class Game {
 				Move interimMove = new Move(row, col, row -1, col - 2);
 				Game nextPosition = new Game(this, interimMove);
 				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if ((Math.abs((row - 1) - kingRow) == 2 && Math.abs((col-2) - kingColumn) == 1) 
-					|| (Math.abs((row - 1) - kingRow) == 1 && Math.abs((col-2) - kingColumn) == 2)){	
+					if ((Math.abs((row - 1) - targetKingRow) == 2 && Math.abs((col-2) - targetKingColumn) == 1) 
+					|| (Math.abs((row - 1) - targetKingRow) == 1 && Math.abs((col-2) - targetKingColumn) == 2)){	
 						quietMoves.add(0, interimMove);
 					}	
 					else {quietMoves.add(interimMove);}
@@ -2679,8 +2679,8 @@ public class Game {
 				Move interimMove = new Move(row, col, row - 2, col + 1);
 				Game nextPosition = new Game(this, interimMove);
 				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if ((Math.abs((row - 2) - kingRow) == 2 && Math.abs((col+1) - kingColumn) == 1) 
-					|| (Math.abs((row - 2) - kingRow) == 1 && Math.abs((col+1) - kingColumn) == 2)){	
+					if ((Math.abs((row - 2) - targetKingRow) == 2 && Math.abs((col+1) - targetKingColumn) == 1) 
+					|| (Math.abs((row - 2) - targetKingRow) == 1 && Math.abs((col+1) - targetKingColumn) == 2)){	
 						quietMoves.add(0, interimMove);
 					}	
 					else {quietMoves.add(interimMove);}
@@ -2704,8 +2704,8 @@ public class Game {
 				Move interimMove = new Move(row, col, row - 2, col - 1);
 				Game nextPosition = new Game(this, interimMove);
 				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if ((Math.abs((row - 2) - kingRow) == 2 && Math.abs((col-1) - kingColumn) == 1) 
-					|| (Math.abs((row - 2) - kingRow) == 1 && Math.abs((col-1) - kingColumn) == 2)){	
+					if ((Math.abs((row - 2) - targetKingRow) == 2 && Math.abs((col-1) - targetKingColumn) == 1) 
+					|| (Math.abs((row - 2) - targetKingRow) == 1 && Math.abs((col-1) - targetKingColumn) == 2)){	
 						quietMoves.add(0, interimMove);
 					}	
 					else {quietMoves.add(interimMove);}
