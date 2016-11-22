@@ -1030,6 +1030,18 @@ public class Game {
 		whitePieceActivity = whiteKnightActivity + whiteRookActivity + whiteBishopActivity;
 		blackPieceActivity = blackKnightActivity + blackRookActivity + blackBishopActivity;
 		
+		if (whiteMaterialScore < 1600){
+			if (blackKingLocation[0] == 6){ blackPieceActivity = blackPieceActivity + 10;}
+			else if (blackKingLocation[0] == 5) {blackPieceActivity = blackPieceActivity + 20;}
+			else if (blackKingLocation[0] <= 4) {blackPieceActivity = blackPieceActivity + 30;}
+		}
+		
+		if (blackMaterialScore < 1600){
+			if (whiteKingLocation[0] == 1){ whitePieceActivity = whitePieceActivity + 10;}
+			else if (whiteKingLocation[0] == 2) {whitePieceActivity = whitePieceActivity + 20;}
+			else if (whiteKingLocation[0] >= 3) {whitePieceActivity = whitePieceActivity + 30;}
+		}
+		
 		if (whiteMaterialScore - blackMaterialScore  >= 300) {whiteTradeBonus = (4000 - blackMaterialScore)/25;}
 		if (blackMaterialScore - whiteMaterialScore  >= 300) {blackTradeBonus = (4000 - whiteMaterialScore)/25;}
 		
@@ -1085,17 +1097,17 @@ public class Game {
 			for (int j = 0; j < 8; j++) {
 				if (board[i][j] == 'x') {
 				} else if (board[i][j] == 'P') {
-					moves.addAll(findWhitePawnCaptures(i, j));
+					moves.addAll(0, findWhitePawnCaptures(i, j));
 				} else if (board[i][j] == 'R') {
-					moves.addAll(findRookCaptures(i, j, blackPieces));
+					findRookCaptures(i, j, blackPieces, moves);
 				} else if (board[i][j] == 'B') {
-					moves.addAll(findBishopCaptures(i, j, blackPieces));
+					findBishopCaptures(i, j, blackPieces, moves);
 				} else if (board[i][j] == 'N') {
-					moves.addAll(findKnightCaptures(i, j, blackPieces));
+					findKnightCaptures(i, j, blackPieces, moves);
 				} else if (board[i][j] == 'Q') {
-					moves.addAll(findQueenCaptures(i, j, blackPieces));
+					findQueenCaptures(i, j, blackPieces, moves);
 				} else if (board[i][j] == 'K') {
-				moves.addAll(findKingCaptures(i, j, blackPieces));
+				moves.addAll(0, findKingCaptures(i, j, blackPieces));
 				}
 			}	
 		}
@@ -1110,17 +1122,17 @@ public class Game {
 			for (int j = 0; j < 8; j++) {
 				if (board[i][j] == 'x') {
 				} else if (board[i][j] == 'p') {
-					moves.addAll(findBlackPawnCaptures(i, j));
+					moves.addAll(0, findBlackPawnCaptures(i, j));
 				} else if (board[i][j] == 'n') {
-					moves.addAll(findKnightCaptures(i, j, whitePieces));
+					findKnightCaptures(i, j, whitePieces, moves);
 				} else if (board[i][j] == 'r') {
-					moves.addAll(findRookCaptures(i, j, whitePieces));
+					findRookCaptures(i, j, whitePieces, moves);
 				} else if (board[i][j] == 'b') {
-					moves.addAll(findBishopCaptures(i, j, whitePieces));
+					findBishopCaptures(i, j, whitePieces, moves);
 				} else if (board[i][j] == 'q') {
-					moves.addAll(findQueenCaptures(i, j, whitePieces));
+					findQueenCaptures(i, j, whitePieces, moves);
 				} else if (board[i][j] == 'k') {
-					moves.addAll(findKingCaptures(i, j, whitePieces));
+					moves.addAll(0, findKingCaptures(i, j, whitePieces));
 				}
 			}
 		}
@@ -1130,7 +1142,7 @@ public class Game {
 
 	public ArrayList<Move> generateLegalMoves() {
 		// System.out.println("generateLegalMoves");
-		// System.out.println("positionScore is " + evaluateBoard());
+		//System.out.println("positionScore is " + evaluateBoard());
 		// System.out.println("whiteKcastle is" + whiteKCastle);
 		ArrayList<Move> moves = new ArrayList<Move>();
 		if (sideToMove == 'w') {
@@ -1651,10 +1663,9 @@ public class Game {
 		}
 	}
 
-	private ArrayList<Move> findRookCaptures(int row, int col, char[] opponentPieces) {
+	private void findRookCaptures(int row, int col, char[] opponentPieces, ArrayList<Move> moves) {
 		// System.out.println("generateRookMoves");
-		ArrayList<Move> moves = new ArrayList<Move>();
-
+		
 		for (int i = row + 1; i <= 7; i++) {
 			if (contains(opponentPieces, board[i][col])) {
 				Move interimMove = new Move(row, col, i, col);
@@ -1772,7 +1783,6 @@ public class Game {
 			}
 		}
 
-		return moves;
 	}
 
 	private void generateBishopMoves(int row, int col, char[] opponentPieces, ArrayList<Move> moves, ArrayList<Move> quietMoves) {
@@ -1905,10 +1915,9 @@ public class Game {
 		}
 	}
 
-	private ArrayList<Move> findBishopCaptures(int row, int col, char[] opponentPieces) {
+	private void findBishopCaptures(int row, int col, char[] opponentPieces, ArrayList<Move> moves) {
 		// System.out.println("generateBishopMoves");
-		ArrayList<Move> moves = new ArrayList<Move>();
-
+		
 		for (int i = row + 1, j = col + 1; i <= 7 && j <= 7; i++, j++) {
 			if (contains(opponentPieces, board[i][j])) {
 				Move interimMove = new Move(row, col, i, j);
@@ -2025,8 +2034,6 @@ public class Game {
 				break;
 			}
 		}
-
-		return moves;
 	}
 	
 	private void generateQueenMoves(int row, int col, char[] opponentPieces, ArrayList<Move> moves, ArrayList<Move> quietMoves) {
@@ -2274,8 +2281,7 @@ public class Game {
 		}
 	}
 
-	private ArrayList<Move> findQueenCaptures(int row, int col, char[] opponentPieces) {
-		ArrayList<Move> moves = new ArrayList<Move>();
+	private void findQueenCaptures(int row, int col, char[] opponentPieces, ArrayList<Move> moves) {
 
 		for (int i = row + 1; i <= 7; i++) {
 			if (contains(opponentPieces, board[i][col])) {
@@ -2509,7 +2515,6 @@ public class Game {
 				break;
 			}
 		}
-		return moves;
 	}
 
 	private void generateKnightMoves(int row, int col, char[] opponentPieces, ArrayList<Move> moves, ArrayList<Move> quietMoves) {
@@ -2726,9 +2731,8 @@ public class Game {
 		}
 	}
 
-	private ArrayList<Move> findKnightCaptures(int row, int col, char[] opponentPieces) {
+	private void findKnightCaptures(int row, int col, char[] opponentPieces, ArrayList<Move> moves) {
 		// System.out.println("generateKnightMoves");
-		ArrayList<Move> moves = new ArrayList<Move>();
 		if (row + 2 <= 7 && col + 1 <= 7) {
 			if (contains(opponentPieces, board[row + 2][col + 1])) {
 				Move interimMove = new Move(row, col, row + 2, col + 1);
@@ -2941,7 +2945,6 @@ public class Game {
 				}
 			}
 		}
-		return moves;
 	}
 
 	public boolean isKingInCheck(){
