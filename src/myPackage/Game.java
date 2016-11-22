@@ -1030,18 +1030,6 @@ public class Game {
 		whitePieceActivity = whiteKnightActivity + whiteRookActivity + whiteBishopActivity;
 		blackPieceActivity = blackKnightActivity + blackRookActivity + blackBishopActivity;
 		
-		if (whiteMaterialScore < 1600){
-			if (blackKingLocation[0] == 6){ blackPieceActivity = blackPieceActivity + 10;}
-			else if (blackKingLocation[0] == 5) {blackPieceActivity = blackPieceActivity + 20;}
-			else if (blackKingLocation[0] <= 4) {blackPieceActivity = blackPieceActivity + 30;}
-		}
-		
-		if (blackMaterialScore < 1600){
-			if (whiteKingLocation[0] == 1){ whitePieceActivity = whitePieceActivity + 10;}
-			else if (whiteKingLocation[0] == 2) {whitePieceActivity = whitePieceActivity + 20;}
-			else if (whiteKingLocation[0] >= 3) {whitePieceActivity = whitePieceActivity + 30;}
-		}
-		
 		if (whiteMaterialScore - blackMaterialScore  >= 300) {whiteTradeBonus = (4000 - blackMaterialScore)/25;}
 		if (blackMaterialScore - whiteMaterialScore  >= 300) {blackTradeBonus = (4000 - whiteMaterialScore)/25;}
 		
@@ -1142,7 +1130,7 @@ public class Game {
 
 	public ArrayList<Move> generateLegalMoves() {
 		// System.out.println("generateLegalMoves");
-		//System.out.println("positionScore is " + evaluateBoard());
+		// System.out.println("positionScore is " + evaluateBoard());
 		// System.out.println("whiteKcastle is" + whiteKCastle);
 		ArrayList<Move> moves = new ArrayList<Move>();
 		if (sideToMove == 'w') {
@@ -1155,6 +1143,7 @@ public class Game {
 
 	private ArrayList<Move> generateWhiteMoves() {
 		ArrayList<Move> moves = new ArrayList<Move>();
+		ArrayList<Move> middleMoves = new ArrayList<>();
 		ArrayList<Move> quietMoves = new ArrayList<Move>();
 		
 		moves.addAll(generateCastleMoves());
@@ -1163,25 +1152,26 @@ public class Game {
 			for (int j = 0; j < 8; j++) {
 				if (board[i][j] == 'x'){}
 				else if (board[i][j] == 'P') {
-					generateWhitePawnMoves(i, j, moves, quietMoves);
+					generateWhitePawnMoves(i, j, moves, middleMoves, quietMoves);
 				}
 				else if (board[i][j] == 'R') {
-					generateRookMoves(i, j, blackPieces, moves, quietMoves);
+					generateRookMoves(i, j, blackPieces, moves, middleMoves, quietMoves);
 				}
 				else if (board[i][j] == 'B') {
-					generateBishopMoves(i, j, blackPieces, moves, quietMoves);
+					generateWhiteBishopMoves(i, j, moves, middleMoves, quietMoves);
 				}
 				else if (board[i][j] == 'N') {
-					generateKnightMoves(i, j, blackPieces, moves, quietMoves);
+					generateWhiteKnightMoves(i, j, moves, middleMoves, quietMoves);
 				}
 				else if (board[i][j] == 'K') {
 					generateKingMoves(i, j, blackPieces, moves, quietMoves);
 				}
 				else if (board[i][j] == 'Q') {
-					generateQueenMoves(i, j, blackPieces, moves, quietMoves);
+					generateWhiteQueenMoves(i, j, moves, middleMoves, quietMoves);
 				}
 			}
 		}
+		moves.addAll(middleMoves);
 		moves.addAll(generateCastleMoves());
 		moves.addAll(quietMoves);
 		
@@ -1190,31 +1180,33 @@ public class Game {
 
 	private ArrayList<Move> generateBlackMoves() {
 		ArrayList<Move> moves = new ArrayList<>();
+		ArrayList<Move> middleMoves = new ArrayList<>();
 		ArrayList<Move> quietMoves = new ArrayList<Move>();
 		
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
 				if (board[i][j] == 'x'){}
 				else if (board[i][j] == 'p') {
-					generateBlackPawnMoves(i, j, moves, quietMoves);
+					generateBlackPawnMoves(i, j, moves, middleMoves, quietMoves);
 				}
 				else if (board[i][j] == 'r') {
-					generateRookMoves(i, j, whitePieces, moves, quietMoves);
+					generateRookMoves(i, j, whitePieces, moves, middleMoves, quietMoves);
 				}
 				else if (board[i][j] == 'b') {
-					generateBishopMoves(i, j, whitePieces, moves, quietMoves);
+					generateBlackBishopMoves(i, j, moves, middleMoves, quietMoves);
 				}
 				else if (board[i][j] == 'n') {
-					generateKnightMoves(i, j, whitePieces, moves, quietMoves);
+					generateBlackKnightMoves(i, j, moves, middleMoves, quietMoves);
 				}
 				else if (board[i][j] == 'k') {
 					generateKingMoves(i, j, whitePieces, moves, quietMoves);
 				}
 				else if (board[i][j] == 'q') {
-					generateQueenMoves(i, j, whitePieces, moves, quietMoves);
+					generateBlackQueenMoves(i, j, moves, middleMoves, quietMoves);
 				}
 			}
 		}
+		moves.addAll(middleMoves);
 		moves.addAll(generateCastleMoves());
 		moves.addAll(quietMoves);
 
@@ -1252,14 +1244,17 @@ public class Game {
 		return moves;
 	}
 
-	private void generateBlackPawnMoves(int row, int col, ArrayList<Move> moves, ArrayList<Move> quietMoves) {
+	private void generateBlackPawnMoves(int row, int col, ArrayList<Move> moves, ArrayList<Move> middleMoves, ArrayList<Move> quietMoves) {
 		// System.out.println("generatePawnMoves");
 		
 		if (row == 6 && board[5][col] == 'x' && board[4][col] == 'x') {
 			Move interimMove = new Move(6, col, 4, col);
 			Game nextPosition = new Game(this, interimMove);
 			if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
-				quietMoves.add(interimMove);
+				if (col > 2){
+					middleMoves.add(interimMove);
+				}
+				else {quietMoves.add(0, interimMove);}
 			}
 		}
 
@@ -1267,15 +1262,10 @@ public class Game {
 			Move interimMove = new Move(row, col, row - 1, col);
 			Game nextPosition = new Game(this, interimMove);
 			if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
-				if (row >=2 && col >=1 && whiteKingLocation[0] == row - 2 && whiteKingLocation[1] == col -1){
-					quietMoves.add(0, interimMove);
+				if (col > 2){
+					middleMoves.add(interimMove);
 				}
-				else if (row >=2 && col <=6 && whiteKingLocation[0] == row -2 && whiteKingLocation[1] == col +1){
-					quietMoves.add(0, interimMove);
-				}
-				else{
-					quietMoves.add(interimMove);
-				}
+				else {quietMoves.add(0, interimMove);}
 			}
 		}
 
@@ -1314,13 +1304,16 @@ public class Game {
 		return moves;
 	}
 
-	private void generateWhitePawnMoves(int row, int col, ArrayList<Move> moves, ArrayList<Move> quietMoves) {
+	private void generateWhitePawnMoves(int row, int col, ArrayList<Move> moves, ArrayList<Move> middleMoves, ArrayList<Move> quietMoves) {
 		// System.out.println("generatePawnMoves");
 		if (row == 1 && board[2][col] == 'x' && board[3][col] == 'x') {
 			Move interimMove = new Move(1, col, 3, col);
 			Game nextPosition = new Game(this, interimMove);
 			if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
-				quietMoves.add(new Move(1, col, 3, col));
+				if (col > 2){
+					middleMoves.add(interimMove);
+				}
+				else {quietMoves.add(0, interimMove);}
 			}
 		}
 
@@ -1328,15 +1321,10 @@ public class Game {
 			Move interimMove = new Move(row, col, row + 1, col);
 			Game nextPosition = new Game(this, interimMove);
 			if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
-				if (row <=5 && col >=1 && blackKingLocation[0] == row + 2 && blackKingLocation[1] == col - 1){
-						quietMoves.add(0, interimMove);
-				}	
-				else if (row <=5 && col <=6 && blackKingLocation[0] == row +2 && blackKingLocation[1] == col +1){
-						quietMoves.add(0, interimMove);
-				}	
-				else{
-					quietMoves.add(interimMove);
+				if (col > 2){
+					middleMoves.add(interimMove);
 				}
+				else {quietMoves.add(0, interimMove);}
 			}	
 		}
 		moves.addAll(0, findWhitePawnCaptures(row, col));
@@ -1535,7 +1523,7 @@ public class Game {
 		return moves;
 	}
 
-	private void generateRookMoves(int row, int col, char[] opponentPieces, ArrayList<Move> moves, ArrayList<Move> quietMoves) {
+	private void generateRookMoves(int row, int col, char[] opponentPieces, ArrayList<Move> moves, ArrayList<Move> middleMoves, ArrayList<Move> quietMoves) {
 		// System.out.println("generateRookMoves");
 		int kingRow = 0; int kingColumn = 0; int targetKingRow = 0; int targetKingColumn = 0;
 		if (sideToMove == 'w'){
@@ -1552,7 +1540,7 @@ public class Game {
 				Game nextPosition = new Game(this, interimMove);
 				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
 					if (targetKingRow == i || targetKingColumn == col){
-						quietMoves.add(0, interimMove);
+						middleMoves.add(interimMove);
 					}
 					else {quietMoves.add(interimMove);
 					}
@@ -1562,11 +1550,14 @@ public class Game {
 				Move interimMove = new Move(row, col, i, col);
 				Game nextPosition = new Game(this, interimMove);
 				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if (board[i][col] == 'Q' || board[i][col] == 'q' || board[i][col] == 'R' || board[i][col] == 'r') { 	
+					if (board[i][col] == 'Q' || board[i][col] == 'q') { 	
 						moves.add(0, interimMove);
 					}
-					else {
+					else if (board[i][col] == 'R' || board[i][col] == 'r'){
 						moves.add(interimMove);
+					}
+					else {
+						middleMoves.add(0, interimMove);
 					}
 				}
 			}
@@ -1581,7 +1572,7 @@ public class Game {
 				Game nextPosition = new Game(this, interimMove);
 				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
 					if (targetKingRow == i || targetKingColumn == col){
-						quietMoves.add(0, interimMove);
+						middleMoves.add(interimMove);
 					}
 					else {quietMoves.add(interimMove);
 					}
@@ -1591,11 +1582,14 @@ public class Game {
 				Move interimMove = new Move(row, col, i, col);
 				Game nextPosition = new Game(this, interimMove);
 				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if (board[i][col] == 'Q' || board[i][col] == 'q' || board[i][col] == 'R' || board[i][col] == 'r') { 	
+					if (board[i][col] == 'Q' || board[i][col] == 'q') { 	
 						moves.add(0, interimMove);
 					}
-					else {
+					else if (board[i][col] == 'R' || board[i][col] == 'r'){
 						moves.add(interimMove);
+					}
+					else {
+						middleMoves.add(0, interimMove);
 					}
 				}
 			}
@@ -1609,7 +1603,7 @@ public class Game {
 				Game nextPosition = new Game(this, interimMove);
 				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
 					if (targetKingRow == i || targetKingColumn == col){
-						quietMoves.add(0, interimMove);
+						middleMoves.add(interimMove);
 					}
 					else {quietMoves.add(interimMove);
 					}
@@ -1619,11 +1613,14 @@ public class Game {
 				Move interimMove = new Move(row, col, row, i);
 				Game nextPosition = new Game(this, interimMove);
 				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if (board[row][i] == 'Q' || board[row][i] == 'q' || board[row][i] == 'R' || board[row][i] == 'r') { 	
+					if (board[row][i] == 'Q' || board[row][i] == 'q') { 	
 						moves.add(0, interimMove);
 					}
-					else {
+					else if (board[row][i] == 'R' || board[row][i] == 'r'){
 						moves.add(interimMove);
+					}
+					else {
+						middleMoves.add(0, interimMove);
 					}
 				}
 			}
@@ -1638,7 +1635,7 @@ public class Game {
 				Game nextPosition = new Game(this, interimMove);
 				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
 					if (targetKingRow == i || targetKingColumn == col){
-						quietMoves.add(0, interimMove);
+						middleMoves.add(interimMove);
 					}
 					else {quietMoves.add(interimMove);
 					}
@@ -1648,11 +1645,14 @@ public class Game {
 				Move interimMove = new Move(row, col, row, i);
 				Game nextPosition = new Game(this, interimMove);
 				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if (board[row][i] == 'Q' || board[row][i] == 'q' || board[row][i] == 'R' || board[row][i] == 'r') { 	
+					if (board[row][i] == 'Q' || board[row][i] == 'q') { 	
 						moves.add(0, interimMove);
 					}
-					else {
+					else if (board[row][i] == 'R' || board[row][i] == 'r'){
 						moves.add(interimMove);
+					}
+					else {
+						middleMoves.add(0, interimMove);
 					}
 				}
 			}	
@@ -1782,42 +1782,34 @@ public class Game {
 				break;
 			}
 		}
-
 	}
 
-	private void generateBishopMoves(int row, int col, char[] opponentPieces, ArrayList<Move> moves, ArrayList<Move> quietMoves) {
+	private void generateWhiteBishopMoves(int row, int col, ArrayList<Move> moves, ArrayList<Move> middleMoves, ArrayList<Move> quietMoves) {
 		// System.out.println("generateBishopMoves");
-		int kingRow = 0; int kingColumn = 0; int targetKingRow = 0; int targetKingColumn = 0;
-		if (sideToMove == 'w'){
-			kingRow = whiteKingLocation[0]; kingColumn = whiteKingLocation[1];
-			targetKingRow = blackKingLocation[0]; targetKingColumn = blackKingLocation[1];
-		}
-		else {
-			kingRow = blackKingLocation[0]; kingColumn = blackKingLocation[1];
-			targetKingRow = whiteKingLocation[0]; targetKingColumn = whiteKingLocation[1];
-		}
-		
 		for (int i = row + 1, j = col + 1; i <= 7 && j <= 7; i++, j++) {
 			if (board[i][j] == 'x') {
 				Move interimMove = new Move(row, col, i, j);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if (Math.abs(targetKingRow - i) == Math.abs(targetKingColumn - j)){
-						quietMoves.add(0, interimMove);
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if (Math.abs(blackKingLocation[0] - i) == Math.abs(blackKingLocation[1] - j)){
+						middleMoves.add(interimMove);
 					}
-					else {quietMoves.add(interimMove);
+					else {quietMoves.add(0, interimMove);
 					}
 				}
 			}
-			else if (contains(opponentPieces, board[i][j])) {
+			else if (contains(blackPieces, board[i][j])) {
 				Move interimMove = new Move(row, col, i, j);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if (board[i][j] != 'P' && board[i][j] != 'p' ) { 	
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if (board[i][j] == 'r' || board[i][j] == 'q') { 	
 						moves.add(0, interimMove);
 					}
-					else {
+					else if (board[i][j] == 'b' || board[i][j] == 'n'){
 						moves.add(interimMove);
+					}
+					else {
+						middleMoves.add(0, interimMove);
 					}
 				}
 			}
@@ -1830,23 +1822,26 @@ public class Game {
 			if (board[i][j] == 'x') {
 				Move interimMove = new Move(row, col, i, j);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if (Math.abs(targetKingRow - i) == Math.abs(targetKingColumn - j)){
-						quietMoves.add(0, interimMove);
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if (Math.abs(blackKingLocation[0] - i) == Math.abs(blackKingLocation[1] - j)){
+						middleMoves.add(interimMove);
 					}
-					else {quietMoves.add(interimMove);
+					else {quietMoves.add(0, interimMove);
 					}
 				}
 			}
-			else if (contains(opponentPieces, board[i][j])) {
+			else if (contains(blackPieces, board[i][j])) {
 				Move interimMove = new Move(row, col, i, j);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if (board[i][j] != 'P' && board[i][j] != 'p' ) { 	
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if (board[i][j] == 'r' || board[i][j] == 'q') { 	
 						moves.add(0, interimMove);
 					}
-					else {
+					else if (board[i][j] == 'b' || board[i][j] == 'n'){
 						moves.add(interimMove);
+					}
+					else {
+						middleMoves.add(0, interimMove);
 					}
 				}
 			}
@@ -1859,23 +1854,26 @@ public class Game {
 			if (board[i][j] == 'x') {
 				Move interimMove = new Move(row, col, i, j);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if (Math.abs(targetKingRow - i) == Math.abs(targetKingColumn - j)){
-						quietMoves.add(0, interimMove);
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if (Math.abs(blackKingLocation[0] - i) == Math.abs(blackKingLocation[1] - j)){
+						middleMoves.add(interimMove);
 					}
 					else {quietMoves.add(interimMove);
 					}
 				}
 			}
-			else if (contains(opponentPieces, board[i][j])) {
+			else if (contains(blackPieces, board[i][j])) {
 				Move interimMove = new Move(row, col, i, j);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if (board[i][j] != 'P' && board[i][j] != 'p' ) { 	
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if (board[i][j] == 'r' || board[i][j] == 'q') { 	
 						moves.add(0, interimMove);
 					}
-					else {
+					else if (board[i][j] == 'b' || board[i][j] == 'n'){
 						moves.add(interimMove);
+					}
+					else {
+						middleMoves.add(0, interimMove);
 					}
 				}
 			}
@@ -1888,23 +1886,158 @@ public class Game {
 			if (board[i][j] == 'x') {
 				Move interimMove = new Move(row, col, i, j);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if (Math.abs(targetKingRow - i) == Math.abs(targetKingColumn - j)){
-						quietMoves.add(0, interimMove);
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if (Math.abs(blackKingLocation[0] - i) == Math.abs(blackKingLocation[1] - j)){
+						middleMoves.add(interimMove);
 					}
 					else {quietMoves.add(interimMove);
 					}
 				}
 			}
-			else if (contains(opponentPieces, board[i][j])) {
+			else if (contains(blackPieces, board[i][j])) {
 				Move interimMove = new Move(row, col, i, j);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if (board[i][j] != 'P' && board[i][j] != 'p' ) { 	
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if (board[i][j] == 'r' || board[i][j] == 'q') { 	
 						moves.add(0, interimMove);
 					}
-					else {
+					else if (board[i][j] == 'b' || board[i][j] == 'n'){
 						moves.add(interimMove);
+					}
+					else {
+						middleMoves.add(0, interimMove);
+					}
+				}
+			}
+			
+			if (board[i][j] != 'x') {
+				break;
+			}
+		}
+	}
+	
+	private void generateBlackBishopMoves(int row, int col, ArrayList<Move> moves, ArrayList<Move> middleMoves, ArrayList<Move> quietMoves) {
+		// System.out.println("generateBishopMoves");
+		for (int i = row + 1, j = col + 1; i <= 7 && j <= 7; i++, j++) {
+			if (board[i][j] == 'x') {
+				Move interimMove = new Move(row, col, i, j);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if (Math.abs(whiteKingLocation[0] - i) == Math.abs(whiteKingLocation[1] - j)){
+						middleMoves.add(interimMove);
+					}
+					else {quietMoves.add(interimMove);
+					}
+				}
+			}
+			else if (contains(whitePieces, board[i][j])) {
+				Move interimMove = new Move(row, col, i, j);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if (board[i][j] == 'R' || board[i][j] == 'Q') { 	
+						moves.add(0, interimMove);
+					}
+					else if (board[i][j] == 'B' || board[i][j] == 'N'){
+						moves.add(interimMove);
+					}
+					else {
+						middleMoves.add(0, interimMove);
+					}
+				}
+			}
+			
+			if (board[i][j] != 'x') {
+				break;
+			}
+		}
+		for (int i = row + 1, j = col - 1; i <= 7 && j >= 0; i++, j--) {
+			if (board[i][j] == 'x') {
+				Move interimMove = new Move(row, col, i, j);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if (Math.abs(whiteKingLocation[0] - i) == Math.abs(whiteKingLocation[1] - j)){
+						middleMoves.add(interimMove);
+					}
+					else {quietMoves.add(interimMove);
+					}
+				}
+			}
+			else if (contains(whitePieces, board[i][j])) {
+				Move interimMove = new Move(row, col, i, j);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if (board[i][j] == 'R' || board[i][j] == 'Q') { 	
+						moves.add(0, interimMove);
+					}
+					else if (board[i][j] == 'B' || board[i][j] == 'N'){
+						moves.add(interimMove);
+					}
+					else {
+						middleMoves.add(0, interimMove);
+					}
+				}
+			}
+			
+			if (board[i][j] != 'x') {
+				break;
+			}
+		}
+		for (int i = row - 1, j = col + 1; i >= 0 && j <= 7; i--, j++) {
+			if (board[i][j] == 'x') {
+				Move interimMove = new Move(row, col, i, j);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if (Math.abs(whiteKingLocation[0] - i) == Math.abs(whiteKingLocation[1] - j)){
+						middleMoves.add(interimMove);
+					}
+					else {quietMoves.add(0, interimMove);
+					}
+				}
+			}
+			else if (contains(whitePieces, board[i][j])) {
+				Move interimMove = new Move(row, col, i, j);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if (board[i][j] == 'R' || board[i][j] == 'Q') { 	
+						moves.add(0, interimMove);
+					}
+					else if (board[i][j] == 'B' || board[i][j] == 'N'){
+						moves.add(interimMove);
+					}
+					else {
+						middleMoves.add(0, interimMove);
+					}
+				}
+			}
+			
+			if (board[i][j] != 'x') {
+				break;
+			}
+		}
+		for (int i = row - 1, j = col - 1; i >= 0 && j >= 0; i--, j--) {
+			if (board[i][j] == 'x') {
+				Move interimMove = new Move(row, col, i, j);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if (Math.abs(whiteKingLocation[0] - i) == Math.abs(whiteKingLocation[1] - j)){
+						middleMoves.add(interimMove);
+					}
+					else {quietMoves.add(0, interimMove);
+					}
+				}
+			}
+			else if (contains(whitePieces, board[i][j])) {
+				Move interimMove = new Move(row, col, i, j);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if (board[i][j] == 'R' || board[i][j] == 'Q') { 	
+						moves.add(0, interimMove);
+					}
+					else if (board[i][j] == 'B' || board[i][j] == 'N'){
+						moves.add(interimMove);
+					}
+					else {
+						middleMoves.add(0, interimMove);
 					}
 				}
 			}
@@ -2036,39 +2169,30 @@ public class Game {
 		}
 	}
 	
-	private void generateQueenMoves(int row, int col, char[] opponentPieces, ArrayList<Move> moves, ArrayList<Move> quietMoves) {
+	private void generateWhiteQueenMoves(int row, int col, ArrayList<Move> moves, ArrayList<Move> middleMoves, ArrayList<Move> quietMoves) {
 		// System.out.println("generateQueenMoves");
-		int kingRow = 0; int kingColumn = 0; int targetKingRow = 0; int targetKingColumn = 0;
-		if (sideToMove == 'w'){
-			kingRow = whiteKingLocation[0]; kingColumn = whiteKingLocation[1];
-			targetKingRow = blackKingLocation[0]; targetKingColumn = blackKingLocation[1];
-		}
-		else {
-			kingRow = blackKingLocation[0]; kingColumn = blackKingLocation[1];
-			targetKingRow = whiteKingLocation[0]; targetKingColumn = whiteKingLocation[1];
-		}
 		
 		for (int i = row + 1, j = col + 1; i <= 7 && j <= 7; i++, j++) {
 			if (board[i][j] == 'x') {
 				Move interimMove = new Move(row, col, i, j);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if (Math.abs(targetKingRow - i) == Math.abs(targetKingColumn - j)){
-						quietMoves.add(0, interimMove);
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if (Math.abs(blackKingLocation[0] - i) == Math.abs(blackKingLocation[1] - j)){
+						middleMoves.add(interimMove);
 					}
-					else {quietMoves.add(interimMove);
+					else {quietMoves.add(0, interimMove);
 					}
 				}
 			}
-			else if (contains(opponentPieces, board[i][j])) {
+			else if (contains(blackPieces, board[i][j])) {
 				Move interimMove = new Move(row, col, i, j);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if (board[i][j] == 'Q' || board[i][j] == 'q') { 	
-						moves.add(0, interimMove);
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if (board[i][j] == 'q') { 	
+						moves.add(interimMove);
 					}
 					else {
-						moves.add(interimMove);
+						middleMoves.add(0, interimMove);
 					}
 				}
 			}
@@ -2081,23 +2205,23 @@ public class Game {
 			if (board[i][j] == 'x') {
 				Move interimMove = new Move(row, col, i, j);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if (Math.abs(targetKingRow - i) == Math.abs(targetKingColumn - j)){
-						quietMoves.add(0, interimMove);
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if (Math.abs(blackKingLocation[0] - i) == Math.abs(blackKingLocation[1] - j)){
+						middleMoves.add(interimMove);
 					}
-					else {quietMoves.add(interimMove);
+					else {quietMoves.add(0, interimMove);
 					}
 				}
 			}
-			else if (contains(opponentPieces, board[i][j])) {
+			else if (contains(blackPieces, board[i][j])) {
 				Move interimMove = new Move(row, col, i, j);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if (board[i][j] == 'Q' || board[i][j] == 'q') { 	
-						moves.add(0, interimMove);
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if (board[i][j] == 'q') { 	
+						moves.add(interimMove);
 					}
 					else {
-						moves.add(interimMove);
+						middleMoves.add(0, interimMove);
 					}
 				}
 			}
@@ -2109,23 +2233,23 @@ public class Game {
 			if (board[i][j] == 'x') {
 				Move interimMove = new Move(row, col, i, j);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if (Math.abs(targetKingRow - i) == Math.abs(targetKingColumn - j)){
-						quietMoves.add(0, interimMove);
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if (Math.abs(blackKingLocation[0] - i) == Math.abs(blackKingLocation[1] - j)){
+						middleMoves.add(interimMove);
 					}
 					else {quietMoves.add(interimMove);
 					}
 				}
 			}
-			else if (contains(opponentPieces, board[i][j])) {
+			else if (contains(blackPieces, board[i][j])) {
 				Move interimMove = new Move(row, col, i, j);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if (board[i][j] == 'Q' || board[i][j] == 'q') { 	
-						moves.add(0, interimMove);
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if (board[i][j] == 'q') { 	
+						moves.add(interimMove);
 					}
 					else {
-						moves.add(interimMove);
+						middleMoves.add(0, interimMove);
 					}
 				}
 			}
@@ -2138,23 +2262,23 @@ public class Game {
 			if (board[i][j] == 'x') {
 				Move interimMove = new Move(row, col, i, j);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if (Math.abs(targetKingRow - i) == Math.abs(targetKingColumn - j)){
-						quietMoves.add(0, interimMove);
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if (Math.abs(blackKingLocation[0] - i) == Math.abs(blackKingLocation[1] - j)){
+						middleMoves.add(interimMove);
 					}
 					else {quietMoves.add(interimMove);
 					}
 				}
 			}
-			else if (contains(opponentPieces, board[i][j])) {
+			else if (contains(blackPieces, board[i][j])) {
 				Move interimMove = new Move(row, col, i, j);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if (board[i][j] == 'Q' || board[i][j] == 'q') { 	
-						moves.add(0, interimMove);
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if (board[i][j] == 'q') { 	
+						moves.add(interimMove);
 					}
 					else {
-						moves.add(interimMove);
+						middleMoves.add(0, interimMove);
 					}
 				}
 			}
@@ -2167,23 +2291,23 @@ public class Game {
 			if (board[i][col] == 'x') {
 				Move interimMove = new Move(row, col, i, col);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if (targetKingRow == i || targetKingColumn == col){
-						quietMoves.add(0, interimMove);
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if (blackKingLocation[0] == i || blackKingLocation[1] == col){
+						middleMoves.add(interimMove);
 					}
-					else {quietMoves.add(interimMove);
+					else {quietMoves.add(0, interimMove);
 					}
 				}	
 			}
-			else if (contains(opponentPieces, board[i][col])) {
+			else if (contains(blackPieces, board[i][col])) {
 				Move interimMove = new Move(row, col, i, col);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if (board[i][col] == 'Q' || board[i][col] == 'q') { 	
-						moves.add(0, interimMove);
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if (board[i][col] == 'q') { 	
+						moves.add(interimMove);
 					}
 					else {
-						moves.add(interimMove);
+						middleMoves.add(0, interimMove);
 					}
 				}
 			}
@@ -2196,23 +2320,23 @@ public class Game {
 			if (board[i][col] == 'x') {
 				Move interimMove = new Move(row, col, i, col);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if (targetKingRow == i || targetKingColumn == col){
-						quietMoves.add(0, interimMove);
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if (blackKingLocation[0]== i || blackKingLocation[1] == col){
+						middleMoves.add(interimMove);
 					}
 					else {quietMoves.add(interimMove);
 					}
 				}
 			}
-			else if (contains(opponentPieces, board[i][col])) {
+			else if (contains(blackPieces, board[i][col])) {
 				Move interimMove = new Move(row, col, i, col);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if (board[i][col] == 'Q' || board[i][col] == 'q') { 	
-						moves.add(0, interimMove);
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if (board[i][col] == 'q') { 	
+						moves.add(interimMove);
 					}
 					else {
-						moves.add(interimMove);
+						middleMoves.add(0, interimMove);
 					}
 				}
 			}
@@ -2225,23 +2349,23 @@ public class Game {
 			if (board[row][i] == 'x') {
 				Move interimMove = new Move(row, col, row, i);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if (targetKingRow == i || targetKingColumn == col){
-						quietMoves.add(0, interimMove);
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if (blackKingLocation[0] == i || blackKingLocation[1] == col){
+						middleMoves.add(interimMove);
 					}
 					else {quietMoves.add(interimMove);
 					}
 				}
 			}
-			else if (contains(opponentPieces, board[row][i])) {
+			else if (contains(blackPieces, board[row][i])) {
 				Move interimMove = new Move(row, col, row, i);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if (board[row][i] == 'Q' || board[row][i] == 'q') { 	
-						moves.add(0, interimMove);
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if (board[row][i] == 'q') { 	
+						moves.add(interimMove);
 					}
 					else {
-						moves.add(interimMove);
+						middleMoves.add(0, interimMove);
 					}
 				}
 			}
@@ -2254,23 +2378,259 @@ public class Game {
 			if (board[row][i] == 'x') {
 				Move interimMove = new Move(row, col, row, i);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if (targetKingRow == i || targetKingColumn == col){
-						quietMoves.add(0, interimMove);
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if (blackKingLocation[0] == i || blackKingLocation[1] == col){
+						middleMoves.add(interimMove);
 					}
 					else {quietMoves.add(interimMove);
 					}
 				}
 			}
-			else if (contains(opponentPieces, board[row][i])) {
+			else if (contains(blackPieces, board[row][i])) {
 				Move interimMove = new Move(row, col, row, i);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if (board[row][i] == 'Q' || board[row][i] == 'q') { 	
-						moves.add(0, interimMove);
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if (board[row][i] == 'q') { 	
+						moves.add(interimMove);
 					}
 					else {
+						middleMoves.add(0, interimMove);
+					}
+				}
+			}	
+				
+			if (board[row][i] != 'x') {
+				break;
+			}
+		}
+	}
+	
+	private void generateBlackQueenMoves(int row, int col, ArrayList<Move> moves, ArrayList<Move> middleMoves, ArrayList<Move> quietMoves) {
+		// System.out.println("generateQueenMoves");
+		
+		for (int i = row + 1, j = col + 1; i <= 7 && j <= 7; i++, j++) {
+			if (board[i][j] == 'x') {
+				Move interimMove = new Move(row, col, i, j);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if (Math.abs(whiteKingLocation[0] - i) == Math.abs(whiteKingLocation[1] - j)){
+						middleMoves.add(interimMove);
+					}
+					else {quietMoves.add(interimMove);
+					}
+				}
+			}
+			else if (contains(whitePieces, board[i][j])) {
+				Move interimMove = new Move(row, col, i, j);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if (board[i][j] == 'Q') { 	
 						moves.add(interimMove);
+					}
+					else {
+						middleMoves.add(0, interimMove);
+					}
+				}
+			}
+			
+			if (board[i][j] != 'x') {
+				break;
+			}
+		}
+		for (int i = row + 1, j = col - 1; i <= 7 && j >= 0; i++, j--) {
+			if (board[i][j] == 'x') {
+				Move interimMove = new Move(row, col, i, j);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if (Math.abs(whiteKingLocation[0] - i) == Math.abs(whiteKingLocation[1] - j)){
+						middleMoves.add(interimMove);
+					}
+					else {quietMoves.add(interimMove);
+					}
+				}
+			}
+			else if (contains(whitePieces, board[i][j])) {
+				Move interimMove = new Move(row, col, i, j);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if (board[i][j] == 'Q') { 	
+						moves.add(interimMove);
+					}
+					else {
+						middleMoves.add(0, interimMove);
+					}
+				}
+			}
+			if (board[i][j] != 'x') {
+				break;
+			}
+		}
+		for (int i = row - 1, j = col + 1; i >= 0 && j <= 7; i--, j++) {
+			if (board[i][j] == 'x') {
+				Move interimMove = new Move(row, col, i, j);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if (Math.abs(whiteKingLocation[0] - i) == Math.abs(whiteKingLocation[1] - j)){
+						middleMoves.add(interimMove);
+					}
+					else {quietMoves.add(0, interimMove);
+					}
+				}
+			}
+			else if (contains(whitePieces, board[i][j])) {
+				Move interimMove = new Move(row, col, i, j);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if (board[i][j] == 'Q') { 	
+						moves.add(interimMove);
+					}
+					else {
+						middleMoves.add(0, interimMove);
+					}
+				}
+			}
+			
+			if (board[i][j] != 'x') {
+				break;
+			}
+		}
+		for (int i = row - 1, j = col - 1; i >= 0 && j >= 0; i--, j--) {
+			if (board[i][j] == 'x') {
+				Move interimMove = new Move(row, col, i, j);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if (Math.abs(whiteKingLocation[0] - i) == Math.abs(whiteKingLocation[1] - j)){
+						middleMoves.add(interimMove);
+					}
+					else {quietMoves.add(0, interimMove);
+					}
+				}
+			}
+			else if (contains(whitePieces, board[i][j])) {
+				Move interimMove = new Move(row, col, i, j);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if (board[i][j] == 'Q') { 	
+						moves.add(interimMove);
+					}
+					else {
+						middleMoves.add(0, interimMove);
+					}
+				}
+			}
+			
+			if (board[i][j] != 'x') {
+				break;
+			}
+		}
+		for (int i = row + 1; i <= 7; i++) {
+			if (board[i][col] == 'x') {
+				Move interimMove = new Move(row, col, i, col);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if (whiteKingLocation[0] == i || whiteKingLocation[1] == col){
+						middleMoves.add(interimMove);
+					}
+					else {quietMoves.add(interimMove);
+					}
+				}	
+			}
+			else if (contains(whitePieces, board[i][col])) {
+				Move interimMove = new Move(row, col, i, col);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if (board[i][col] == 'Q') { 	
+						moves.add(interimMove);
+					}
+					else {
+						middleMoves.add(0, interimMove);
+					}
+				}
+			}
+			
+			if (board[i][col] != 'x') {
+				break;
+			}
+		}
+		for (int i = row - 1; i >= 0; i--) {
+			if (board[i][col] == 'x') {
+				Move interimMove = new Move(row, col, i, col);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if (whiteKingLocation[0] == i || whiteKingLocation[1] == col){
+						middleMoves.add(interimMove);
+					}
+					else {quietMoves.add(interimMove);
+					}
+				}
+			}
+			else if (contains(whitePieces, board[i][col])) {
+				Move interimMove = new Move(row, col, i, col);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if (board[i][col] == 'Q') { 	
+						moves.add(interimMove);
+					}
+					else {
+						middleMoves.add(0, interimMove);
+					}
+				}
+			}
+		
+			if (board[i][col] != 'x') {
+				break;
+			}
+		}
+		for (int i = col + 1; i <= 7; i++) {
+			if (board[row][i] == 'x') {
+				Move interimMove = new Move(row, col, row, i);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if (whiteKingLocation[0] == i || whiteKingLocation[1] == col){
+						middleMoves.add(interimMove);
+					}
+					else {quietMoves.add(interimMove);
+					}
+				}
+			}
+			else if (contains(whitePieces, board[row][i])) {
+				Move interimMove = new Move(row, col, row, i);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if (board[row][i] == 'Q') { 	
+						moves.add(interimMove);
+					}
+					else {
+						middleMoves.add(0, interimMove);
+					}
+				}
+			}
+			
+			if (board[row][i] != 'x') {
+				break;
+			}
+		}
+		for (int i = col - 1; i >= 0; i--) {
+			if (board[row][i] == 'x') {
+				Move interimMove = new Move(row, col, row, i);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if (whiteKingLocation[0] == i || whiteKingLocation[1] == col){
+						middleMoves.add(interimMove);
+					}
+					else {quietMoves.add(interimMove);
+					}
+				}
+			}
+			else if (contains(whitePieces, board[row][i])) {
+				Move interimMove = new Move(row, col, row, i);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if (board[row][i] == 'Q') { 	
+						moves.add(interimMove);
+					}
+					else {
+						middleMoves.add(0, interimMove);
 					}
 				}
 			}	
@@ -2282,7 +2642,7 @@ public class Game {
 	}
 
 	private void findQueenCaptures(int row, int col, char[] opponentPieces, ArrayList<Move> moves) {
-
+		
 		for (int i = row + 1; i <= 7; i++) {
 			if (contains(opponentPieces, board[i][col])) {
 				Move interimMove = new Move(row, col, i, col);
@@ -2517,38 +2877,32 @@ public class Game {
 		}
 	}
 
-	private void generateKnightMoves(int row, int col, char[] opponentPieces, ArrayList<Move> moves, ArrayList<Move> quietMoves) {
+	private void generateWhiteKnightMoves(int row, int col, ArrayList<Move> moves, ArrayList<Move> middleMoves, ArrayList<Move> quietMoves) {
 		// System.out.println("generateKnightMoves");
-		int kingRow = 0; int kingColumn = 0; int targetKingRow = 0; int targetKingColumn = 0;
-		if (sideToMove == 'w'){
-			kingRow = whiteKingLocation[0]; kingColumn = whiteKingLocation[1];
-			targetKingRow = blackKingLocation[0]; targetKingColumn = blackKingLocation[1];
-		}
-		else {
-			kingRow = blackKingLocation[0]; kingColumn = blackKingLocation[1];
-			targetKingRow = whiteKingLocation[0]; targetKingColumn = whiteKingLocation[1];
-		}
 		if (row + 2 <= 7 && col + 1 <= 7) {
 			if (board[row + 2][col + 1] == 'x') {
 				Move interimMove = new Move(row, col, row + 2, col + 1);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if ((Math.abs((row + 2) - targetKingRow) == 2 && Math.abs((col+1) - targetKingColumn) == 1) 
-					|| (Math.abs((row + 2) - targetKingRow) == 1 && Math.abs((col+1) - targetKingColumn) == 2)){	
-						quietMoves.add(0, interimMove);
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if ((Math.abs((row + 2) - blackKingLocation[0]) == 2 && Math.abs((col+1) - blackKingLocation[1]) == 1) 
+					|| (Math.abs((row + 2) - blackKingLocation[0]) == 1 && Math.abs((col+1) - blackKingLocation[1]) == 2)){	
+						middleMoves.add(interimMove);
 					}	
-					else {quietMoves.add(interimMove);}
+					else {quietMoves.add(0, interimMove);}
 				}
 			}
-			else if (contains(opponentPieces, board[row + 2][col + 1])) {
+			else if (contains(blackPieces, board[row + 2][col + 1])) {
 				Move interimMove = new Move(row, col, row + 2, col + 1);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if (board[row+2][col+1] != 'P' && board[row+2][col+1] != 'p') { 	
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if (board[row+2][col+1] == 'r' || board[row+2][col+1] == 'q') { 	
 						moves.add(0, interimMove);
 					}
-					else {
+					else if (board[row+2][col+1] == 'b' || board[row+2][col+1] == 'n') { 
 						moves.add(interimMove);
+					}
+					else {
+						middleMoves.add(0, interimMove);
 					}
 				}
 			}	
@@ -2557,23 +2911,26 @@ public class Game {
 			if (board[row + 2][col - 1] == 'x') {
 				Move interimMove = new Move(row, col, row + 2, col - 1);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if ((Math.abs((row + 2) - targetKingRow) == 2 && Math.abs((col-1) - targetKingColumn) == 1) 
-					|| (Math.abs((row + 2) - targetKingRow) == 1 && Math.abs((col-1) - targetKingColumn) == 2)){	
-						quietMoves.add(0, interimMove);
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if ((Math.abs((row + 2) - blackKingLocation[0]) == 2 && Math.abs((col-1) - blackKingLocation[1]) == 1) 
+					|| (Math.abs((row + 2) - blackKingLocation[0]) == 1 && Math.abs((col-1) - blackKingLocation[1]) == 2)){	
+						middleMoves.add(interimMove);
 					}	
-					else {quietMoves.add(interimMove);}
+					else {quietMoves.add(0, interimMove);}
 					}
 			}
-			else if (contains(opponentPieces, board[row + 2][col - 1])) {
+			else if (contains(blackPieces, board[row + 2][col - 1])) {
 				Move interimMove = new Move(row, col, row + 2, col - 1);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if (board[row+2][col-1] != 'P' && board[row+2][col-1] != 'p') { 	
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if (board[row+2][col-1] == 'r' || board[row+2][col-1] == 'q') { 	
 						moves.add(0, interimMove);
 					}
-					else {
+					else if (board[row+2][col-1] == 'b' || board[row+2][col-1] == 'n') { 
 						moves.add(interimMove);
+					}
+					else {
+						middleMoves.add(0, interimMove);
 					}
 				}	
 			}	
@@ -2582,23 +2939,26 @@ public class Game {
 			if (board[row + 1][col + 2] == 'x') {
 				Move interimMove = new Move(row, col, row + 1, col + 2);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if ((Math.abs((row + 1) - targetKingRow) == 2 && Math.abs((col+2) - targetKingColumn) == 1) 
-					|| (Math.abs((row + 1) - targetKingRow) == 1 && Math.abs((col+2) - targetKingColumn) == 2)){	
-						quietMoves.add(0, interimMove);
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if ((Math.abs((row + 1) - blackKingLocation[0]) == 2 && Math.abs((col+2) - blackKingLocation[1]) == 1) 
+					|| (Math.abs((row + 1) - blackKingLocation[0]) == 1 && Math.abs((col+2) - blackKingLocation[1]) == 2)){	
+						middleMoves.add(interimMove);
 					}	
 					else {quietMoves.add(interimMove);}
 					}
 			}
-			else if (contains(opponentPieces, board[row + 1][col + 2])) {
+			else if (contains(blackPieces, board[row + 1][col + 2])) {
 				Move interimMove = new Move(row, col, row + 1, col + 2);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if (board[row+1][col+2] != 'P' && board[row+1][col+2] != 'p') { 	
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if (board[row+1][col+2] == 'r' || board[row+1][col+2] == 'q') { 	
 						moves.add(0, interimMove);
 					}
-					else {
+					else if (board[row+1][col+2] == 'b' || board[row+1][col+2] == 'n') { 
 						moves.add(interimMove);
+					}
+					else {
+						middleMoves.add(0, interimMove);
 					}
 				}
 			}	
@@ -2607,23 +2967,26 @@ public class Game {
 			if (board[row + 1][col - 2] == 'x') {
 				Move interimMove = new Move(row, col, row + 1, col - 2);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if ((Math.abs((row + 1) - targetKingRow) == 2 && Math.abs((col-2) - targetKingColumn) == 1) 
-					|| (Math.abs((row + 1) - targetKingRow) == 1 && Math.abs((col-2) - targetKingColumn) == 2)){	
-						quietMoves.add(0, interimMove);
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if ((Math.abs((row + 1) - blackKingLocation[0]) == 2 && Math.abs((col-2) - blackKingLocation[1]) == 1) 
+					|| (Math.abs((row + 1) - blackKingLocation[0]) == 1 && Math.abs((col-2) - blackKingLocation[1]) == 2)){	
+						middleMoves.add(interimMove);
 					}	
 					else {quietMoves.add(interimMove);}
 					}
 			}
-			else if (contains(opponentPieces, board[row + 1][col - 2])) {
+			else if (contains(blackPieces, board[row + 1][col - 2])) {
 				Move interimMove = new Move(row, col, row + 1, col - 2);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if (board[row+1][col-2] != 'P' && board[row+1][col-2] != 'p') { 	
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if (board[row + 1][col - 2] == 'r' || board[row + 1][col - 2] == 'q') { 	
 						moves.add(0, interimMove);
 					}
-					else {
+					else if (board[row + 1][col - 2] == 'b' || board[row + 1][col - 2] == 'n') { 
 						moves.add(interimMove);
+					}
+					else {
+						middleMoves.add(0, interimMove);
 					}
 				}
 			}	
@@ -2632,23 +2995,26 @@ public class Game {
 			if (board[row - 1][col + 2] == 'x') {
 				Move interimMove = new Move(row, col, row - 1, col + 2);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if ((Math.abs((row - 1) - targetKingRow) == 2 && Math.abs((col+2) - targetKingColumn) == 1) 
-					|| (Math.abs((row - 1) - targetKingRow) == 1 && Math.abs((col+2) - targetKingColumn) == 2)){	
-						quietMoves.add(0, interimMove);
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if ((Math.abs((row - 1) - blackKingLocation[0]) == 2 && Math.abs((col+2) - blackKingLocation[1]) == 1) 
+					|| (Math.abs((row - 1) - blackKingLocation[0]) == 1 && Math.abs((col+2) - blackKingLocation[1]) == 2)){	
+						middleMoves.add(interimMove);
 					}	
 					else {quietMoves.add(interimMove);}
 					}
 			}
-			else if (contains(opponentPieces, board[row - 1][col + 2])) {
+			else if (contains(blackPieces, board[row - 1][col + 2])) {
 				Move interimMove = new Move(row, col, row - 1, col + 2);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if (board[row-1][col+2] != 'P' && board[row-1][col+2] != 'p') { 	
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if (board[row - 1][col + 2] == 'r' || board[row - 1][col + 2] == 'q') { 	
 						moves.add(0, interimMove);
 					}
-					else {
+					else if (board[row - 1][col + 2] == 'b' || board[row - 1][col + 2] == 'n') { 
 						moves.add(interimMove);
+					}
+					else {
+						middleMoves.add(0, interimMove);
 					}
 				}
 			}
@@ -2658,23 +3024,26 @@ public class Game {
 			if (board[row - 1][col - 2] == 'x') {
 				Move interimMove = new Move(row, col, row -1, col - 2);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if ((Math.abs((row - 1) - targetKingRow) == 2 && Math.abs((col-2) - targetKingColumn) == 1) 
-					|| (Math.abs((row - 1) - targetKingRow) == 1 && Math.abs((col-2) - targetKingColumn) == 2)){	
-						quietMoves.add(0, interimMove);
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false){
+					if ((Math.abs((row - 1) - blackKingLocation[0]) == 2 && Math.abs((col-2) - blackKingLocation[1]) == 1) 
+					|| (Math.abs((row - 1) - blackKingLocation[0]) == 1 && Math.abs((col-2) - blackKingLocation[1]) == 2)){	
+						middleMoves.add(interimMove);
 					}	
 					else {quietMoves.add(interimMove);}
 					}
 			}
-			else if (contains(opponentPieces, board[row - 1][col - 2])) {
+			else if (contains(blackPieces, board[row - 1][col - 2])) {
 				Move interimMove = new Move(row, col, row - 1, col - 2);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if (board[row-1][col-2] != 'P' && board[row-1][col-2] != 'p') { 	
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if (board[row - 1][col - 2] == 'r' || board[row - 1][col - 2] == 'q') { 	
 						moves.add(0, interimMove);
 					}
-					else {
+					else if (board[row - 1][col - 2] == 'b' || board[row - 1][col - 2] == 'n') { 
 						moves.add(interimMove);
+					}
+					else {
+						middleMoves.add(0, interimMove);
 					}
 				}
 			}	
@@ -2683,23 +3052,26 @@ public class Game {
 			if (board[row - 2][col + 1] == 'x') {
 				Move interimMove = new Move(row, col, row - 2, col + 1);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if ((Math.abs((row - 2) - targetKingRow) == 2 && Math.abs((col+1) - targetKingColumn) == 1) 
-					|| (Math.abs((row - 2) - targetKingRow) == 1 && Math.abs((col+1) - targetKingColumn) == 2)){	
-						quietMoves.add(0, interimMove);
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if ((Math.abs((row - 2) - blackKingLocation[0]) == 2 && Math.abs((col+1) - blackKingLocation[1]) == 1) 
+					|| (Math.abs((row - 2) - blackKingLocation[0]) == 1 && Math.abs((col+1) - blackKingLocation[1]) == 2)){	
+						middleMoves.add(interimMove);
 					}	
 					else {quietMoves.add(interimMove);}
 					}
 			}
-			else if (contains(opponentPieces, board[row - 2][col + 1])) {
+			else if (contains(blackPieces, board[row-2][col+1])) {
 				Move interimMove = new Move(row, col, row - 2, col + 1);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if (board[row-2][col+1] != 'P' && board[row-2][col+1] != 'p') { 	
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if (board[row-2][col+1] == 'r' || board[row-2][col+1] == 'q') { 	
 						moves.add(0, interimMove);
 					}
-					else {
+					else if (board[row-2][col+1] == 'b' || board[row-2][col+1] == 'n') { 
 						moves.add(interimMove);
+					}
+					else {
+						middleMoves.add(0, interimMove);
 					}
 				}
 			}	
@@ -2708,23 +3080,255 @@ public class Game {
 			if (board[row - 2][col - 1] == 'x') {
 				Move interimMove = new Move(row, col, row - 2, col - 1);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if ((Math.abs((row - 2) - targetKingRow) == 2 && Math.abs((col-1) - targetKingColumn) == 1) 
-					|| (Math.abs((row - 2) - targetKingRow) == 1 && Math.abs((col-1) - targetKingColumn) == 2)){	
-						quietMoves.add(0, interimMove);
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if ((Math.abs((row - 2) - blackKingLocation[0]) == 2 && Math.abs((col-1) - blackKingLocation[1]) == 1) 
+					|| (Math.abs((row - 2) - blackKingLocation[0]) == 1 && Math.abs((col-1) - blackKingLocation[1]) == 2)){	
+						middleMoves.add(interimMove);
 					}	
 					else {quietMoves.add(interimMove);}
 					}
 			}
-			else if (contains(opponentPieces, board[row - 2][col - 1])) {
+			else if (contains(blackPieces, board[row-2][col-1])) {
 				Move interimMove = new Move(row, col, row - 2, col - 1);
 				Game nextPosition = new Game(this, interimMove);
-				if (nextPosition.isKingInCheck(kingRow, kingColumn, sideToMove) == false) {
-					if (board[row-2][col-1] != 'P' && board[row-2][col-1] != 'p') { 	
+				if (nextPosition.isWhiteKingInCheck(whiteKingLocation[0], whiteKingLocation[1]) == false) {
+					if (board[row-2][col-1] == 'r' || board[row-2][col-1] == 'q') { 	
 						moves.add(0, interimMove);
 					}
-					else {
+					else if (board[row-2][col-1] == 'b' || board[row-2][col-1] == 'n') { 
 						moves.add(interimMove);
+					}
+					else {
+						middleMoves.add(0, interimMove);
+					}
+				}
+			}	
+		}
+	}
+	
+	private void generateBlackKnightMoves(int row, int col, ArrayList<Move> moves, ArrayList<Move> middleMoves, ArrayList<Move> quietMoves) {
+		// System.out.println("generateKnightMoves");
+		if (row + 2 <= 7 && col + 1 <= 7) {
+			if (board[row + 2][col + 1] == 'x') {
+				Move interimMove = new Move(row, col, row + 2, col + 1);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if ((Math.abs((row + 2) - whiteKingLocation[0]) == 2 && Math.abs((col+1) - whiteKingLocation[1]) == 1) 
+					|| (Math.abs((row + 2) - whiteKingLocation[0]) == 1 && Math.abs((col+1) - whiteKingLocation[1]) == 2)){	
+						middleMoves.add(interimMove);
+					}	
+					else {quietMoves.add(interimMove);}
+				}
+			}
+			else if (contains(whitePieces, board[row + 2][col + 1])) {
+				Move interimMove = new Move(row, col, row + 2, col + 1);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if (board[row+2][col+1] == 'R' ||  board[row+2][col+1] == 'Q') { 	
+						moves.add(0, interimMove);
+					}
+					else if (board[row+2][col+1] == 'B' || board[row+2][col+1] == 'N') { 
+						moves.add(interimMove);
+					}
+					else {
+						middleMoves.add(0, interimMove);
+					}
+				}
+			}	
+		}
+		if (row + 2 <= 7 && col - 1 >= 0) {
+			if (board[row + 2][col - 1] == 'x') {
+				Move interimMove = new Move(row, col, row + 2, col - 1);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if ((Math.abs((row + 2) - whiteKingLocation[0]) == 2 && Math.abs((col-1) - whiteKingLocation[1]) == 1) 
+					|| (Math.abs((row + 2) - whiteKingLocation[0]) == 1 && Math.abs((col-1) - whiteKingLocation[1]) == 2)){	
+						middleMoves.add(interimMove);
+					}	
+					else {quietMoves.add(interimMove);}
+					}
+			}
+			else if (contains(whitePieces, board[row + 2][col - 1])) {
+				Move interimMove = new Move(row, col, row + 2, col - 1);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if (board[row+2][col-1] == 'R' || board[row+2][col-1] == 'Q') { 	
+						moves.add(0, interimMove);
+					}
+					else if (board[row+2][col-1] == 'B' ||  board[row+2][col-1] == 'N') { 
+						moves.add(interimMove);
+					}
+					else {
+						middleMoves.add(0, interimMove);
+					}
+				}	
+			}	
+		}
+		if (row + 1 <= 7 && col + 2 <= 7) {
+			if (board[row + 1][col + 2] == 'x') {
+				Move interimMove = new Move(row, col, row + 1, col + 2);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if ((Math.abs((row + 1) - whiteKingLocation[0]) == 2 && Math.abs((col+2) - whiteKingLocation[1]) == 1) 
+					|| (Math.abs((row + 1) - whiteKingLocation[0]) == 1 && Math.abs((col+2) - whiteKingLocation[1]) == 2)){	
+						middleMoves.add(interimMove);
+					}	
+					else {quietMoves.add(interimMove);}
+					}
+			}
+			else if (contains(whitePieces, board[row + 1][col + 2])) {
+				Move interimMove = new Move(row, col, row + 1, col + 2);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if (board[row+1][col+2] == 'R' || board[row+1][col+2] == 'Q') { 	
+						moves.add(0, interimMove);
+					}
+					else if (board[row+1][col+2] == 'B' || board[row+1][col+2] == 'N') { 
+						moves.add(interimMove);
+					}
+					else {
+						middleMoves.add(0, interimMove);
+					}
+				}
+			}	
+		}
+		if (row + 1 <= 7 && col - 2 >= 0) {
+			if (board[row + 1][col - 2] == 'x') {
+				Move interimMove = new Move(row, col, row + 1, col - 2);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if ((Math.abs((row + 1) - whiteKingLocation[0]) == 2 && Math.abs((col-2) - whiteKingLocation[1]) == 1) 
+					|| (Math.abs((row + 1) - whiteKingLocation[0]) == 1 && Math.abs((col-2) - whiteKingLocation[1]) == 2)){	
+						middleMoves.add(interimMove);
+					}	
+					else {quietMoves.add(interimMove);}
+					}
+			}
+			else if (contains(whitePieces, board[row + 1][col - 2])) {
+				Move interimMove = new Move(row, col, row + 1, col - 2);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if (board[row + 1][col - 2] == 'R' || board[row + 1][col - 2] == 'Q') { 	
+						moves.add(0, interimMove);
+					}
+					else if (board[row + 1][col - 2] == 'B' || board[row + 1][col - 2] == 'N') { 
+						moves.add(interimMove);
+					}
+					else {
+						middleMoves.add(0, interimMove);
+					}
+				}
+			}	
+		}
+		if (row - 1 >= 0 && col + 2 <= 7) {
+			if (board[row - 1][col + 2] == 'x') {
+				Move interimMove = new Move(row, col, row - 1, col + 2);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if ((Math.abs((row - 1) - whiteKingLocation[0]) == 2 && Math.abs((col+2) - whiteKingLocation[1]) == 1) 
+					|| (Math.abs((row - 1) - whiteKingLocation[0]) == 1 && Math.abs((col+2) - whiteKingLocation[1]) == 2)){	
+						middleMoves.add(interimMove);
+					}	
+					else {quietMoves.add(0, interimMove);}
+					}
+			}
+			else if (contains(whitePieces, board[row - 1][col + 2])) {
+				Move interimMove = new Move(row, col, row - 1, col + 2);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if (board[row - 1][col + 2] == 'R' || board[row - 1][col + 2] == 'Q') { 	
+						moves.add(0, interimMove);
+					}
+					else if (board[row - 1][col + 2] == 'B' || board[row - 1][col + 2] == 'N') { 
+						moves.add(interimMove);
+					}
+					else {
+						middleMoves.add(0, interimMove);
+					}
+				}
+			}
+			
+		}
+		if (row - 1 >= 0 && col - 2 >= 0) {
+			if (board[row - 1][col - 2] == 'x') {
+				Move interimMove = new Move(row, col, row -1, col - 2);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if ((Math.abs((row - 1) - whiteKingLocation[0]) == 2 && Math.abs((col-2) - whiteKingLocation[1]) == 1) 
+					|| (Math.abs((row - 1) - whiteKingLocation[0]) == 1 && Math.abs((col-2) - whiteKingLocation[1]) == 2)){	
+						middleMoves.add(interimMove);
+					}	
+					else {quietMoves.add(0, interimMove);}
+					}
+			}
+			else if (contains(whitePieces, board[row - 1][col - 2])) {
+				Move interimMove = new Move(row, col, row - 1, col - 2);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if (board[row - 1][col - 2] == 'R' || board[row - 1][col - 2] == 'Q') { 	
+						moves.add(0, interimMove);
+					}
+					else if (board[row - 1][col - 2] == 'B' || board[row - 1][col - 2] == 'N') { 
+						moves.add(interimMove);
+					}
+					else {
+						middleMoves.add(0, interimMove);
+					}
+				}
+			}	
+		}
+		if (row - 2 >= 0 && col + 1 <= 7) {
+			if (board[row - 2][col + 1] == 'x') {
+				Move interimMove = new Move(row, col, row - 2, col + 1);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if ((Math.abs((row - 2) - whiteKingLocation[0]) == 2 && Math.abs((col+1) - whiteKingLocation[1]) == 1) 
+					|| (Math.abs((row - 2) - whiteKingLocation[0]) == 1 && Math.abs((col+1) - whiteKingLocation[1]) == 2)){	
+						middleMoves.add(interimMove);
+					}	
+					else {quietMoves.add(0, interimMove);}
+					}
+			}
+			else if (contains(whitePieces, board[row-2][col+1])) {
+				Move interimMove = new Move(row, col, row - 2, col + 1);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if (board[row-2][col+1] == 'R' || board[row-2][col+1] == 'Q') { 	
+						moves.add(0, interimMove);
+					}
+					else if (board[row-2][col+1] == 'B' || board[row-2][col+1] == 'N') { 
+						moves.add(interimMove);
+					}
+					else {
+						middleMoves.add(0, interimMove);
+					}
+				}
+			}	
+		}
+		if (row - 2 >= 0 && col - 1 >= 0) {
+			if (board[row - 2][col - 1] == 'x') {
+				Move interimMove = new Move(row, col, row - 2, col - 1);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if ((Math.abs((row - 2) - whiteKingLocation[0]) == 2 && Math.abs((col-1) - whiteKingLocation[1]) == 1) 
+					|| (Math.abs((row - 2) - whiteKingLocation[0]) == 1 && Math.abs((col-1) - whiteKingLocation[1]) == 2)){	
+						middleMoves.add(interimMove);
+					}	
+					else {quietMoves.add(0, interimMove);}
+					}
+			}
+			else if (contains(whitePieces, board[row-2][col-1])) {
+				Move interimMove = new Move(row, col, row - 2, col - 1);
+				Game nextPosition = new Game(this, interimMove);
+				if (nextPosition.isBlackKingInCheck(blackKingLocation[0], blackKingLocation[1]) == false) {
+					if (board[row-2][col-1] == 'R' || board[row-2][col-1] == 'Q') { 	
+						moves.add(0, interimMove);
+					}
+					else if (board[row-2][col-1] == 'B' || board[row-2][col-1] == 'N') { 
+						moves.add(interimMove);
+					}
+					else {
+						middleMoves.add(0, interimMove);
 					}
 				}
 			}	
