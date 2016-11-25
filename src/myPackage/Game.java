@@ -414,6 +414,10 @@ public class Game {
 					}*/
 						
 					//Encourage pawn pushing in endgame
+					if (Math.abs(i - blackKingLocation[0]) <= 2 && Math.abs(j - blackKingLocation[1]) <= 2 && whiteMaterialScore > 1600 ){
+						{blackKingSafety = blackKingSafety - 20;}
+					}	
+					
 					if (blackMaterialScore < 2300){
 						//passed pawns
 						boolean whitePassedPawn = true;
@@ -499,6 +503,10 @@ public class Game {
 						if (blackBackwardPawn == true && i >=3 && board[i-1][j] != 'P' && ((j+1<=7 && board[i-2][j+1] == 'P') || (j-1>=0 && board[i-2][j-1] == 'P'))){
 							blackPawnStructure = blackPawnStructure - 10;
 						}}*/
+					if (Math.abs(i - whiteKingLocation[0]) <= 2 && Math.abs(j - whiteKingLocation[1]) <= 2 && whiteMaterialScore > 1600 ){
+						{whiteKingSafety = whiteKingSafety - 20;}
+					}	
+						
 					}
 					if (whiteMaterialScore < 2300){
 						boolean blackPassedPawn = true;
@@ -610,6 +618,9 @@ public class Game {
 							whiteBishopActivity = whiteBishopActivity - 10;
 							if (j < 5){whiteBishopActivity = whiteBishopActivity - 10;}	
 						}
+						if (Math.abs(i - blackKingLocation[0]) <= 2 && Math.abs(j - blackKingLocation[1]) <= 2 && whiteMaterialScore > 1600 ){
+							{blackKingSafety = blackKingSafety - 20;}
+						}
 				}
 				else if (board[i][j] == 'R') {
 					boolean friendlyOpenFile = true;
@@ -626,14 +637,18 @@ public class Game {
 					if (friendlyOpenFile == true) {
 						whiteRookActivity = whiteRookActivity + 15;
 						if (enemyOpenFile == true) {whiteRookActivity = whiteRookActivity + 15;}
-						if (j<=2 && blackKingLocation[1] <= 3){
-							whiteAttackingPieces = whiteAttackingPieces + 1;
-							blackKingSafety = blackKingSafety - 20;
+						if (whiteMaterialScore > 1600){ 
+							if (j<=2 && blackKingLocation[1] <= 3){
+								whiteAttackingPieces = whiteAttackingPieces + 1;
+								blackKingSafety = blackKingSafety - 20;
+								if (enemyOpenFile == true) {blackKingSafety = blackKingSafety - 20;}
 							}
-						else if (j>=5 && blackKingLocation[1] >= 5){
-							whiteAttackingPieces = whiteAttackingPieces + 1;
-							blackKingSafety = blackKingSafety - 20;
+							else if (j>=5 && blackKingLocation[1] >= 5){
+								whiteAttackingPieces = whiteAttackingPieces + 1;
+								blackKingSafety = blackKingSafety - 20;
+								if (enemyOpenFile == true) {blackKingSafety = blackKingSafety - 20;}
 							}
+						}
 					}	
 					if (i==6){whiteRookActivity = whiteRookActivity + 20;}
 				}
@@ -645,8 +660,11 @@ public class Game {
 					if(j==0 || j==7){ whiteKnightActivity = whiteKnightActivity - 10;}
 					else if(j==1 || j==6){ whiteKnightActivity = whiteKnightActivity - 5;}
 					
-					if (Math.abs(i - blackKingLocation[0]) <= 3 && Math.abs(j - blackKingLocation[1]) <= 2){
+					if (Math.abs(i - blackKingLocation[0]) <= 4 && Math.abs(j - blackKingLocation[1]) <= 3 && whiteMaterialScore > 1600){
 						whiteAttackingPieces = whiteAttackingPieces + 1;
+						if (Math.abs(i - blackKingLocation[0]) <= 3 && Math.abs(j - blackKingLocation[1]) <= 2){
+							{blackKingSafety = blackKingSafety - 20;}
+						}
 					} 
 					
 					if (Math.abs(i - whiteKingLocation[0]) <= 4 && Math.abs(j - whiteKingLocation[1]) <= 2){
@@ -692,6 +710,10 @@ public class Game {
 					// is queen defending king?
 					if (j<=3 && whiteKingLocation[1] <= 3){whiteDefendingPieces = whiteDefendingPieces + 1;}
 					else if (j>=4 && whiteKingLocation[1] >= 5){whiteDefendingPieces = whiteDefendingPieces + 1;} 
+					
+					if (Math.abs(i - blackKingLocation[0]) <= 2 && Math.abs(j - blackKingLocation[1]) <= 2 && whiteMaterialScore > 1600 ){
+						{blackKingSafety = blackKingSafety - 40;}
+					}
 				}	
 				else if (board[i][j] == 'b') {
 					int bishopMoves = 0;
@@ -746,6 +768,10 @@ public class Game {
 					
 					if (j<=3 && blackKingLocation[1] <= 3){blackDefendingPieces = blackDefendingPieces + 1;}
 					else if (j>=4 && blackKingLocation[1] >= 5){blackDefendingPieces = blackDefendingPieces + 1;}
+					
+					if (Math.abs(i - whiteKingLocation[0]) <= 2 && Math.abs(j - whiteKingLocation[1]) <= 2 && whiteMaterialScore > 1600 ){
+						{whiteKingSafety = whiteKingSafety - 20;}
+					}
 						
 					//avoid trapped bishop
 					if (i == 1 && j == 7 && board[2][6] == 'P' && board[1][5] == 'P') {
@@ -777,13 +803,17 @@ public class Game {
 					if (friendlyOpenFile == true) {
 						blackRookActivity = blackRookActivity + 15;
 						if (enemyOpenFile == true) {blackRookActivity = blackRookActivity + 15;}
-						if (j<=2 && whiteKingLocation[1] <= 3){
-							blackAttackingPieces = blackAttackingPieces + 1;
-							whiteKingSafety = whiteKingSafety - 20;
-						}
-						if (j>=5 && whiteKingLocation[1] >= 5){
-							blackAttackingPieces = blackAttackingPieces + 1;
-							whiteKingSafety = whiteKingSafety - 20;
+						if (blackMaterialScore > 1600){
+							if (j<=2 && whiteKingLocation[1] <= 3){
+								blackAttackingPieces = blackAttackingPieces + 1;
+								whiteKingSafety = whiteKingSafety - 20;
+								if (enemyOpenFile == true) {whiteKingSafety = whiteKingSafety - 20;}
+							}
+							else if (j>=5 && whiteKingLocation[1] >= 5){
+								blackAttackingPieces = blackAttackingPieces + 1;
+								whiteKingSafety = whiteKingSafety - 20;
+								if (enemyOpenFile == true) {whiteKingSafety = whiteKingSafety - 20;}
+							}
 						}
 					}	
 					if (i==1){blackRookActivity = blackRookActivity + 20;}
@@ -797,8 +827,11 @@ public class Game {
 					else if(j==1 || j==6){ blackKnightActivity = blackKnightActivity - 5;}
 					
 					//is knight attacking king?
-					if (Math.abs(i - whiteKingLocation[0]) <= 3 && Math.abs(j - whiteKingLocation[1]) <= 2){
+					if (Math.abs(i - whiteKingLocation[0]) <= 4 && Math.abs(j - whiteKingLocation[1]) <= 3 && blackMaterialScore > 1600){
 						blackAttackingPieces = blackAttackingPieces + 1;
+						if (Math.abs(i - whiteKingLocation[0]) <= 3 && Math.abs(j - whiteKingLocation[1]) <= 2){
+							{whiteKingSafety = whiteKingSafety - 20;}
+						}
 					} 
 					//is knight defending king?
 					if (Math.abs(i - blackKingLocation[0]) <= 4 && Math.abs(j - blackKingLocation[1]) <= 2){
@@ -840,6 +873,11 @@ public class Game {
 					//is queen attacking king?
 					if (j<=2 && i<=5 && whiteKingLocation[1] <= 3){blackAttackingPieces = blackAttackingPieces + 1;}
 					else if (j>=5 && i<=5 && whiteKingLocation[1] >= 5){blackAttackingPieces = blackAttackingPieces + 1;} 
+					
+					if (Math.abs(i - whiteKingLocation[0]) <= 2 && Math.abs(j - whiteKingLocation[1]) <= 2 && whiteMaterialScore > 1600 ){
+						{whiteKingSafety = whiteKingSafety - 40;}
+					}
+					
 					// is queen defending king?
 					if (j<=3 && blackKingLocation[1] <= 3){blackDefendingPieces = blackDefendingPieces + 1;}
 					else if (j>=4 && blackKingLocation[1] >= 5){blackDefendingPieces = blackDefendingPieces + 1;}

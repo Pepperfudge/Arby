@@ -56,17 +56,18 @@ public class UCI {
 	}
 	
 	public static String findMove(){
-		/*if (num_moves == 0 || num_moves == 1){
-			ArrayList<Move> possibleMoves = currGame.generateLegalMoves();
+		if (num_moves == 0){
+			ArrayList<Move> possibleMoves = new ArrayList<>();
+			possibleMoves.add(new Move(1, 3, 3, 3)); possibleMoves.add(new Move(1, 4, 3, 4)); possibleMoves.add(new Move(1, 5, 3, 5)); possibleMoves.add(new Move(0, 1, 2, 2));
 			int rnd = new Random().nextInt(possibleMoves.size());
 			Move nextMove =  possibleMoves.get(rnd);
 			return nextMove.convertToUCIFormat();
-		}*/
-		if (num_moves <=49){
+		}
+		else if (num_moves <=69){
 			return negaMax.findBestMove(currGame, DEPTH).convertToUCIFormat();
 			}
-		else if (num_moves <=79){return negaMax.findBestMove(currGame, DEPTH+1).convertToUCIFormat();}
-		else if (num_moves <=109){return negaMax.findBestMove(currGame, DEPTH+2).convertToUCIFormat();}
+		else if (num_moves <=99){return negaMax.findBestMove(currGame, DEPTH+1).convertToUCIFormat();}
+		else if (num_moves <=129){return negaMax.findBestMove(currGame, DEPTH+2).convertToUCIFormat();}
 		else {return negaMax.findBestMove(currGame, DEPTH+3).convertToUCIFormat();}
 	}
 
