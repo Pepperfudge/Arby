@@ -111,11 +111,30 @@ public final class NegaMax {
 		}
 		ArrayList<Move> captures = position.findCaptures();
 
+		
 		int maxValue = CHECKMATE_VALUE;
+		Move lastBestCapture = pastSearches.get(position);
+
 		Move bestCapture = null;
+		if (lastBestCapture != null ){
+			int row = lastBestCapture.newRow;
+			int col = lastBestCapture.newColumn;
+			if (position.getPieceAt(row, col) != 'x'){
+				Game newPosition = new Game(position, lastBestCapture);
+				maxValue = -quiesce(newPosition, -beta, -alpha);
+				if (maxValue > beta) {
+					return maxValue;
+				}
+				bestCapture = lastBestCapture;
+			} 
+		}
+		
 		for (int i = 0; i < captures.size(); i++) {
 			// for (int i = 0; i < captures.size(); i++){
 			Move capture = captures.get(i);
+			if (capture.equals(lastBestCapture)){
+				continue;
+			}
 			// Move capture = captures.get(
 			// (new Random()).nextInt(captures.size()));
 			
@@ -144,7 +163,7 @@ public final class NegaMax {
 				Game newPosition = new Game(position, capture);
 				int moveValue = -quiesce(newPosition, -beta, -alpha);
 				if (moveValue >= beta) {
-//					pastSearches.put(position, capture);
+					pastSearches.put(position, capture);
 					return moveValue;
 				}
 				if (moveValue > maxValue) {
@@ -156,9 +175,9 @@ public final class NegaMax {
 				}
 			}
 		}
-//		if (bestCapture != null){
-//			pastSearches.put(position, bestCapture);
-//		}
+		if (bestCapture != null){
+			pastSearches.put(position, bestCapture);
+		}
 		return Math.max(maxValue, stand_pat);
 
 	}
