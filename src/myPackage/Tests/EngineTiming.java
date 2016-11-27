@@ -14,10 +14,14 @@ public class EngineTiming {
 	public void timing() {
 		
 		NegaMax nm = new NegaMax(128,true);
-		//last time: 10.713 seconds
-		//hash used to look at lastBestMove first
+		//last time: 22.427 seconds
+		//boosts to king safety
+		//21.574
+		// use best capture in quiesce
+		//17.89 seconds
+		// update best move in quiesce
 		Game game = new Game();
-		for (int i = 0; i < 5; i++){
+		for (int i = 0; i < 10; i++){
 			game = new Game(game, nm.findBestMove(game, 5));
 		}
 //		Game[] storedPositions = new Game[1000000000]; // to create a memory error
