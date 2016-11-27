@@ -20,25 +20,25 @@ public class UCI {
 	            {
 	                System.out.println("id name Arby");
 	                System.out.println("id author LuckyAC");
-	                System.out.println("version hash size good");
+	                System.out.println("version backwards 2");
 	                System.out.println("option name Hash type spin default 1 min 1 max 128");
 	                System.out.println("uciok");
 	            }  else if (inputString.equals("ucinewgame")){
 	            	currGame = new Game();
-	            	num_moves = 0;
 	            }  else if (inputString.equals("isready")){
 	            	System.out.println("readyok");
 	            } else if (inputString.equals("stop")){
 	            	System.out.println("Not implemented");
 	            }  else if (inputString.startsWith("position")){
 	            	String[] moves = inputString.split(" ");
-	            	if (moves.length - 3 > num_moves){
-	            		for(int i = num_moves + 3; i < moves.length; i++){
-	            			Move lastMove = new Move(moves[i]); 
-	            			currGame = new Game(currGame, lastMove );
-	            			num_moves++;
-	            		}
-	            	}
+	            	num_moves = 0;
+	            	currGame = new Game();
+	            	for(int i = 3; i < moves.length; i++){
+	            		Move lastMove = new Move(moves[i]); 
+	           			currGame = new Game(currGame, lastMove );
+	           			num_moves++;
+	           		}
+	            	System.out.println(currGame);
 	            }  else if (inputString.startsWith("setoption name Hash value")){
 	            	int hashSize = Integer.parseInt(inputString.split(" ")[4]);
 	            	negaMax = new NegaMax(hashSize, QUIESCE);
