@@ -63,11 +63,11 @@ public class UCI {
 			Move nextMove =  possibleMoves.get(rnd);
 			return nextMove.convertToUCIFormat();
 		}
-		else if (num_moves <=29){
+		else if (num_moves <=59){
 			return negaMax.findBestMove(currGame, DEPTH).convertToUCIFormat();
 			}
-		else if (num_moves <=69){return negaMax.findBestMove(currGame, DEPTH+1).convertToUCIFormat();}
-		else if (num_moves <=99){return negaMax.findBestMove(currGame, DEPTH+2).convertToUCIFormat();}
+		else if (num_moves <=89){return negaMax.findBestMove(currGame, DEPTH+1).convertToUCIFormat();}
+		else if (num_moves <=129){return negaMax.findBestMove(currGame, DEPTH+2).convertToUCIFormat();}
 		else {return negaMax.findBestMove(currGame, DEPTH+3).convertToUCIFormat();}
 	}
 

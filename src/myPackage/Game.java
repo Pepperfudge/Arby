@@ -26,6 +26,8 @@ public class Game {
 
 	private static char[] whitePieces = { 'R', 'N', 'B', 'Q', 'K', 'P' };
 	private static char[] blackPieces = { 'r', 'n', 'b', 'q', 'k', 'p' };
+	
+	public ArrayList<Game> prevPositions; 
 
 	/*
 	 * default constructor to start a new game
@@ -43,6 +45,8 @@ public class Game {
 		blackKCastle = true;
 		whiteKingLocation = new int[] {0, 3};
 		blackKingLocation = new int[] {7, 3};
+		
+		prevPositions = new ArrayList<>();
 	}
 	
 	public char getPieceAt(int row, int col){
@@ -56,7 +60,9 @@ public class Game {
 		blackQCastle = prevPosition.blackQCastle;
 		blackKCastle = prevPosition.blackKCastle;
 
-
+		this.prevPositions = new ArrayList<Game>(prevPosition.prevPositions);
+		this.prevPositions.add(prevPosition);
+		
 		if (prevPosition.sideToMove == 'w') {
 			this.sideToMove = 'b';
 		} else {
@@ -339,6 +345,7 @@ public class Game {
 	}
 
 	public int evaluateBoard(){
+		
 		int positionScore=0;
 		int blackScore=0;
 		int whiteScore=0;

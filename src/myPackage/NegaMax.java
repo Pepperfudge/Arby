@@ -43,6 +43,13 @@ public final class NegaMax {
 	
 	private int evaluatePosition(Game position, int depth, 
 			int alpha, int beta) {
+		if (position.prevPositions.size() > 5){
+			for (int i = 0; i<5; i++){
+				if (position.equals(position.prevPositions.get(position.prevPositions.size() - i -1))){
+					return 0;
+				}
+			}
+		}
 		if (depth == 0) {
 			int score;
 			if (quiesce){
