@@ -58,7 +58,17 @@ public class UCI {
 	public static String findMove(){
 		if (num_moves == 0){
 			ArrayList<Move> possibleMoves = new ArrayList<>();
-			possibleMoves.add(new Move(1, 3, 3, 3)); possibleMoves.add(new Move(1, 4, 3, 4)); possibleMoves.add(new Move(1, 5, 3, 5)); possibleMoves.add(new Move(0, 1, 2, 2));
+			possibleMoves.add(new Move(1, 3, 3, 3)); possibleMoves.add(new Move(1, 4, 3, 4)); possibleMoves.add(new Move(1, 5, 3, 5)); 
+			possibleMoves.add(new Move(0, 1, 2, 2)); possibleMoves.add(new Move(1, 1, 2, 1)); possibleMoves.add(new Move(1, 6, 2, 6));
+			int rnd = new Random().nextInt(possibleMoves.size());
+			Move nextMove =  possibleMoves.get(rnd);
+			return nextMove.convertToUCIFormat();
+		}
+		else if (num_moves == 1){
+			ArrayList<Move> possibleMoves = new ArrayList<>();
+			possibleMoves.add(new Move(6, 4, 5, 4)); possibleMoves.add(new Move(6, 4, 4, 4)); possibleMoves.add(new Move(6, 3, 5, 3)); 
+			possibleMoves.add(new Move(6, 5, 4, 5)); possibleMoves.add(new Move(6, 6, 5, 6)); possibleMoves.add(new Move(6, 1, 5, 1));
+			possibleMoves.add(new Move(7, 1, 5, 2)); possibleMoves.add(new Move(7, 6, 5, 5)); possibleMoves.add(new Move(6, 5, 5, 5));
 			int rnd = new Random().nextInt(possibleMoves.size());
 			Move nextMove =  possibleMoves.get(rnd);
 			return nextMove.convertToUCIFormat();
