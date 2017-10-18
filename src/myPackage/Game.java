@@ -52,8 +52,10 @@ public class Game {
 
 	public char sideToMove;
 
-	private int[] whiteKingLocation;
-	private int[] blackKingLocation;
+	private int whiteKingLocation[] = new int[2];
+	private int blackKingLocation[] = new int[2];
+	
+	// private int whitePawns[]  = new int[8];
 
 	private boolean enPassant;
 	private int enPassantTarget;
@@ -89,9 +91,11 @@ public class Game {
 		whiteKCastle = true;
 		blackQCastle = true;
 		blackKCastle = true;
-		whiteKingLocation = new int[] {0, 3};
-		blackKingLocation = new int[] {7, 3};
-		
+		// whitePawns[0]  = 1; whitePawns[1]  = 1; whitePawns[2]  = 1; whitePawns[3]  = 1; whitePawns[4]  = 1; whitePawns[5]  = 1; whitePawns[6] = 1; whitePawns[7] = 1;
+		whiteKingLocation[0] = 0;
+		whiteKingLocation[1] = 3;	
+		blackKingLocation[0] = 7;
+		blackKingLocation[1] = 3;
 		prevPositions = new ArrayList<>();
 	}
 	
@@ -105,6 +109,10 @@ public class Game {
 		whiteKCastle = prevPosition.whiteKCastle;
 		blackQCastle = prevPosition.blackQCastle;
 		blackKCastle = prevPosition.blackKCastle;
+		whiteKingLocation[0] = prevPosition.whiteKingLocation[0];
+		whiteKingLocation[1] = prevPosition.whiteKingLocation[1];	
+		blackKingLocation[0] = prevPosition.blackKingLocation[0];
+		blackKingLocation[1] = prevPosition.blackKingLocation[1];
 
 		this.prevPositions = new ArrayList<Game>(prevPosition.prevPositions);
 		this.prevPositions.add(prevPosition);
@@ -127,9 +135,11 @@ public class Game {
 			if (piece == 'k') {
 				blackQCastle = false;
 				blackKCastle = false;
+				blackKingLocation[0] = move.newRow; blackKingLocation[1] = move.newColumn;
 			} else {
 				whiteQCastle = false;
 				whiteKCastle = false;
+				whiteKingLocation[0] = move.newRow; whiteKingLocation[1] = move.newColumn;
 			}
 			if (Math.abs(move.currColumn - move.newColumn) == 2) {
 				// king side castle
@@ -139,8 +149,15 @@ public class Game {
 				} else { // queen side castle
 					makeMove(new Move(move.currRow, 7, move.currRow, 4));
 				}
-			}
+			}	
 		}
+		
+		/* else {
+			whiteKingLocation[0] = prevPosition.whiteKingLocation[0];
+			 whiteKingLocation[1] = prevPosition.whiteKingLocation[1];	
+			 blackKingLocation[0] = prevPosition.blackKingLocation[0];
+			 blackKingLocation[1] = prevPosition.blackKingLocation[1];
+		} */ 
 
 		if (piece == 'r') {
 			if (blackKCastle && move.currColumn == 0 && move.currRow == 7) {
@@ -173,7 +190,7 @@ public class Game {
 				blackQCastle = false;
 			}
 		}
-
+		// whitePawns = prevPosition.whitePawns;
 		if (piece == 'p' || piece == 'P') {
 			if (Math.abs(move.currRow - move.newRow) == 2) {
 				enPassantTarget = move.newColumn;
@@ -190,9 +207,10 @@ public class Game {
 					board[4][move.newColumn] = 'x';
 				}
 			}
+			// whitePawns[move.newColumn] = move.newRow;
 		}
 		
-		if (piece == 'k' || piece == 'K') {
+		/*if (piece == 'k' || piece == 'K') {
 			for (int i = 0; i < 8; i++) {
 				for (int j = 0; j < 8; j++) {
 					if (board[i][j] == 'K') {
@@ -209,7 +227,7 @@ public class Game {
 										   prevPosition.whiteKingLocation[1]};	
 			blackKingLocation = new int[] {prevPosition.blackKingLocation[0],
 										   prevPosition.blackKingLocation[1]};
-		}
+		} */
 
 		// System.out.format("Turn to move: %s\n", sideToMove);
 
@@ -419,11 +437,14 @@ public class Game {
 		int blackTradeBonus = 0;
 		int whiteBishopCount = 0;
 		int blackBishopCount = 0;
+		int blackPawnCover = 0;
+		int whitePawnCover = 0;
 				
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
 				if (board[i][j] == 'x'){}
 				else if (board[i][j] == 'P'){
+					
 					//Encourage pawn chains
 					if (i>=3 && j>0 && j<7 && (board[i-1][j-1] == 'P' || board[i-1][j+1] == 'P')){
 						whitePawnStructure += 5;
@@ -515,7 +536,43 @@ public class Game {
 							whitePawnStructure = whitePawnStructure - 15;
 							}
 						}
-					}	
+					}
+					if (whiteKCastle == false && whiteMaterialScore > 1600){			
+						if (whiteKingLocation[1] == j){
+							if (i == whiteKingLocation[0]+1 || i == whiteKingLocation[0]){
+								whitePawnCover += 64;
+							}
+							else if (i == whiteKingLocation[0]+2){
+								whitePawnCover += 52;
+							}
+							else if (i == whiteKingLocation[0]+3){
+								whitePawnCover += 32;
+							}
+							else {whitePawnCover += 8;}
+						}	
+						if (whiteKingLocation[1] == j-1 || whiteKingLocation[1] == j+1){	
+							if (i == whiteKingLocation[0]+1 || i == whiteKingLocation[0] ){
+								whitePawnCover += 52;
+							}
+							else if (i == whiteKingLocation[0]+2){
+								whitePawnCover += 40;
+							}
+							else if (i == whiteKingLocation[0]+3){
+								whitePawnCover += 24;
+							}
+							else {whitePawnCover += 4;}
+						}
+						if (whiteKingLocation[1] == 0 && j == 2 || whiteKingLocation[1] == 7 && j == 5){
+							whitePawnCover += 16;
+							if (i == whiteKingLocation[0]+1 || i == whiteKingLocation[0] ){
+								whitePawnCover += 36;
+							}
+							else if (i == whiteKingLocation[0]+2){
+								whitePawnCover += 24;
+							}
+							else {whitePawnCover += 8;}
+						}
+					}
 				}
 				else if (board[i][j] == 'p'){
 					if (i<=4 && j>0 && j<7 && (board[i+1][j-1] == 'p' || board[i+1][j+1] == 'p')){
@@ -595,13 +652,48 @@ public class Game {
 						}
 						else if (i==1){blackPawnStructure = blackPawnStructure + 100;}	
 					}
-					if (i<=5){
-						for (int k = i+1; k <=6; k++){
-							if (board[k][j]=='p') {
-							blackPawnStructure = blackPawnStructure - 15;
-							}
+					
+					for (int k = i+1; k <=6; k++){
+						if (board[k][j]=='p') {
+						blackPawnStructure = blackPawnStructure - 15;
 						}
-					}	
+					}
+					if (blackKCastle == false && blackMaterialScore > 1600){			
+						if (blackKingLocation[1] == j){
+							if (i == blackKingLocation[0]-1 || i == blackKingLocation[0]){
+								blackPawnCover += 64;
+							}
+							else if (i == blackKingLocation[0]-2 ){
+								blackPawnCover += 52;
+							}
+							else if (i == blackKingLocation[0]-3){
+								blackPawnCover += 32;
+							}
+							else {blackPawnCover += 8;}
+						}	
+						if (blackKingLocation[1] == j-1 || blackKingLocation[1] == j+1){	
+							if (i == blackKingLocation[0]-1 || i == blackKingLocation[0]){
+								blackPawnCover += 52;
+							}
+							else if (i == blackKingLocation[0]-2 ){
+								blackPawnCover += 40;
+							}
+							else if (i == blackKingLocation[0]-3){
+								blackPawnCover += 24;
+							}
+							else {blackPawnCover += 4;}
+						}	
+						if (blackKingLocation[1] == 0 && j == 2 || blackKingLocation[1] == 7 && j == 5){
+							blackPawnCover += 16;
+							if (i == blackKingLocation[0]-1  || i == blackKingLocation[0]){
+								blackPawnCover += 36;
+							}
+							else if (i == blackKingLocation[0]-2){
+								blackPawnCover += 24;
+							}
+							else{blackPawnCover += 8;}
+						}
+					}			
 					
 			    }
 				else if (board[i][j] == 'B') {
@@ -938,23 +1030,27 @@ public class Game {
 					else if (j>=4 && blackKingLocation[1] >= 5){blackDefendingPieces = blackDefendingPieces + 1;}
 				}	
 			}	
-		}			
+		}		
 		
 		//blackKingSafety
 		if (whiteMaterialScore > 1600){
+			if (blackKCastle == false){ blackKingSafety -= (168 - blackPawnCover);}
 			//discourage pawn pushing on kingside before castling
-			if (blackKingLocation[1] <4){
+			else {
 				if (board[6][1] != 'p' && board[5][1] != 'p'){blackKingSafety = blackKingSafety - 20;}
 				if (board[6][1] != 'p' && board[6][1] != 'b'){blackKingSafety = blackKingSafety - 5;}
 				if (board[6][2] != 'p'){blackKingSafety = blackKingSafety - 10;}
 				if (board[6][0] != 'p' && board[5][0] != 'p'){blackKingSafety = blackKingSafety - 10;}
 			}
-			if (blackKingLocation[0] == 6) {blackKingSafety = blackKingSafety - 10;} 
-			else if (blackKingLocation[0] < 6) {blackKingSafety = blackKingSafety - 40;} 
+				
+			//discourage moving king forward
+			if (blackKingLocation[0] == 6) {blackKingSafety = blackKingSafety - 10;} 	
+			else if (blackKingLocation[0] < 6) {blackKingSafety = blackKingSafety - 40;}
+					
 			// encourage kingside castling
 			if (blackKingLocation[1] < 2 && board[7][0] != 'r'){ 
 				blackKingSafety = blackKingSafety + 30;
-				if (board[6][1] != 'p' && board[6][0] != 'p'){
+				/*  if (board[6][1] != 'p' && board[6][0] != 'p'){
 					blackKingSafety = blackKingSafety - 10;
 				}	
 				if (board[6][1] !='p' && board[5][1] !='p'){
@@ -963,16 +1059,17 @@ public class Game {
 				if (board[6][0] !='p' && board[5][0] !='p'){
 					blackKingSafety = blackKingSafety - 10;
 				}
-				if (board[6][2] != 'p'){blackKingSafety = blackKingSafety - 5;}
+				if (board[6][2] != 'p'){blackKingSafety = blackKingSafety - 5;} */
 			}
 			// encourage queenside castling
 			else if (blackKingLocation[1] > 4 && board[7][6] != 'r' && board[7][7] != 'r'){ 
 				blackKingSafety = blackKingSafety + 30;
-				if (blackKingLocation[1]==5) { 
+				/*if (blackKingLocation[1]==5) { 
 					blackKingSafety = blackKingSafety - 5;
 					if (board[6][5] != 'p' && board[5][5] != 'p'){blackKingSafety = blackKingSafety - 20;}
 					if (board[6][5] != 'p' && board[6][6] != 'p'){blackKingSafety = blackKingSafety - 10;}
 				}
+				
 				if (board[6][5] != 'p' && board[6][6] != 'p'){
 					blackKingSafety = blackKingSafety - 10;
 				}
@@ -981,51 +1078,44 @@ public class Game {
 				}
 				if (board[6][7] != 'p' && board[5][7] != 'p'){
 					blackKingSafety = blackKingSafety - 10;
-				}
+				} */
 			}
 			// Discourage losing ability to castle
-			if (blackKCastle == false && (blackKingLocation[1] == 3 || blackKingLocation[1] == 4
-			|| blackKingLocation[1] == 2 || (blackKingLocation[1] == 5 && (board[7][7]=='r' || board[7][6]=='r') ) ) ) {
+			if (blackKingLocation[1] == 4 || (blackKCastle == false && blackKingLocation[1] == 3)){
 				blackKingSafety = blackKingSafety - 30;
 				if (blackQCastle == false) {blackKingSafety = blackKingSafety - 30;}
 			}
+		    if ((blackKingLocation[1] == 2 && (board[7][0]=='r' || board[7][1]=='r')) || (blackKingLocation[1] == 5 && (board[7][7]=='r' || board[7][6]=='r'))) {
+		    	blackKingSafety = blackKingSafety - 30;
+		    }
 			if (whiteAttackingPieces >=3 && whiteAttackingPieces > blackDefendingPieces){
 				blackKingSafety = blackKingSafety - 20*(whiteAttackingPieces - blackDefendingPieces);
 			}
-			if (whiteMaterialScore < 2400){ blackKingSafety = blackKingSafety/2;}
+			if (whiteMaterialScore < 2600){ blackKingSafety = blackKingSafety*(whiteMaterialScore-1600)/1000;}
 		}
 		
 		//whiteKingSafety
 		if (blackMaterialScore > 1600){
-			if (whiteKingLocation[1] <4){
+			if (whiteKCastle == false) {whiteKingSafety -= (168 - whitePawnCover);}
+			else{
 				if (board[1][1] != 'P' && board[2][1] != 'P'){whiteKingSafety = whiteKingSafety - 20;}
 				if (board[1][1] != 'P' && board[1][1] != 'B'){whiteKingSafety = whiteKingSafety - 5;}
 				if (board[1][2] != 'P' ){whiteKingSafety = whiteKingSafety - 10;}
 				if (board[1][0] != 'P' && board[2][0] != 'P'){whiteKingSafety = whiteKingSafety - 10;}
-			}	
+			}
 			if (whiteKingLocation[0] == 1) {whiteKingSafety = whiteKingSafety - 10;}  
-			if (whiteKingLocation[0] > 1) {whiteKingSafety = whiteKingSafety - 40;}  
+			else if (whiteKingLocation[0] > 1) {whiteKingSafety = whiteKingSafety - 40;} 
+			//encourage kingside castling
 			if (whiteKingLocation[1] < 2 && board[0][0] != 'R'){ 
-				whiteKingSafety = whiteKingSafety + 30;	
-				if (board[1][1] != 'P' && board[1][0] != 'P'){
-					whiteKingSafety = whiteKingSafety - 10;
-				}	
-				if (board[1][1] != 'P' && board[2][1] != 'P'){
-					whiteKingSafety = whiteKingSafety - 10;
-				}
-				if (board[1][0] != 'P' && board[2][0] != 'P'){
-					whiteKingSafety = whiteKingSafety - 10;
-				}
-				if (board[1][2] != 'P'){whiteKingSafety = whiteKingSafety - 5;}
+				whiteKingSafety = whiteKingSafety + 30;
 			}
 			else if (whiteKingLocation[1] > 4 && board[0][6] != 'R' && board[0][7] != 'R'){ 
 				whiteKingSafety = whiteKingSafety + 30;
-				if (whiteKingLocation[1] == 5) { 
-					whiteKingSafety = whiteKingSafety - 5;
+				/* if (whiteKingLocation[1] == 5) { 
+					 whiteKingSafety = whiteKingSafety - 5;
 					if (board[1][5] != 'P' && board[2][5] != 'P'){whiteKingSafety = whiteKingSafety - 20;}
-					if (board[1][5] != 'P' && board[1][6] != 'P'){whiteKingSafety = whiteKingSafety - 10;}
-				}
-				
+					if (board[1][5] != 'P' && board[1][6] != 'P'){whiteKingSafety = whiteKingSafety - 10;} 
+				} 
 				if (board[1][6] != 'P' && board[1][7] != 'P'){
 					whiteKingSafety = whiteKingSafety - 10;
 				}
@@ -1034,17 +1124,19 @@ public class Game {
 				}
 				if (board[1][7] != 'P' && board[2][7] != 'P'){
 					whiteKingSafety = whiteKingSafety - 10;
-				}
+				} */
 			}	
-			if (whiteKCastle == false && ((whiteKingLocation[1] == 3 || whiteKingLocation[1] == 4 
-			|| whiteKingLocation[1] == 2) || (whiteKingLocation[1] == 5 && (board[0][7]=='R' || board[0][6] == 'R') ) ) ){
+			if (whiteKingLocation[1] == 4 || (whiteKCastle == false && whiteKingLocation[1] == 3)){
 				whiteKingSafety = whiteKingSafety - 30;
 				if (whiteQCastle == false) {whiteKingSafety = whiteKingSafety - 30;}
 			}
+		    if ((whiteKingLocation[1] == 2 && (board[0][0]=='R' || board[0][1]=='R')) || (whiteKingLocation[1] == 5 && (board[0][7]=='R' || board[0][6]=='R'))) {
+		    	whiteKingSafety = whiteKingSafety - 30;
+		    }
 			if (blackAttackingPieces >=3 && blackAttackingPieces > whiteDefendingPieces){
 				whiteKingSafety = whiteKingSafety - 20*(blackAttackingPieces - whiteDefendingPieces);
 			}
-			if (blackMaterialScore < 2400){ whiteKingSafety = whiteKingSafety/2;}
+			if (blackMaterialScore < 2600){ whiteKingSafety = whiteKingSafety*(blackMaterialScore-1600)/1000;}
 		}
 		
 		//blackDevelopment
@@ -1247,9 +1339,9 @@ public class Game {
 
 	public ArrayList<Move> generateLegalMoves() {
 		// System.out.println("generateLegalMoves");
-		// System.out.println("positionScore is " + evaluateBoard());
+		// System.out.println("king safety is " + evaluateBoard());
 		// System.out.println("Last move coordinates is" + lastMoveCol + lastMoveRow);
-		// System.out.println("whiteKcastle is" + whiteKCastle);
+		// System.out.println("whiteKingLocation" + whiteKingLocation[0] + whiteKingLocation[1]);
 		ArrayList<Move> moves = new ArrayList<Move>();
 		if (sideToMove == 'w') {
 			moves.addAll(generateWhiteMoves());
