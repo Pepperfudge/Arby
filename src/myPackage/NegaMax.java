@@ -20,7 +20,7 @@ public final class NegaMax {
 		ArrayList<Move> moves = position.generateLegalMoves();
 
 		int maxValue = CHECKMATE_VALUE;
-		Move bestMove = null;
+		Move bestMove = moves.get(0);
 		for (int i = 0; i < moves.size(); i++) {
 			// for (int i = 0; i < 2; i++){
 			Move move = moves.get(i);
